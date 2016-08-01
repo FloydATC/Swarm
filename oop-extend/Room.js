@@ -455,8 +455,8 @@ module.exports = {
                 let target_b = Game.getObjectById(creep_b.target);
                 if (target_a.id == target_b.id) { continue; } // Same target
 
-                catb = creep_a.pos.getRangeTo(target_b)
-                cbta = creep_b.pos.getRangeTo(target_a)
+                let catb = creep_a.pos.getRangeTo(target_b)
+                let cbta = creep_b.pos.getRangeTo(target_a)
                 if (cbta+1 < creep_b.range_to_target && catb+1 < creep_a.range_to_target) {
                     // Both would benefit
                     //console.log(this+' creeps '+creep_a+' ('+creep_a.range_to_target+'>'+catb+') and '+creep_b+' ('+creep_b.range_to_target+'>'+cbta+')  swapped targets');
