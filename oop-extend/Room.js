@@ -1,0 +1,543 @@
+
+
+module.exports = {
+
+    initialize: function() {
+        //console.log(this+' initializing');
+        this.my_creeps = this.find(FIND_MY_CREEPS);
+        this.my_creeps = this.my_creeps.sort( function(a,b) { return a.ticksToLive - b.ticksToLive; } );
+        this.hostile_creeps = this.find(FIND_HOSTILE_CREEPS);
+        this.dropped_energy = this.find(FIND_DROPPED_ENERGY);
+        this.dropped_other = this.find(FIND_DROPPED_RESOURCES, { filter: function(r) { return r.resourceType != RESOURCE_ENERGY; } });
+        this.sources = this.find(FIND_SOURCES);
+        this.spawns = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_SPAWN; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
+        this.towers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_TOWER; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
+        this.roads = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_ROAD; } });
+        this.extensions = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTENSION; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
+        this.containers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_STORAGE; } });
+        this.construction_sites = this.find(FIND_CONSTRUCTION_SITES).sort( function(a,b) { return b.progress - a.progress; } ); // Nearest completion first
+        this.need_repairs = this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits && s.hits < 250000 && s.hits < s.hitsMax; } }).sort( function(a,b) { return a.hits - b.hits; } ); // Most urgent first
+
+
+        // Request reinforcements if room is owned but has no spawn
+        if (this.controller && this.controller.my && this.spawns.length == 0 && this.my_creeps.length < 10) {
+            Game.request_drones = this.name;
+        }
+
+        //for (var i in this.need_repairs) {
+        //    var s = this.need_repairs[i];
+        //    console.log(this+' repair task '+i+': '+s+' '+s.hits+'/'+s.hitsMax);
+        //}
+
+        // Experimental router code
+        /*
+        var instance = this.memory.routing;
+        if (!instance) {
+            for (var x=0; x<=49; x++) {
+                instance[x] = [];
+                for (var y=0; y<=49; y++) {
+                    instance[x][y] = {};
+                    // Is tile walkable (i.e. needs a routing table)
+                    var tile = this.lookForAt(LOOK_TERRAIN, x, y);
+                    if (tile != 'wall') {
+                        var raw_table = [];
+                        var count = [];
+                        var src = getPositionAt(x, y);
+                        for (var to_x=0; to_x<=49; to_x++) {
+                            raw_table[to_x] = [];
+                            for (var to_y=0; to_y<=49; to_y++) {
+                                var dst = getPositionAt(x, y);
+                                var path = src.findPath(src, dst, { ignoreCreeps: true; serialize: true });
+                                var nexthop = path.charAt(4); // Should be 1..8 or "u"
+                                if (nexthop == 'u') { nexthop = 0; }
+                                count[nexthop] = (count[nexthop] + 1) || 1;
+                                raw_table[to_x][to_y] = nexthop;
+                            }
+                        }
+                        var table = {};
+                        // This is where we need some magic because raw_table is much too large to be kept in memory
+                        // 1. The most common direction will be the "default route" for this table
+                        // 2. Detect rectangles sharing the same direction
+                        // The end result should be something like this:
+                        table{'0-12,0-15'} = 8 // A large region in the upper left is reachable by walking northwest
+                        table{'13,16'} = 3 // A single position to the east
+                        table{'*'} = 1 // Default direction is north
+                        // Hash table = random key order
+                        // First match -> break (overlapping is not allowed except for default route)
+                        // No match -> use default
+                        // ...
+
+                        instance[x][y] = table;
+                    }
+                }
+            }
+            this.memory.routing = instance;
+        }
+        */
+
+
+        for (var i=0; i<this.my_creeps.length; i++) { this.my_creeps[i].initialize(); }
+        for (var i=0; i<this.towers.length; i++) { this.towers[i].initialize(); }
+        for (var i=0; i<this.sources.length; i++) { this.sources[i].initialize(); }
+        for (var i=0; i<this.spawns.length; i++) { this.spawns[i].initialize(); }
+        for (var i=0; i<this.containers.length; i++) { this.containers[i].initialize(); } // Note: Includes storage
+
+        this.containers = this.containers.sort( function(a,b) { return a.free - b.free; } ); // Note: Must initialize before sorting
+
+    },
+
+    repairable: function() {
+        return this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits != undefined && s.hits < s.hitsMax; } });
+    },
+
+    // Room.createCreep()
+    // Pick the spawner with most energy
+    createCreep: function(body, name, memory) {
+        if (this.spawns.length > 0) {
+            var spawn = this.spawns.sort( function(a,b) { return b.energy - a.energy; } )[0];
+            if (spawn.busy == true || spawn.spawning) { return ERR_BUSY; }
+            var result = spawn.canCreateCreep(body, name);
+            if (result == OK) {
+                result = spawn.createCreep(body, name, memory);
+                console.log(this+' '+spawn+' spawn '+body+' result='+result);
+                if (_.isString(result)) { result = OK; }
+                if (result == OK) { spawn.busy = true; }
+                return result;
+            } else {
+                return result;
+            }
+        } else {
+            return ERR_NOT_FOUND;
+        }
+    },
+
+    plan: function() {
+
+        var sources = this.sources.slice();
+        var spawns = this.spawns.slice();
+        var towers = this.towers.slice();
+        var drops = this.dropped_other.slice();
+        var extensions = this.extensions.slice(0,3); // 3 with least energy
+        var containers = this.containers.slice(0,3); // 3 with least energy
+        var my_creeps = this.my_creeps.slice(); // For now, all creeps are drones
+        var hostile_creeps = this.hostile_creeps.slice();
+        var csites = this.construction_sites.slice(0,3); // Max 3 at a time
+        var need_repairs = this.need_repairs.slice(0,3); // Max 3 at a time
+
+        var drones = [];
+        var swarmers = [];
+        var infectors = [];
+        var biters = [];
+        var spitters = [];
+
+        for (var i in my_creeps) {
+            var creep = my_creeps[i];
+            if (typeof creep == 'object') {
+                if (!creep.memory.class) { creep.memory.class = 'Drone'; console.log(this+' AMNESIAC '+creep+' assigned to Drone class'); }
+                if (creep.memory.class == 'Drone') { drones.push(creep); }
+                if (creep.memory.class == 'Swarmer') { swarmers.push(creep); }
+                if (creep.memory.class == 'Infector') { infectors.push(creep); }
+                if (creep.memory.class == 'Biter') { biters.push(creep); }
+                if (creep.memory.class == 'Spitter') { spitters.push(creep); }
+            } else {
+                console.log(this+' POSSIBLE SERVER ERROR: INVALID CREEP type='+(typeof creep)+' creep='+creep);
+            }
+        }
+
+        // Biters swarm and attack threats. Recycle when no longer needed.
+        while (biters.length > 0) {
+            var biter = biters.shift();
+            if (this.hostile_creeps.length > 0) {
+                // Priority 1: Target nearest threat
+                var candidates = this.hostile_creeps.slice();
+                while (candidates.length > 0) {
+                    var candidate = biter.shift_nearest(candidates);
+                    if (!candidate.is_harmless()) {
+                        biter.task = 'attack';
+                        biter.target = candidate.id;
+                        break;
+                    }
+                }
+                if (!biter.task) {
+                    // Priority 2: Target nearest harmless hostile
+                    var candidates = this.hostile_creeps.slice();
+                    var candidate = biter.shift_nearest(candidates);
+                    biter.task = 'attack';
+                    biter.target = candidate.id;
+                }
+            } else {
+                // Find nearest spawn and recycle there
+                var spawn = biter.shift_nearest(this.spawns.slice());
+                biter.task = 'recycle';
+                biter.target = spawn.id;
+            }
+
+        }
+
+        // Spitters swarm and attack threats. Recycle when no longer needed.
+        while (spitters.length > 0) {
+            var spitter = spitters.shift();
+            if (this.hostile_creeps.length > 0) {
+                // Priority 1: Target nearest threat
+                var candidates = this.hostile_creeps.slice();
+                while (candidates.length > 0) {
+                    var candidate = spitter.shift_nearest(candidates);
+                    if (!candidate.is_harmless()) {
+                        spitter.task = 'ranged attack';
+                        spitter.target = candidate.id;
+                        break;
+                    }
+                }
+                if (!spitter.task) {
+                    // Priority 2: Target nearest harmless hostile
+                    var candidates = this.hostile_creeps.slice();
+                    var candidate = spitter.shift_nearest(candidates);
+                    spitter.task = 'ranged attack';
+                    spitter.target = candidate.id;
+                }
+            } else {
+                // Find nearest spawn and recycle there
+                var spawn = spitter.shift_nearest(this.spawns.slice());
+                spitter.task = 'recycle';
+                spitter.target = spawn.id;
+            }
+
+        }
+
+        // Swarmers? Send them in the right direction or morph into Infector
+        while (swarmers.length > 0) {
+            var swarmer = swarmers.shift();
+            if (swarmer.memory.destination == this.name) {
+                swarmer.memory.class = 'Infector';
+                delete swarmer.memory.destination;
+                infectors.push(swarmer);
+            } else {
+                swarmer.task = 'travel';
+                swarmer.target = swarmer.id; // Dummy target
+            }
+        }
+
+        // Infectors? Use them to capture control point, then morph into Drone
+        while (infectors.length > 0) {
+            var infector = infectors.shift();
+            if (this.controller && this.controller.my == false) {
+                infector.task = 'claim';
+                infector.target = this.controller.id;
+            } else {
+                infector.memory.class = 'Drone';
+                drones.push(infector);
+            }
+        }
+
+        // Sources. The energy must flow. For each source, assign a drone.
+        while (drones.length > 0 && sources.length > 0) {
+            var drone = drones.shift();
+            var source = drone.shift_nearest(sources);
+
+            drone.task = 'mine';
+            drone.target = source.id;
+            //console.log(drone.name+' assigned to '+drone.task+' '+drone.target);
+            if (drones.length < 3) { break; } // Bootstrap/emergency
+        }
+
+        // Controller critical?
+        if (drones.length > 0 && this.controller && this.controller.my && this.controller.ticksToDowngrade < 2000) {
+            var drone = drones.shift();
+            drone.task = 'upgrade';
+            drone.target = this.controller.id;
+            //console.log(drone.name+' assigned to '+drone.task+' '+drone.target);
+        }
+
+        // Spawn needs energy?
+        while (drones.length > 0 && spawns.length > 0) {
+            var drone = drones.shift();
+            while (spawns.length > 0) {
+                var spawn = drone.shift_nearest(spawns);
+                if (spawn.energy < spawn.energyCapacity) {
+                    drone.task = 'feed spawn';
+                    drone.target = spawn.id;
+                    //console.log(drone.name+' assigned to '+drone.task+' '+drone.target);
+                    break;
+                }
+            }
+            if (typeof drone.task == 'undefined') {
+                // No spawns need energy
+                drones.push(drone);
+                break;
+            }
+        }
+
+        // Tower needs energy?
+        while (drones.length > 0 && towers.length > 0) {
+            var drone = drones.shift();
+            while (towers.length > 0) {
+                var tower = drone.shift_nearest(towers);
+                if (tower.energy < tower.energyCapacity) {
+                    drone.task = 'feed tower';
+                    drone.target = tower.id;
+                    //console.log(drone.name+' assigned to '+drone.task+' '+drone.target);
+                    tower.assigned = (tower.assigned +1) || 1;
+                    if (tower.energy_pct < 75 && tower.assigned < 2) { towers.push(tower); } // Get one more drone (want 2)
+                    if (tower.energy_pct < 50 && tower.assigned < 3) { towers.push(tower); } // Get one more drone (want 3)
+                    if (tower.energy_pct < 25 && tower.assigned < 4) { towers.push(tower); } // Get one more drone (want 4)
+                    break;
+                }
+            }
+            if (typeof drone.task == 'undefined') {
+                // No towers need energy
+                drones.push(drone);
+                break;
+            }
+        }
+
+        // Enemies dropped loot?
+        while (drones.length > 0 && drops.length > 0) {
+            var drone = drones.shift();
+            var loot = drone.shift_nearest(drops);
+            drone.task = 'pick up';
+            drone.target = loot.id;
+            //console.log(drone.name+' assigned to '+drone.task+' '+loot);
+        }
+
+        // Extensions needs energy?
+        while (drones.length > 0 && extensions.length > 0) {
+            var drone = drones.shift();
+            while (extensions.length > 0) {
+                var extension = drone.shift_nearest(extensions);
+                if (extension.energy < extension.energyCapacity) {
+                    drone.task = 'feed extension';
+                    drone.target = extension.id;
+                    //console.log(drone.name+' assigned to '+drone.task+' '+extension);
+                    break;
+                }
+            }
+            //console.log(drone.room+' '+drone+' task '+drone.task);
+            if (typeof drone.task == 'undefined') {
+                // No extensions need energy
+                drones.push(drone);
+                break;
+            }
+        }
+
+        // Repair stuff?
+        while (drones.length > 0 && need_repairs.length > 0) {
+            var drone = drones.shift();
+            while (need_repairs.length > 0) {
+                var structure = drone.shift_nearest(need_repairs);
+                if (structure.structureType == STRUCTURE_WALL && structure.hits >= 100000) { continue; }
+                drone.task = 'repair';
+                drone.target = structure.id;
+                //console.log(drone.name+' assigned to '+drone.task+' '+drone.target);
+                if (structure.structureType == STRUCTURE_WALL || structure.structureType == STRUCTURE_RAMPART) {
+                    need_repairs = [];
+                    break;
+                } // Only one
+            }
+            if (typeof drone.task == 'undefined') {
+                // No structures need repair
+                drones.push(drone);
+                break;
+            }
+        }
+
+        // Build stuff?
+        while (drones.length > 0 && csites.length > 0) {
+            var drone = drones.shift();
+            var csite = drone.shift_nearest(csites);
+            drone.task = 'build';
+            drone.target = csite.id;
+            if (csite.structureType == STRUCTURE_SPAWN && this.spawns.length == 0) {
+                csites.push(csite); // Emergency! Throw all remaining creeps on this task
+            }
+
+            //console.log(drone.name+' assigned to '+drone.task+' '+drone.target);
+        }
+
+        // Containers needs energy?
+        //console.log(this+' container assignments:');
+        while (drones.length > 0 && containers.length > 0) {
+            var drone = drones.shift();
+            while (containers.length > 0) {
+                //var container = drone.shift_nearest(containers);
+                var container = containers.shift();
+                if (container.free > 0) {
+                    drone.task = 'stockpile';
+                    drone.target = container.id;
+                    //console.log(drone.room+' '+drone.name+' assigned to '+drone.task+' '+container+' ('+container.energy+' energy)');
+                    break;
+                }
+            }
+            if (typeof drone.task == 'undefined') {
+                // No containers need energy
+                drones.push(drone);
+                break;
+            }
+        }
+
+        // If possible, assign two creeps to upgrading
+        var upgrader = 2;
+        while (upgrader && drones.length > 0 && this.controller && this.controller.my) {
+            upgrader--;
+            var drone = drones.shift();
+            drone.task = 'upgrade';
+            drone.target = this.controller.id;
+            //console.log(drone.name+' assigned to '+drone.task+' '+drone.target);
+        }
+
+        // Any leftover drones in the room? Mine energy
+        while (drones.length > 0) {
+            var drone = drones.shift();
+            drone.task = 'mine';
+            var source = Math.floor(Math.random() * this.sources.length);
+            drone.target = this.sources[source].id;
+        }
+
+        // Rudimentary spawn code
+        // Count remaining goals. More creeps needed?
+        var need = sources.length + towers.length + spawns.length + extensions.length + csites.length + need_repairs.length + upgrader;
+
+
+        if (this.hostile_creeps.length > 0 && this.towers.length == 0) {
+            // Emergency, spawn biters and spitters
+            if (Math.random() > 0.5) {
+                var result = this.createCreep([MOVE,ATTACK], undefined, { class: 'Biter' });
+            } else {
+                var result = this.createCreep([MOVE,RANGED_ATTACK], undefined, { class: 'Spitter' });
+            }
+        } else if (need > 0 || (this.my_creeps[0].ticksToLive < (CREEP_LIFE_TIME / 4) && this.spawn_reserves() > 50)) {
+            /*
+            console.log(this+' needs '+need);
+            console.log('  sources: '+sources.length);
+            console.log('  towers: '+towers.length);
+            console.log('  spawns: '+spawns.length);
+            console.log('  extensions: '+extensions.length);
+            console.log('  construction sites: '+csites.length);
+            console.log('  repairs: '+need_repairs.length);
+            */
+
+            // FIXME! Naive scaling code
+            var result = this.createCreep([MOVE,MOVE,MOVE,MOVE,MOVE,CARRY,CARRY,CARRY,CARRY,CARRY,WORK,WORK,WORK,WORK,WORK], undefined, { class: 'Drone' });
+            if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,MOVE,MOVE,CARRY,CARRY,CARRY,CARRY,WORK,WORK,WORK,WORK], undefined, { class: 'Drone' }); }
+            if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,MOVE,CARRY,CARRY,CARRY,WORK,WORK,WORK], undefined, { class: 'Drone' }); }
+            if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,CARRY,CARRY,WORK,WORK], undefined, { class: 'Drone' }); }
+            if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Drone' }); }
+            //console.log(this+' spawn result='+result);
+        } else if (Game.colonize && Game.time % 50 == 0) {
+            console.log(this+' spawning a creep to claim '+Game.colonize);
+            var result = this.createCreep([MOVE,CARRY,WORK,CLAIM], undefined, { class: 'Swarmer', destination: Game.colonize });
+        } else if (Game.request_drones && Game.time % 50 == 0) {
+            console.log(this+' spawning a creep to build spawn in '+Game.request_drones);
+            var result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Swarmer', destination: Game.request_drones });
+        }
+
+    },
+
+    optimize: function() {
+        // Swap tasks where it makes sense
+
+        // Calculate each creep's range to target
+        for (let i=0; i<this.my_creeps.length; i++) {
+            this.my_creeps[i].range_to_target = this.my_creeps[i].pos.getRangeTo(Game.getObjectById(this.my_creeps[i].target));
+        }
+
+        // For each creep, if both are same class, would they benefit from swapping targets?
+        for (let i=0; i<this.my_creeps.length; i++) {
+            let creep_a = this.my_creeps[i];
+            if (creep_a.range_to_target <= 1) { continue; } // Pointless
+            if (creep_a.memory.working == false) { continue; } // Out of energy
+            let target_a = Game.getObjectById(creep_a.target);
+            for (let j=0; j<this.my_creeps.length; j++) {
+                let creep_b = this.my_creeps[j];
+                if (creep_a.id == creep_b.id) { continue; } // Same creep
+                if (creep_b.range_to_target <= 1) { continue; } // Pointless
+                if (creep_b.memory.working == false) { continue; } // Out of energy
+                if (creep_a.memory.class != creep_b.memory.class) { continue; } // Not same class of creep
+                let target_b = Game.getObjectById(creep_b.target);
+                if (target_a.id == target_b.id) { continue; } // Same target
+
+                catb = creep_a.pos.getRangeTo(target_b)
+                cbta = creep_b.pos.getRangeTo(target_a)
+                if (cbta+1 < creep_b.range_to_target && catb+1 < creep_a.range_to_target) {
+                    // Both would benefit
+                    //console.log(this+' creeps '+creep_a+' ('+creep_a.range_to_target+'>'+catb+') and '+creep_b+' ('+creep_b.range_to_target+'>'+cbta+')  swapped targets');
+                    let target = creep_a.target;
+                    let task = creep_a.task;
+                    creep_a.target = creep_b.target;
+                    creep_a.task = creep_b.task;
+                    creep_b.target = creep_a.target;
+                    creep_b.task = creep_a.task;
+                    creep_a.say('swap');
+                    creep_b.say('swap');
+                }
+            }
+        }
+    },
+
+    execute: function() {
+        for (var i=0; i<this.towers.length; i++) { this.towers[i].execute(); }
+        for (var i=0; i<this.my_creeps.length; i++) { this.my_creeps[i].execute(); }
+    },
+
+    energy_reserves: function() {
+        if (this.energy_reserves) { return this.energy_reserves; }
+        var count = this.containers.length;
+        var total = 0;
+        var total_capacity = 0;
+        for (var i=0; i<count; i++) {
+            total += this.containers[i].store.energy;
+            total_capacity += this.containers[i].storeCapacity;
+        }
+        if (count > 0) {
+            var percent = total * 100 / total_capacity;
+            this.energy_reserves = percent;
+            console.log(this+' energy reserves at '+percent.toFixed(1)+'%');
+            return percent;
+        } else {
+            return 0;
+        }
+    },
+
+    spawn_reserves: function() {
+        if (this.spawn_reserves) { return this.spawn_reserves; }
+        var count = this.extensions.length;
+        var total = 0;
+        var total_capacity = 0;
+        for (var i=0; i<count; i++) {
+            total += this.extensions[i].energy;
+            total_capacity += this.containers[i].energyCapacity;
+        }
+        count = this.spawns.length;
+        for (var i=0; i<count; i++) {
+            total += this.spawns[i].energy;
+            total_capacity += this.spawns[i].energyCapacity;
+        }
+        if (total_capacity > 0) {
+            var percent = total * 100 / total_capacity;
+            this.spawn_reserves = percent;
+            console.log(this+' spawn reserves at '+percent.toFixed(1)+'%');
+            return percent;
+        } else {
+            return 0;
+        }
+    },
+
+    consider_road: function(creep) {
+        // creep.fatigue, creep.pos => construct road?
+        creep.say('Road?');
+        if (this.construction_sites.length > 2) { return; } // Throttle construction work
+        var coord = creep.pos.x + ',' + creep.pos.y;
+        var votes = this.memory.votes || {};
+        //console.log(this+' vote sheet before: '+JSON.stringify(votes));
+        votes[coord] = (votes[coord] + creep.fatigue) || creep.fatigue; // Count vote
+        //console.log(this+' vote sheet after: '+JSON.stringify(votes));
+        if (votes[coord] > this.roads.length) {
+            votes = {}; // Reset vote sheet
+            console.log(this+' build road at '+coord+' (have '+this.roads.length+')');
+            this.createConstructionSite(creep.pos.x, creep.pos.y, STRUCTURE_ROAD);
+        } else {
+            //console.log(this+' received '+votes[coord]+' votes for a road at '+coord+' (need '+this.roads.length+')');
+        }
+        this.memory.votes = votes; // Commit to memory
+    },
+
+};

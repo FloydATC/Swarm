@@ -1,0 +1,21 @@
+
+ScreepsAutocomplete
+  * Download https://github.com/Garethp/ScreepsAutocomplete
+  * Copy ScreepsAutocomplete in to your project folder
+  * Install the atom-ternjs package
+  * Create a file ".tern-project file"
+  {
+    "ecmaVersion": 6,
+    "libs": [],
+    "loadEagerly": [
+      "ScreepsAutocomplete/**/*.js"
+    ]
+  }
+  * Restart and Enjoy
+
+
+
+git init https://github.com/FloydATC/Swarm
+
+.gitignore
+ScreepsAutocomplete
