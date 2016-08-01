@@ -1,4 +1,7 @@
 
+//var m_universe = require('Universe');
+//var Universe = m_universe.c_universe;
+
 var extend_game = require('Game');
 var extend_creep = require('Creep');
 var extend_room = require('Room');
