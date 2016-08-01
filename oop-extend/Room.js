@@ -534,7 +534,8 @@ module.exports = {
         }
     },
 
-    assign_task_repair: function(creep, need_repairs){
+    // WAT
+    assign_task_repair: function(drones, need_repairs){
         while (drones.length > 0 && need_repairs.length > 0) {
             var drone = drones.shift();
             while (need_repairs.length > 0) {
@@ -556,7 +557,7 @@ module.exports = {
         }
     },
 
-    assign_task_build: function(creep, csites) {
+    assign_task_build: function(drones, csites) {
         while (drones.length > 0 && csites.length > 0) {
             var drone = drones.shift();
             var csite = drone.shift_nearest(csites);
