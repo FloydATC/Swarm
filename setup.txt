@@ -6,7 +6,7 @@ ScreepsAutocomplete
   * Download https://github.com/Garethp/ScreepsAutocomplete
   * Copy ScreepsAutocomplete in to your project folder
   * In Atom "settings", install the package "atom-ternjs"
-  * Create a file ".tern-project file"
+  * Create a file ".tern-project"
   {
     "ecmaVersion": 6,
     "libs": [],
