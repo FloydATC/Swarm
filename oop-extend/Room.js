@@ -599,7 +599,7 @@ module.exports = {
             drone.task = 'recycle';
             //var source = Math.floor(Math.random() * this.sources.length);
             //drone.target = this.sources[source].id;
-            var spawn = biter.shift_nearest(this.spawns.slice());
+            var spawn = drone.shift_nearest(this.spawns.slice());
             drone.target = spawn.id;
         }
     },
