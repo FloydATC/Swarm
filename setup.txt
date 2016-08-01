@@ -1,8 +1,11 @@
 
 ScreepsAutocomplete
+
+  // This lets Atom do auto-completion on the Screeps game API
+
   * Download https://github.com/Garethp/ScreepsAutocomplete
   * Copy ScreepsAutocomplete in to your project folder
-  * Install the atom-ternjs package
+  * In Atom "settings", install the package "atom-ternjs"
   * Create a file ".tern-project file"
   {
     "ecmaVersion": 6,
@@ -17,7 +20,11 @@ ScreepsAutocomplete
 
 Github integration
 
+  // The following goes to show my absolutely non-existing experience with git/github
+  // Seems to work, only time will tell what kind of problems it will cause down the road
+
   * Download and install Git
+  * In Atom "settings", install the package "github-plus"
   * Create a file ".gitignore"
 ScreepsAutocomplete
 
@@ -29,9 +36,19 @@ ScreepsAutocomplete
     - git remote -v
     - git push origin master -f // WARNING! Forced push overwrites master branch!
 
-  * Additional workstations
+  * Additional workstation setup
     - git clone https://github.com/FloydATC/Swarm
     - git add .
     - (edit)
     - git commit -m "Description"
     - git push origin master
+
+  * Typical work cycle
+    - git merge master
+    - (edit)
+    - git commit -m "Description"
+    - git push origin master
+
+
+Comments? Contact me: floyd@atc.no
+Pull requests not accepted, sorry. I don't know how to deal with them.
