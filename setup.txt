@@ -15,7 +15,23 @@ ScreepsAutocomplete
 
 
 
-git init https://github.com/FloydATC/Swarm
+Github integration
 
-.gitignore
+  * Download and install Git
+  * Create a file ".gitignore"
 ScreepsAutocomplete
+
+  * First time setup
+    - git init
+    - git add .
+    - git commit -m "First commit"
+    - git remote add origin https://github.com/FloydATC/Swarm
+    - git remote -v
+    - git push origin master -f // WARNING! Forced push overwrites master branch!
+
+  * Additional workstations
+    - git clone https://github.com/FloydATC/Swarm
+    - git add .
+    - (edit)
+    - git commit -m "Description"
+    - git push origin master
