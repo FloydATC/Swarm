@@ -343,8 +343,8 @@ module.exports = {
         var direction = p.charAt(offset);
         var vector = this.direction_vector(direction);
         var opposite = this.opposite_vector(vector[0], vector[1]);
-        var x1 = p.substring(0,2) * opposite[0];
-        var y1 = p.substring(2,4) * opposite[1];
+        var x1 = p.substring(0,2) + opposite[0];
+        var y1 = p.substring(2,4) + opposite[1];
         // Path begins at x1,y1 and describes how to reach target.pos.x,target.pos.y
         // For a path p1,p2,p3,p4, learn the following
         // p1-p2 p1-p3 p1-p4 p2-p3 p2-p4 p3-p4
@@ -369,12 +369,12 @@ module.exports = {
     move_to: function(target) {
         this.learn_path();
         if (this.pos.roomName == target.pos.roomName) {
-            var curpos = ('0'+this.pos.x).slice(-2) + ('0'+this.pos.y).slice(-2); // Format as XXYY
-            var endpos = ('0'+target.pos.x).slice(-2) + ('0'+target.pos.y).slice(-2); // Format as XXYY
             var direction = this.room.get_direction(this.pos, target.pos);
-            if (direction >= 1 && direction <= 8) { this.move(direction); } // Cache hit!
-            delete this.memory._move; //
-            return;
+            if (direction >= 1 && direction <= 8) {
+                this.move(direction);
+                delete this.memory._move; //
+                return;
+            }
         }
         this.moveTo(target);
     },
