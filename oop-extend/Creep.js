@@ -343,8 +343,8 @@ module.exports = {
         var direction = p.charAt(offset);
         var vector = this.direction_vector(direction);
         var opposite = this.opposite_vector(vector[0], vector[1]);
-        var x1 = p.substring(0,2) + opposite[0];
-        var y1 = p.substring(2,4) + opposite[1];
+        var x1 = p.substring(0,2)*1 + opposite[0];
+        var y1 = p.substring(2,4)*1 + opposite[1];
         // Path begins at x1,y1 and describes how to reach target.pos.x,target.pos.y
         // For a path p1,p2,p3,p4, learn the following
         // p1-p2 p1-p3 p1-p4 p2-p3 p2-p4 p3-p4
