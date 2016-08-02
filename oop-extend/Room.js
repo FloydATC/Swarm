@@ -189,22 +189,15 @@ module.exports = {
         // Containers needs energy?
         this.assign_task_stockpile(drones, containers);
 
-        // If possible, assign two creeps to upgrading
-        var upgrader = 2;
-        while (upgrader && drones.length > 0 && this.controller && this.controller.my) {
-            upgrader--;
-            var drone = drones.shift();
-            drone.task = 'upgrade';
-            drone.target = this.controller.id;
-            //console.log(drone.name+' assigned to '+drone.task+' '+drone.target);
-        }
-
-        // FINALLY: Any leftover drones in the room? Recycle.
-        this.assign_task_recycle(drones);
+        // FINALLY: Any leftover drones? Upgrade
+        let want_upgraders = 2;
+        let upgraders = this.assign_task_upgrade(drones);
+        let need_upgraders = (upgraders < want_upgraders ? want_upgraders - upgraders : 0);
+        
 
         // Rudimentary spawn code
         // Count remaining goals. More creeps needed?
-        var need = sources.length + towers.length + spawns.length + extensions.length + csites.length + need_repairs.length + upgrader;
+        var need = sources.length + towers.length + spawns.length + extensions.length + csites.length + need_repairs.length + need_upgraders;
 
 
         if (this.hostile_creeps.length > 0 && this.towers.length == 0) {
@@ -534,7 +527,6 @@ module.exports = {
         }
     },
 
-    // WAT
     assign_task_repair: function(drones, need_repairs){
         while (drones.length > 0 && need_repairs.length > 0) {
             var drone = drones.shift();
@@ -603,4 +595,17 @@ module.exports = {
             drone.target = spawn.id;
         }
     },
+
+    assign_task_upgrade: function(drones) {
+        let upgraders = 0;
+        while (drones.length > 0 && this.controller && this.controller.my) {
+            var drone = drones.shift();
+            drone.task = 'upgrade';
+            drone.target = this.controller.id;
+            upgraders++;
+            //console.log(drone.name+' assigned to '+drone.task+' '+drone.target);
+        }
+        return upgraders;
+    },
+
 };
