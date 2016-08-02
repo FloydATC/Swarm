@@ -118,7 +118,7 @@ module.exports = {
         var towers = this.towers.slice();
         var drops = this.dropped_other.slice();
         var extensions = this.extensions.slice(0,3); // 3 with least energy
-        var containers = this.containers.slice(0,3); // 3 with least energy
+        var containers = this.containers.reverse().slice(0,3); // 3 with least energy
         var my_creeps = this.my_creeps.slice(); // For now, all creeps are drones
         var hostile_creeps = this.hostile_creeps.slice();
         var csites = this.construction_sites.slice(0,3); // Max 3 at a time
@@ -193,7 +193,7 @@ module.exports = {
         let want_upgraders = 2;
         let upgraders = this.assign_task_upgrade(drones);
         let need_upgraders = (upgraders < want_upgraders ? want_upgraders - upgraders : 0);
-        
+
 
         // Rudimentary spawn code
         // Count remaining goals. More creeps needed?
