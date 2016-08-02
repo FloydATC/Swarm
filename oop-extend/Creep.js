@@ -343,17 +343,28 @@ module.exports = {
         let direction = p.charAt(offset);
         let vector = this.direction_vector(direction);
         let opposite = this.opposite_vector(vector[0], vector[1]);
-        let x = p.substring(0,2) * opposite[0];
-        let y = p.substring(2,4) * opposite[1];
-        // Path begins at x,y and describes how to reach target.pos.x,target.pos.y
+        let x1 = p.substring(0,2) * opposite[0];
+        let y1 = p.substring(2,4) * opposite[1];
+        // Path begins at x1,y1 and describes how to reach target.pos.x,target.pos.y
         // For a path p1,p2,p3,p4, learn the following
         // p1-p2 p1-p3 p1-p4 p2-p3 p2-p4 p3-p4
         for (let from_offset=4; from_offset<p.length - 1; from_offset++) {
+            let x2 = x1;
+            let y2 = y1;
             for (let to_offset=from_offset+1; to_offset<p.length; to_offset++) {
-                console.log(this+' path='+p+' from='+from_offset+' to='+to_offset);
+                let direction = p.charAt(to_offset);
+                let vector = this.direction_vector(direction);
+                x2 = x2 + vector[0];
+                y2 = y2 + vector[1];
+                console.log(this+' path='+p+' from='+from_offset+' ('+x1+','+y1+') to='+to_offset+' ('+x2+','+y2+')');
+                this.room.set_direction({ 'x': x1, 'y': y1 }, { 'x': x2, 'y': y2 });
             }
+            let direction = p.charAt(from_offset);
+            let vector = this.direction_vector(direction);
+            x1 = x1 + vector[0];
+            y1 = y1 + vector[1];
         }
-        
+
         //let curpos = ('0'+this.pos.x).slice(-2) + ('0'+this.pos.y).slice(-2); // Format as XXYY
         //let endpos = ('0'+target.pos.x).slice(-2) + ('0'+target.pos.y).slice(-2); // Format as XXYY
         //let direction = '';
@@ -365,7 +376,7 @@ module.exports = {
         if (this.pos.roomName == target.pos.roomName) {
             let curpos = ('0'+this.pos.x).slice(-2) + ('0'+this.pos.y).slice(-2); // Format as XXYY
             let endpos = ('0'+target.pos.x).slice(-2) + ('0'+target.pos.y).slice(-2); // Format as XXYY
-            let direction = this.room.memory.test[curpos][endpos];
+            let direction = this.room.get_direction(this.pos, target.pos);
             if (direction >= 1 && direction <= 8) { this.move(direction); } // Cache hit!
             delete this.memory._move; //
             return;
