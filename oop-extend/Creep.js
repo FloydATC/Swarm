@@ -239,9 +239,9 @@ module.exports = {
         if (this.pos.inRangeTo(target, 1)) {
             this.harvest(target);
             // Container with space within reach?
-            let containers = this.pos.findInRange(STRUCTURE_CONTAINER, 1);
-            let container = null;
-            for (let i=0; i<containers.length; i++) {
+            var containers = this.pos.findInRange(STRUCTURE_CONTAINER, 1);
+            var container = null;
+            for (var i=0; i<containers.length; i++) {
                 if (containers[i].free == 0) { continue; }
                 container = containers[i]
             }
@@ -323,7 +323,7 @@ module.exports = {
     },
 
     direction_vector: function(direction) {
-        let vec = [[0,0], [0,-1], [1,-1], [1,0], [1,1], [0,1], [-1,1], [-1,0], [-1,-1] ];
+        var vec = [[0,0], [0,-1], [1,-1], [1,0], [1,1], [0,1], [-1,1], [-1,0], [-1,-1] ];
         return vec[direction];
     },
 
@@ -338,29 +338,29 @@ module.exports = {
         if (this.memory._move.path.charAt(4) == 'u') { return; } // Undefined path
         if (typeof this.memory._move.dest == 'undefined') { return; } // No moveTo destination
         if (this.memory._move.room != this.memory._move.dest.room) { return; } // Not a local path
-        let p = this.memory._move.path
-        let offset = 4;
-        let direction = p.charAt(offset);
-        let vector = this.direction_vector(direction);
-        let opposite = this.opposite_vector(vector[0], vector[1]);
-        let x1 = p.substring(0,2) * opposite[0];
-        let y1 = p.substring(2,4) * opposite[1];
+        var p = this.memory._move.path;
+        var offset = 4;
+        var direction = p.charAt(offset);
+        var vector = this.direction_vector(direction);
+        var opposite = this.opposite_vector(vector[0], vector[1]);
+        var x1 = p.substring(0,2) * opposite[0];
+        var y1 = p.substring(2,4) * opposite[1];
         // Path begins at x1,y1 and describes how to reach target.pos.x,target.pos.y
         // For a path p1,p2,p3,p4, learn the following
         // p1-p2 p1-p3 p1-p4 p2-p3 p2-p4 p3-p4
         for (var offset1=4; offset1<p.length - 1; offset1++) {
-            let x2 = x1;
-            let y2 = y1;
+            var x2 = x1;
+            var y2 = y1;
             for (var offset2=offset1+1; offset2<p.length; offset2++) {
-                let direction2 = p.charAt(offset2);
-                let vector2 = this.direction_vector(direction2);
+                var direction2 = p.charAt(offset2);
+                var vector2 = this.direction_vector(direction2);
                 x2 = x2 + vector2[0];
                 y2 = y2 + vector2[1];
                 console.log(this+' path='+p+' from='+offset1+' ('+x1+','+y1+') to='+offset2+' ('+x2+','+y2+')');
                 this.room.set_direction({ 'x': x1, 'y': y1 }, { 'x': x2, 'y': y2 }, direction2);
             }
-            let direction1 = p.charAt(offset1);
-            let vector1 = this.direction_vector(direction1);
+            var direction1 = p.charAt(offset1);
+            var vector1 = this.direction_vector(direction1);
             x1 = x1 + vector1[0];
             y1 = y1 + vector1[1];
         }
@@ -369,9 +369,9 @@ module.exports = {
     move_to: function(target) {
         this.learn_path();
         if (this.pos.roomName == target.pos.roomName) {
-            let curpos = ('0'+this.pos.x).slice(-2) + ('0'+this.pos.y).slice(-2); // Format as XXYY
-            let endpos = ('0'+target.pos.x).slice(-2) + ('0'+target.pos.y).slice(-2); // Format as XXYY
-            let direction = this.room.get_direction(this.pos, target.pos);
+            var curpos = ('0'+this.pos.x).slice(-2) + ('0'+this.pos.y).slice(-2); // Format as XXYY
+            var endpos = ('0'+target.pos.x).slice(-2) + ('0'+target.pos.y).slice(-2); // Format as XXYY
+            var direction = this.room.get_direction(this.pos, target.pos);
             if (direction >= 1 && direction <= 8) { this.move(direction); } // Cache hit!
             delete this.memory._move; //
             return;

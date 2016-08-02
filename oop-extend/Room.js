@@ -190,9 +190,9 @@ module.exports = {
         this.assign_task_stockpile(drones, containers);
 
         // FINALLY: Any leftover drones? Upgrade
-        let want_upgraders = 2;
-        let upgraders = this.assign_task_upgrade(drones);
-        let need_upgraders = (upgraders < want_upgraders ? want_upgraders - upgraders : 0);
+        var want_upgraders = 2;
+        var upgraders = this.assign_task_upgrade(drones);
+        var need_upgraders = (upgraders < want_upgraders ? want_upgraders - upgraders : 0);
 
 
         // Rudimentary spawn code
@@ -239,32 +239,32 @@ module.exports = {
         // Swap tasks where it makes sense
 
         // Calculate each creep's range to target
-        for (let i=0; i<this.my_creeps.length; i++) {
+        for (var i=0; i<this.my_creeps.length; i++) {
             this.my_creeps[i].range_to_target = this.my_creeps[i].pos.getRangeTo(Game.getObjectById(this.my_creeps[i].target));
         }
 
         // For each creep, if both are same class, would they benefit from swapping targets?
-        for (let i=0; i<this.my_creeps.length; i++) {
-            let creep_a = this.my_creeps[i];
+        for (var i=0; i<this.my_creeps.length; i++) {
+            var creep_a = this.my_creeps[i];
             if (creep_a.range_to_target <= 1) { continue; } // Pointless
             if (creep_a.memory.working == false) { continue; } // Out of energy
-            let target_a = Game.getObjectById(creep_a.target);
-            for (let j=0; j<this.my_creeps.length; j++) {
-                let creep_b = this.my_creeps[j];
+            var target_a = Game.getObjectById(creep_a.target);
+            for (var j=0; j<this.my_creeps.length; j++) {
+                var creep_b = this.my_creeps[j];
                 if (creep_a.id == creep_b.id) { continue; } // Same creep
                 if (creep_b.range_to_target <= 1) { continue; } // Pointless
                 if (creep_b.memory.working == false) { continue; } // Out of energy
                 if (creep_a.memory.class != creep_b.memory.class) { continue; } // Not same class of creep
-                let target_b = Game.getObjectById(creep_b.target);
+                var target_b = Game.getObjectById(creep_b.target);
                 if (target_a.id == target_b.id) { continue; } // Same target
 
-                let catb = creep_a.pos.getRangeTo(target_b)
-                let cbta = creep_b.pos.getRangeTo(target_a)
+                var catb = creep_a.pos.getRangeTo(target_b)
+                var cbta = creep_b.pos.getRangeTo(target_a)
                 if (cbta+1 < creep_b.range_to_target && catb+1 < creep_a.range_to_target) {
                     // Both would benefit
                     //console.log(this+' creeps '+creep_a+' ('+creep_a.range_to_target+'>'+catb+') and '+creep_b+' ('+creep_b.range_to_target+'>'+cbta+')  swapped targets');
-                    let target = creep_a.target;
-                    let task = creep_a.task;
+                    var target = creep_a.target;
+                    var task = creep_a.task;
                     creep_a.target = creep_b.target;
                     creep_a.task = creep_b.task;
                     creep_b.target = creep_a.target;
@@ -597,7 +597,7 @@ module.exports = {
     },
 
     assign_task_upgrade: function(drones) {
-        let upgraders = 0;
+        var upgraders = 0;
         while (drones.length > 0 && this.controller && this.controller.my) {
             var drone = drones.shift();
             drone.task = 'upgrade';
@@ -609,16 +609,16 @@ module.exports = {
     },
 
     set_direction: function(src, dst, direction) {
-        let pos1 = ('0'+src.x).slice(-2) + ('0'+src.y).slice(-2); // Format as XXYY
-        let pos2 = ('0'+dst.x).slice(-2) + ('0'+dst.y).slice(-2); // Format as XXYY
+        var pos1 = ('0'+src.x).slice(-2) + ('0'+src.y).slice(-2); // Format as XXYY
+        var pos2 = ('0'+dst.x).slice(-2) + ('0'+dst.y).slice(-2); // Format as XXYY
         if (typeof this.memory.router == 'undefined') { this.memory.router = []; }
         if (typeof this.memory.router[pos1] == 'undefined') { this.memory.router[pos1] = []; }
         this.memory.router[pos1][pos2] = direction;
     },
 
     get_direction: function(src, dst) {
-        let pos1 = ('0'+src.x).slice(-2) + ('0'+src.y).slice(-2); // Format as XXYY
-        let pos2 = ('0'+dst.x).slice(-2) + ('0'+dst.y).slice(-2); // Format as XXYY
+        var pos1 = ('0'+src.x).slice(-2) + ('0'+src.y).slice(-2); // Format as XXYY
+        var pos2 = ('0'+dst.x).slice(-2) + ('0'+dst.y).slice(-2); // Format as XXYY
         if (typeof this.memory.router == 'undefined') { return null; }
         if (typeof this.memory.router[pos1] == 'undefined') { return null; }
         if (typeof this.memory.router[pos1][pos2] == 'undefined') { return null; }
