@@ -348,27 +348,22 @@ module.exports = {
         // Path begins at x1,y1 and describes how to reach target.pos.x,target.pos.y
         // For a path p1,p2,p3,p4, learn the following
         // p1-p2 p1-p3 p1-p4 p2-p3 p2-p4 p3-p4
-        for (let from_offset=4; from_offset<p.length - 1; from_offset++) {
+        for (var offset1=4; offset1<p.length - 1; offset1++) {
             let x2 = x1;
             let y2 = y1;
-            for (let to_offset=from_offset+1; to_offset<p.length; to_offset++) {
-                let direction = p.charAt(to_offset);
-                let vector = this.direction_vector(direction);
-                x2 = x2 + vector[0];
-                y2 = y2 + vector[1];
-                console.log(this+' path='+p+' from='+from_offset+' ('+x1+','+y1+') to='+to_offset+' ('+x2+','+y2+')');
-                this.room.set_direction({ 'x': x1, 'y': y1 }, { 'x': x2, 'y': y2 });
+            for (var offset2=offset1+1; offset2<p.length; offset2++) {
+                let direction2 = p.charAt(offset2);
+                let vector2 = this.direction_vector(direction2);
+                x2 = x2 + vector2[0];
+                y2 = y2 + vector2[1];
+                console.log(this+' path='+p+' from='+offset1+' ('+x1+','+y1+') to='+offset2+' ('+x2+','+y2+')');
+                this.room.set_direction({ 'x': x1, 'y': y1 }, { 'x': x2, 'y': y2 }, direction2);
             }
-            let direction = p.charAt(from_offset);
-            let vector = this.direction_vector(direction);
-            x1 = x1 + vector[0];
-            y1 = y1 + vector[1];
+            let direction1 = p.charAt(offset1);
+            let vector1 = this.direction_vector(direction1);
+            x1 = x1 + vector1[0];
+            y1 = y1 + vector1[1];
         }
-
-        //let curpos = ('0'+this.pos.x).slice(-2) + ('0'+this.pos.y).slice(-2); // Format as XXYY
-        //let endpos = ('0'+target.pos.x).slice(-2) + ('0'+target.pos.y).slice(-2); // Format as XXYY
-        //let direction = '';
-        //this.room.memory.router[curpos][endpos] = direction;
     },
 
     move_to: function(target) {
