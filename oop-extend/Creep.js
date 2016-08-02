@@ -54,7 +54,7 @@ module.exports = {
                 this.memory.tracking = false;
 
             } else {
-                this.moveTo(target);
+                this.move_to(target);
                 this.memory.tracking = false;
             }
             return;
@@ -105,7 +105,7 @@ module.exports = {
                     this.memory.tracking = false;
                 } else {
                     //console.log(this+' moving to pick up '+energy);
-                    this.moveTo(energy);
+                    this.move_to(energy);
                     this.memory.tracking = false;
                 }
                 return;
@@ -126,7 +126,7 @@ module.exports = {
                         this.withdraw(container, RESOURCE_ENERGY);
                         this.memory.tracking = true;
                     } else {
-                        this.moveTo(container);
+                        this.move_to(container);
                         this.memory.tracking = false;
                     }
                     return;
@@ -148,7 +148,7 @@ module.exports = {
                     this.harvest(source);
                     this.memory.tracking = true;
                 } else {
-                    this.moveTo(source);
+                    this.move_to(source);
                     this.memory.tracking = false;
                 }
                 return;
@@ -187,7 +187,7 @@ module.exports = {
             this.attack(target);
             this.memory.tracking = false;
         } else {
-            this.moveTo(target);
+            this.move_to(target);
             this.memory.tracking = false;
         }
         return;
@@ -199,7 +199,7 @@ module.exports = {
             this.rangedAttack(target);
             this.memory.tracking = false;
         } else {
-            this.moveTo(target);
+            this.move_to(target);
             this.memory.tracking = false;
         }
         return;
@@ -215,7 +215,7 @@ module.exports = {
             }
             this.memory.tracking = false;
         } else {
-            this.moveTo(target);
+            this.move_to(target);
             this.memory.tracking = false;
         }
         return;
@@ -228,7 +228,7 @@ module.exports = {
             this.memory.tracking = false;
         } else {
             if (this.carry.energy) { this.drop(RESOURCE_ENERGY); } // Make room for valuables!
-            this.moveTo(target);
+            this.move_to(target);
             this.memory.tracking = false;
         }
         return;
@@ -253,7 +253,7 @@ module.exports = {
             }
             this.memory.tracking = false;
         } else {
-            this.moveTo(target);
+            this.move_to(target);
             this.memory.tracking = true;
         }
         return;
@@ -265,14 +265,14 @@ module.exports = {
             this.claimController(target);
             this.memory.tracking = false;
         } else {
-            this.moveTo(target);
+            this.move_to(target);
             this.memory.tracking = false;
         }
         return;
     },
 
     task_travel: function() {
-        var result = this.moveTo(new RoomPosition(25, 25, this.memory.destination));
+        var result = this.move_to(new RoomPosition(25, 25, this.memory.destination));
         this.memory.tracking = true;
         //console.log(this+' moveTo '+this.memory.destination+' result='+result);
         return;
@@ -283,7 +283,7 @@ module.exports = {
         if (this.pos.inRangeTo(target, 1)) {
             this.transfer(target, RESOURCE_ENERGY);
         } else {
-            this.moveTo(target);
+            this.move_to(target);
         }
         return;
     },
@@ -294,7 +294,7 @@ module.exports = {
             this.build(target)
             this.memory.tracking = false;
         } else {
-            this.moveTo(target);
+            this.move_to(target);
             this.memory.tracking = false;
         }
         return;
@@ -306,7 +306,7 @@ module.exports = {
             this.repair(target)
             this.memory.tracking = false;
         } else {
-            this.moveTo(target, { maxRooms: 0 }); // Stay in this room!
+            this.move_to(target, { maxRooms: 0 }); // Stay in this room!
             this.memory.tracking = false;
         }
         return;
@@ -317,8 +317,59 @@ module.exports = {
         if (this.pos.inRangeTo(target, 3)) {
             this.upgradeController(target);
         } else {
-            this.moveTo(target);
+            this.move_to(target);
         }
         return;
+    },
+
+    direction_vector: function(direction) {
+        let vec = [[0,0], [0,-1], [1,-1], [1,0], [1,1], [0,1], [-1,1], [-1,0], [-1,-1] ];
+        return vec[direction];
+    },
+
+    opposite_vector: function(x,y) {
+        return [x*-1, y*-1];
+    },
+
+    learn_path: function() {
+        if (this.memory.tracking != true) { return; } // Do not track this creep
+        if (typeof this.memory._move == 'undefined') { return; } // No moveTo data
+        if (typeof this.memory._move.path == 'undefined') { return; } // No moveTo path
+        if (this.memory._move.path.charAt(4) == 'u') { return; } // Undefined path
+        if (typeof this.memory._move.dest == 'undefined') { return; } // No moveTo destination
+        if (this.memory._move.room != this.memory._move.dest.room) { return; } // Not a local path
+        let p = this.memory._move.path
+        let offset = 4;
+        let direction = p.charAt(offset);
+        let vector = this.direction_vector(direction);
+        let opposite = this.opposite_vector(vector[0], vector[1]);
+        let x = p.substring(0,2) * opposite[0];
+        let y = p.substring(2,4) * opposite[1];
+        // Path begins at x,y and describes how to reach target.pos.x,target.pos.y
+        // For a path p1,p2,p3,p4, learn the following
+        // p1-p2 p1-p3 p1-p4 p2-p3 p2-p4 p3-p4
+        for (let from_offset=4; from_offset<p.length - 1; from_offset++) {
+            for (let to_offset=from_offset+1; to_offset<p.length; to_offset++) {
+                console.log(this+' path='+p+' from='+from_offset+' to='+to_offset);
+            }
+        }
+        
+        //let curpos = ('0'+this.pos.x).slice(-2) + ('0'+this.pos.y).slice(-2); // Format as XXYY
+        //let endpos = ('0'+target.pos.x).slice(-2) + ('0'+target.pos.y).slice(-2); // Format as XXYY
+        //let direction = '';
+        //this.room.memory.router[curpos][endpos] = direction;
+    },
+
+    move_to: function(target) {
+        this.learn_path();
+        if (this.pos.roomName == target.pos.roomName) {
+            let curpos = ('0'+this.pos.x).slice(-2) + ('0'+this.pos.y).slice(-2); // Format as XXYY
+            let endpos = ('0'+target.pos.x).slice(-2) + ('0'+target.pos.y).slice(-2); // Format as XXYY
+            let direction = this.room.memory.test[curpos][endpos];
+            if (direction >= 1 && direction <= 8) { this.move(direction); } // Cache hit!
+            delete this.memory._move; //
+            return;
+        }
+        this.moveTo(target);
     },
 };
