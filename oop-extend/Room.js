@@ -615,6 +615,7 @@ module.exports = {
         if (!this.memory.router[pos1]) { this.memory.router[pos1] = {}; }
         //console.log('-->:'+pos1+'-'+pos2+'='+direction);
         this.memory.router[pos1][pos2] = direction;
+        this.memory.router[pos1]['mru'] = Game.time;
     },
 
     get_direction: function(src, dst) {
@@ -625,7 +626,20 @@ module.exports = {
         if (!this.memory.router[pos1]) { return null; }
         if (!this.memory.router[pos1][pos2]) { return null; }
         var direction = this.memory.router[pos1][pos2];
+        this.memory.router[pos1]['mru'] = Game.time;
         //console.log('HIT:'+pos1+'-'+pos2+'='+direction);
         return direction;
+    },
+
+    expire_routes: function() {
+        if (this.memory.router) {
+            var maxage = Game.time - 900; // Drop routing table for tiles not visited in 'maxage' ticks
+            var tiles = Object.keys(this.memory.router);
+            for (var i=0; i<tiles.length; i++) {
+                if (this.memory.router[tiles[i]]['mru'] < maxage) {
+                    delete this.memory.router[tiles[i]];
+                }
+            }
+        }
     },
 };
