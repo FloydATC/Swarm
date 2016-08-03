@@ -408,9 +408,14 @@ module.exports = {
             // Another creep is moving there using moveTo()
             if (creep.memory._move && creep.memory._move.dest.x == pos.x && creep.memory._move.dest.y == pos.y) { return false; }
             // Another creep is sitting there but has not indicated a movement (yet)
-            if (!creep.moving_to && !creep.memory._move && creep.pos.x == pos.x && creep.pos.y == pos.y) { return false; }
+            if (!creep.memory.moving_to && !creep.memory._move && creep.pos.x == pos.x && creep.pos.y == pos.y) { return false; }
         }
-        this.moving_to = { x: pos.x, y: pos.y }; // Make reservation
+        if (this.memory.moving_to && this.memory.moving_to.x == pos.x && this.memory.moving_to.y == pos.y) {
+            // We already tried this move
+            delete this.memory.moving_to;
+            return false;
+        }
+        this.memory.moving_to = { x: pos.x, y: pos.y }; // Make reservation
         return true;
     },
 
