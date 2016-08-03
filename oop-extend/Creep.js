@@ -374,7 +374,7 @@ module.exports = {
             if (direction >= 1 && direction <= 8) {
                 //console.log('#DEBUG '+this+' ROUTER move('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+')');
                 var newpos = this.next_position(direction);
-                if (this.reserve_position(newpos)) {
+                if (this.reserve_position(newpos) == true) {
                     this.move(direction);
                     this.say(direction);
                     delete this.memory._move;
