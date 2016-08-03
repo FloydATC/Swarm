@@ -207,7 +207,7 @@ module.exports = {
             } else {
                 var result = this.createCreep([MOVE,RANGED_ATTACK], undefined, { class: 'Spitter' });
             }
-        } else if (need > 0 || (this.my_creeps[0].ticksToLive < (CREEP_LIFE_TIME / 4) && this.spawn_reserves() > 50)) {
+        } else if (need > 0 || (this.my_creeps[0].ticksToLive < (CREEP_LIFE_TIME / 4) && this.spawn_reserves() > 50 && upgraders < 4)) {
             /*
             console.log(this+' needs '+need);
             console.log('  sources: '+sources.length);
