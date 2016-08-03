@@ -391,7 +391,7 @@ module.exports = {
     },
 
     next_position: function(direction) {
-        var vector = direction_vector(direction);
+        var vector = this.direction_vector(direction);
         var newpos = new RoomPosition(this.pos.x + vector[0], this.pos.y + vector[1], this.pos.roomName);
         if (newpos.x < 0 || newpos.y < 0 || newpos.x > 49 || newpos.y > 49) { return null; } // Boundary checks
         return newpos;
