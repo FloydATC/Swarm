@@ -373,14 +373,45 @@ module.exports = {
             var direction = this.room.get_direction(this.pos, target.pos);
             if (direction >= 1 && direction <= 8) {
                 //console.log('#DEBUG '+this+' ROUTER move('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+')');
-                this.move(direction);
-                this.say(direction);
-                delete this.memory._move; //
+                var newpos = this.next_position(direction);
+                if (this.reserve_position(newpos)) {}
+                    this.move(direction);
+                    this.say(direction);
+                    delete this.memory._move;
+                } else {
+                    this.say('Traffic');
+                    this.moveTo(target); // Try to avoid other creeps but do not learn path
+                }
                 return;
             }
         }
         //console.log('#DEBUG '+this+' moveTo('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+')');
-        this.moveTo(target);
+        this.moveTo(target, { ignoreCreeps: true; } );
         this.learn_path();
     },
+
+    next_position: function(direction) {
+        var vector = direction_vector(direction);
+        var newpos = new RoomPosition(this.pos.x + vector[0], this.pos.y + vector[1], this.pos.roomName);
+        if (newpos.x < 0 || newpos.y < 0 || newpos.x > 49 || newpos.y > 49) { return null; } // Boundary checks
+        return newpos;
+    },
+
+    reserve_position: function(pos) {
+        // Collision detection. Return true if reservation successful (= move ok)
+        // Return false if another creep has reserved or will move there using moveTo()
+        var creeps_in_room = this.room.my_creeps.length;
+        for (var i=0; i<creeps_in_room; i++) {
+            var creep = this.room.my_creeps[i];
+            // Another creep has already reserved that position
+            if (creep.moving_to && creep.moving_to.x == pos.x && creep.moving_to.y == pos.y) { return false; }
+            // Another creep is moving there using moveTo()
+            if (creep.memory._move && creep.memory._move.dest.x == pos.x && creep.memory._move.dest.y == pos.y) { return false; }
+            // Another creep is sitting there but has not indicated a movement (yet)
+            if (!creep.moving_to && !creep.memory._move && creep.pos.x == pos.x && creep.pos.y == pos.y) { return false; }
+            this.moving_to = { x: pos.x, y: pos.y }; // Make reservation
+            return true;
+        }
+    },
+
 };
