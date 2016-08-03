@@ -611,17 +611,21 @@ module.exports = {
     set_direction: function(src, dst, direction) {
         var pos1 = ('0'+src.x).slice(-2) + ('0'+src.y).slice(-2); // Format as XXYY
         var pos2 = ('0'+dst.x).slice(-2) + ('0'+dst.y).slice(-2); // Format as XXYY
-        if (typeof this.memory.router == 'undefined') { this.memory.router = []; }
-        if (typeof this.memory.router[pos1] == 'undefined') { this.memory.router[pos1] = []; }
+        if (!this.memory.router) { this.memory.router = {}; }
+        if (!this.memory.router[pos1]) { this.memory.router[pos1] = {}; }
+        //console.log('-->:'+pos1+'-'+pos2+'='+direction);
         this.memory.router[pos1][pos2] = direction;
     },
 
     get_direction: function(src, dst) {
         var pos1 = ('0'+src.x).slice(-2) + ('0'+src.y).slice(-2); // Format as XXYY
         var pos2 = ('0'+dst.x).slice(-2) + ('0'+dst.y).slice(-2); // Format as XXYY
-        if (typeof this.memory.router == 'undefined') { return null; }
-        if (typeof this.memory.router[pos1] == 'undefined') { return null; }
-        if (typeof this.memory.router[pos1][pos2] == 'undefined') { return null; }
-        return this.memory.router[pos1][pos2];
+        //console.log('???:'+pos1+'-'+pos2);
+        if (!this.memory.router) { return null; }
+        if (!this.memory.router[pos1]) { return null; }
+        if (!this.memory.router[pos1][pos2]) { return null; }
+        var direction = this.memory.router[pos1][pos2];
+        //console.log('HIT:'+pos1+'-'+pos2+'='+direction);
+        return direction;
     },
 };

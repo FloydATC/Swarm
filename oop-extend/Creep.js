@@ -332,7 +332,7 @@ module.exports = {
     },
 
     learn_path: function() {
-        if (this.memory.tracking != true) { return; } // Do not track this creep
+        //if (this.memory.tracking != true) { return; } // Do not track this creep
         if (typeof this.memory._move == 'undefined') { return; } // No moveTo data
         if (typeof this.memory._move.path == 'undefined') { return; } // No moveTo path
         if (this.memory._move.path.charAt(4) == 'u') { return; } // Undefined path
@@ -345,37 +345,41 @@ module.exports = {
         var opposite = this.opposite_vector(vector[0], vector[1]);
         var x1 = p.substring(0,2)*1 + opposite[0];
         var y1 = p.substring(2,4)*1 + opposite[1];
+        //console.log(this+' p='+p+' x1='+x1+' y1='+y1);
         // Path begins at x1,y1 and describes how to reach target.pos.x,target.pos.y
         // For a path p1,p2,p3,p4, learn the following
         // p1-p2 p1-p3 p1-p4 p2-p3 p2-p4 p3-p4
-        for (var offset1=4; offset1<p.length - 1; offset1++) {
+        for (var offset1=4; offset1<p.length-2; offset1++) {
             var x2 = x1;
             var y2 = y1;
-            for (var offset2=offset1+1; offset2<p.length; offset2++) {
+            for (var offset2=offset1+1; offset2<p.length-1; offset2++) {
                 var direction2 = p.charAt(offset2);
                 var vector2 = this.direction_vector(direction2);
                 x2 = x2 + vector2[0];
                 y2 = y2 + vector2[1];
-                console.log(this+' path='+p+' from='+offset1+' ('+x1+','+y1+') to='+offset2+' ('+x2+','+y2+')');
-                this.room.set_direction({ 'x': x1, 'y': y1 }, { 'x': x2, 'y': y2 }, direction2);
+                //console.log(this+' path='+p+' from='+offset1+' ('+x1+','+y1+') to='+offset2+' ('+x2+','+y2+') direction='+direction1);
+                this.room.set_direction({ 'x': x1, 'y': y1 }, { 'x': x2, 'y': y2 }, nexthop);
             }
-            var direction1 = p.charAt(offset1);
-            var vector1 = this.direction_vector(direction1);
+            var nexthop = p.charAt(offset1);
+            var vector1 = this.direction_vector(nexthop);
             x1 = x1 + vector1[0];
             y1 = y1 + vector1[1];
         }
     },
 
     move_to: function(target) {
-        this.learn_path();
         if (this.pos.roomName == target.pos.roomName) {
             var direction = this.room.get_direction(this.pos, target.pos);
             if (direction >= 1 && direction <= 8) {
+                console.log('#DEBUG '+this+' ROUTER move()');
                 this.move(direction);
+                this.say(direction);
                 delete this.memory._move; //
                 return;
             }
         }
+        console.log('#DEBUG '+this+' moveTo()');
         this.moveTo(target);
+        this.learn_path();
     },
 };
