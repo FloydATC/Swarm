@@ -386,7 +386,7 @@ module.exports = {
             }
         }
         //console.log('#DEBUG '+this+' moveTo('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+')');
-        this.moveTo(target, { ignoreCreeps: true; } );
+        this.moveTo(target, { ignoreCreeps: true } );
         this.learn_path();
     },
 
