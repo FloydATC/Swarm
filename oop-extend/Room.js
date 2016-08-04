@@ -121,6 +121,7 @@ module.exports = {
         var sources = this.sources.slice();
         var spawns = this.spawns.slice();
         var towers = this.towers.slice();
+        var links = this.links.slice();
         var drops = this.dropped_other.slice();
         var extensions = this.extensions.slice(0,3); // 3 with least energy
         var containers = this.containers.reverse().slice(0,3); // 3 with least energy
@@ -178,6 +179,9 @@ module.exports = {
 
         // Tower needs energy?
         this.assign_task_feed_tower(drones, towers);
+
+        // Links can aid the feeding of towers
+        this.assign_task_feed_link(drones, links);
 
         // Enemies dropped loot?
         this.assign_task_pick_up(drones, drops);
@@ -495,6 +499,27 @@ module.exports = {
             }
             if (typeof drone.task == 'undefined') {
                 // No towers need energy
+                drones.push(drone);
+                break;
+            }
+        }
+    },
+
+    assign_task_feed_link: function(drones, links) {
+        while (drones.length > 0 && links.length > 0) {
+            var drone = drones.shift();
+            while (links.length > 0) {
+                if (this.link_average < this.energyCapacity / 2) {
+                    // Link network needs energy, we just need the closest link
+                    var link = drone.shift_nearest(links);
+                    drone.task = 'feed link';
+                    drone.target = link.id; // Will switch whenever needed
+                    //console.log(drone.name+' assigned to '+drone.task+' '+drone.target);
+                    return;
+                }
+            }
+            if (typeof drone.task == 'undefined') {
+                // Nearest link does not need energy
                 drones.push(drone);
                 break;
             }

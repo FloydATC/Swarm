@@ -78,6 +78,7 @@ module.exports = {
 
         // Tasks that consume energy
         if (this.task == 'feed spawn') { this.task_feed(); return; }
+        if (this.task == 'feed link') { this.task_feed_link(); return; }
         if (this.task == 'feed tower') { this.task_feed(); return; }
         if (this.task == 'feed extension') { this.task_feed(); return; }
         if (this.task == 'stockpile') { this.task_feed(); return; }
@@ -280,6 +281,17 @@ module.exports = {
 
     task_feed: function() {
         var target = Game.getObjectById(this.target);
+        if (this.pos.inRangeTo(target, 1)) {
+            this.transfer(target, RESOURCE_ENERGY);
+        } else {
+            this.move_to(target);
+        }
+        return;
+    },
+
+    task_feed_link: function() {
+        var target = this.shift_nearest(this.room.links.slice())); // Always switch to nearest
+        this.target = target.id;
         if (this.pos.inRangeTo(target, 1)) {
             this.transfer(target, RESOURCE_ENERGY);
         } else {
