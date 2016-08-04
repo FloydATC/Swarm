@@ -464,7 +464,7 @@ module.exports = {
                     // Link network needs energy, we just need the closest link
                     drone.task = 'feed link';
                     drone.target = link.id; // Will switch whenever needed
-                    console.log(drone.name+' assigned to '+drone.task+' '+drone.target);
+                    //console.log(drone.name+' assigned to '+drone.task+' '+drone.target);
                     return;
                 }
             }
