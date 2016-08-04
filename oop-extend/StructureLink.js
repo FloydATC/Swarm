@@ -21,7 +21,7 @@ module.exports = {
 
     shift_least_energy: function(objects) {
         objects = objects.sort( function(a,b) { a.energy - b.energy } );
-        console.log(JSON.stringify(objects));
+        console.log(objects);
         return objects.shift();
     },
 };
