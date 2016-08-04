@@ -458,7 +458,7 @@ module.exports = {
     assign_task_feed_link: function(drones, links) {
         while (drones.length > 0 && links.length > 0) {
             var drone = drones.shift();
-            while (links.length > 0) {
+            if (links.length > 0) {
                 if (this.link_average < this.energyCapacity / 2) {
                     // Link network needs energy, we just need the closest link
                     var link = drone.shift_nearest(links);
