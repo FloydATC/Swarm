@@ -6,7 +6,7 @@ module.exports = {
         this.free = this.energyCapacity - this.energy;
         this.room.link_count++;
         this.room.link_total += this.energy;
-        this.room.link_average = this.room.link_total / this.room.link_count;
+        this.room.link_average = Math.floor(this.room.link_total / this.room.link_count);
     },
 
     execute: function() {
