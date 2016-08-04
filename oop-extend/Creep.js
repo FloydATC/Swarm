@@ -113,6 +113,28 @@ module.exports = {
             }
         }
 
+        // Consider fetching energy from a link
+        //console.log(this+' considers fetching energy from a container');
+        if (this.task != 'upgrade' && this.task != 'stockpile') {
+            var links = this.room.links.slice();
+            while (links.length > 0) {
+                var link = this.shift_nearest(links);
+                if (link instanceof StructureLink) {
+                    var reserved = link.reserved_amount || 0;
+                    if (reserved >= link.energy) { continue; } // Not enough left for me
+                    link.reserved_amount = reserved + this.carryCapacity - _.sum(this.carry);
+                    if (this.pos.inRangeTo(link, 1)) {
+                        this.withdraw(link, RESOURCE_ENERGY);
+                        this.memory.tracking = true;
+                    } else {
+                        this.move_to(link);
+                        this.memory.tracking = false;
+                    }
+                    return;
+                }
+            }
+        }
+
         // Consider fetching energy from a container
         //console.log(this+' considers fetching energy from a container');
         if (this.task != 'upgrade' && this.task != 'stockpile') {
