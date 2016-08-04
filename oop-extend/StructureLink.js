@@ -12,8 +12,6 @@ module.exports = {
     execute: function() {
         if (this.cooldown > 0) { return; } // Unable to transfer
         if (this.energy <= this.room.link_average) { return; } // We should receive, not transmit
-        var xmit_total = this.energy - this.room.link_average;
-        var recv_total = 0;
         var peer = this.shift_least_energy(this.room.links.clone());
         var amount = this.room.link_average - peer.energy;
         console.log(this.room+' '+this+' transferring '+amount+' to '+peer);
@@ -21,7 +19,7 @@ module.exports = {
     },
 
     shift_least_energy: function(objects) {
-        objects = objects.sort( function(a,b) { a.energy - b.energy } );
+        var objects = objects.sort( function(a,b) { a.energy - b.energy } );
         return objects.shift();
     },
 };
