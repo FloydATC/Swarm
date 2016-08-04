@@ -10,20 +10,19 @@ module.exports = {
     },
 
     execute: function() {
-        console.log(this+' execute() with energy='+this.energy+' average='+this.room.link_average);
-
-        if (this.cooldown > 0) { console.log(this+' cooling down'); return; } // Unable to transfer
-        if (this.energy <= this.room.link_average) { console.log(this+' is below average'); return; } // We should receive, not transmit
+        //console.log(this+' execute() with energy='+this.energy+' average='+this.room.link_average);
+        if (this.cooldown > 0) { return; } // Unable to transfer
+        if (this.energy <= this.room.link_average) { return; } // We should receive, not transmit
         var peer = this.shift_least_energy(this.room.links.slice());
-        console.log('  peer '+peer+' has '+peer.energy+' energy');
+        //console.log('  peer '+peer+' has '+peer.energy+' energy');
         var amount = this.room.link_average - peer.energy;
         console.log(this.room+' '+this+' transferring '+amount+' to '+peer);
         this.transferEnergy(peer, amount);
     },
 
     shift_least_energy: function(objects) {
-        var sorted = objects.sort( function(a,b) { a.energy - b.energy } );
-        console.log(sorted);
+        var sorted = objects.sort( function(a,b) { return a.energy - b.energy; } );
+        //console.log(sorted);
         return sorted.shift();
     },
 };
