@@ -16,8 +16,10 @@ module.exports = {
         var peer = this.shift_least_energy(this.room.links.slice());
         //console.log('  peer '+peer+' has '+peer.energy+' energy');
         var amount = this.room.link_average - peer.energy;
-        console.log(this.room+' '+this+' transferring '+amount+' to '+peer);
-        this.transferEnergy(peer, amount);
+        if (amount >= 50) {
+            console.log(this.room+' '+this+' transferring '+amount+' to '+peer);
+            this.transferEnergy(peer, amount);
+        }
     },
 
     shift_least_energy: function(objects) {
