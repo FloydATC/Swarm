@@ -22,8 +22,8 @@ module.exports = {
     },
 
     shift_least_energy: function(objects) {
-        objects = objects.sort( function(a,b) { a.energy - b.energy } );
-        console.log(objects);
-        return objects.shift();
+        var sorted = objects.sort( function(a,b) { a.energy - b.energy } );
+        console.log(sorted);
+        return sorted.shift();
     },
 };
