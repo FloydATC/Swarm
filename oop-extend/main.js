@@ -5,6 +5,7 @@ var extend_flag = require('Flag');
 var extend_room = require('Room');
 var extend_source = require('Source');
 var extend_s_container = require('StructureContainer');
+var extend_s_link = require('StructureLink');
 var extend_s_spawn = require('StructureSpawn');
 var extend_s_storage = require('StructureStorage');
 var extend_s_tower = require('StructureTower');
@@ -34,6 +35,7 @@ module.exports.loop = function () {
     for (var key in extend_room) { Room.prototype[key] = extend_room[key]; }
     for (var key in extend_source) { Source.prototype[key] = extend_source[key]; }
     for (var key in extend_s_container) { StructureContainer.prototype[key] = extend_s_container[key]; }
+    for (var key in extend_s_link) { StructureLink.prototype[key] = extend_s_link[key]; }
     for (var key in extend_s_spawn) { StructureSpawn.prototype[key] = extend_s_spawn[key]; }
     for (var key in extend_s_storage) { StructureStorage.prototype[key] = extend_s_storage[key]; }
     for (var key in extend_s_tower) { StructureTower.prototype[key] = extend_s_tower[key]; }
@@ -55,7 +57,7 @@ module.exports.loop = function () {
         room.expire_routes();
         if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' expired routes '+room); }
         if (show_perf) { console.log(room+' routing table: '+roughSizeOfObject(Memory.rooms[room.name].router)+' bytes (est.)'); }
-        
+
     }
     if (show_perf) { console.log('(finished)'); }
 }

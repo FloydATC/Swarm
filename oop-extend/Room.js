@@ -13,11 +13,15 @@ module.exports = {
         this.spawns = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_SPAWN; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
         this.towers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_TOWER; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
         this.roads = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_ROAD; } });
+        this.links = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_LINK; } });
         this.extensions = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTENSION; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
         this.containers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_STORAGE; } });
         this.construction_sites = this.find(FIND_CONSTRUCTION_SITES).sort( function(a,b) { return b.progress - a.progress; } ); // Nearest completion first
         this.need_repairs = this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits && s.hits < 250000 && s.hits < s.hitsMax; } }).sort( function(a,b) { return a.hits - b.hits; } ); // Most urgent first
 
+        this.link_count = 0;
+        this.link_total = 0;
+        this.link_average = 0;
 
         // Request reinforcements if room is owned but has no spawn
         if (this.controller && this.controller.my && this.spawns.length == 0 && this.my_creeps.length < 10) {
@@ -75,6 +79,7 @@ module.exports = {
         }
         */
 
+        for (var i=0; i<this.links.length; i++) { this.spawns[i].initialize(); }
 
         for (var i=0; i<this.my_creeps.length; i++) { this.my_creeps[i].initialize(); }
         for (var i=0; i<this.towers.length; i++) { this.towers[i].initialize(); }
