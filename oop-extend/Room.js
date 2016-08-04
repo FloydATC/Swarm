@@ -287,6 +287,7 @@ module.exports = {
 
     execute: function() {
         for (var i=0; i<this.towers.length; i++) { this.towers[i].execute(); }
+        for (var i=0; i<this.links.length; i++) { this.links[i].execute(); }
         for (var i=0; i<this.my_creeps.length; i++) { this.my_creeps[i].execute(); }
     },
 

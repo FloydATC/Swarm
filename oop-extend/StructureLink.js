@@ -9,7 +9,7 @@ module.exports = {
         this.room.link_average = this.room.link_total / this.room.link_count;
     },
 
-    balance: function() {
+    execute: function() {
         if (this.cooldown > 0) { return; } // Unable to transfer
         if (this.energy <= this.room.link_average) { return; } // We should receive, not transmit
         var xmit_total = this.energy - this.room.link_average;
