@@ -369,6 +369,9 @@ module.exports = {
 
     move_to: function(target) {
         if (this.fatigue > 0) { return; }
+        this.moveTo(target);
+        return;
+        /*
         if (this.pos.roomName == target.pos.roomName) {
             var direction = this.room.get_direction(this.pos, target.pos);
             if (direction >= 1 && direction <= 8) {
@@ -388,6 +391,7 @@ module.exports = {
         //console.log('#DEBUG '+this+' moveTo('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+')');
         this.moveTo(target, { ignoreCreeps: true } );
         this.learn_path();
+        */
     },
 
     next_position: function(direction) {
