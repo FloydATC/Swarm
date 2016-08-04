@@ -79,8 +79,7 @@ module.exports = {
         }
         */
 
-        for (var i=0; i<this.links.length; i++) { this.spawns[i].initialize(); }
-
+        for (var i=0; i<this.links.length; i++) { this.links[i].initialize(); }
         for (var i=0; i<this.my_creeps.length; i++) { this.my_creeps[i].initialize(); }
         for (var i=0; i<this.towers.length; i++) { this.towers[i].initialize(); }
         for (var i=0; i<this.sources.length; i++) { this.sources[i].initialize(); }
