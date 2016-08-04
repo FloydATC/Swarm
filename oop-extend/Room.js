@@ -28,56 +28,6 @@ module.exports = {
             Game.request_drones = this.name;
         }
 
-        //for (var i in this.need_repairs) {
-        //    var s = this.need_repairs[i];
-        //    console.log(this+' repair task '+i+': '+s+' '+s.hits+'/'+s.hitsMax);
-        //}
-
-        // Experimental router code
-        /*
-        var instance = this.memory.routing;
-        if (!instance) {
-            for (var x=0; x<=49; x++) {
-                instance[x] = [];
-                for (var y=0; y<=49; y++) {
-                    instance[x][y] = {};
-                    // Is tile walkable (i.e. needs a routing table)
-                    var tile = this.lookForAt(LOOK_TERRAIN, x, y);
-                    if (tile != 'wall') {
-                        var raw_table = [];
-                        var count = [];
-                        var src = getPositionAt(x, y);
-                        for (var to_x=0; to_x<=49; to_x++) {
-                            raw_table[to_x] = [];
-                            for (var to_y=0; to_y<=49; to_y++) {
-                                var dst = getPositionAt(x, y);
-                                var path = src.findPath(src, dst, { ignoreCreeps: true; serialize: true });
-                                var nexthop = path.charAt(4); // Should be 1..8 or "u"
-                                if (nexthop == 'u') { nexthop = 0; }
-                                count[nexthop] = (count[nexthop] + 1) || 1;
-                                raw_table[to_x][to_y] = nexthop;
-                            }
-                        }
-                        var table = {};
-                        // This is where we need some magic because raw_table is much too large to be kept in memory
-                        // 1. The most common direction will be the "default route" for this table
-                        // 2. Detect rectangles sharing the same direction
-                        // The end result should be something like this:
-                        table{'0-12,0-15'} = 8 // A large region in the upper left is reachable by walking northwest
-                        table{'13,16'} = 3 // A single position to the east
-                        table{'*'} = 1 // Default direction is north
-                        // Hash table = random key order
-                        // First match -> break (overlapping is not allowed except for default route)
-                        // No match -> use default
-                        // ...
-
-                        instance[x][y] = table;
-                    }
-                }
-            }
-            this.memory.routing = instance;
-        }
-        */
 
         for (var i=0; i<this.links.length; i++) { this.links[i].initialize(); }
         for (var i=0; i<this.my_creeps.length; i++) { this.my_creeps[i].initialize(); }
