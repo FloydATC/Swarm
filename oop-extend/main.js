@@ -54,8 +54,8 @@ module.exports.loop = function () {
         if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' optimized '+room); }
         room.execute();
         if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' executed '+room); }
-        room.expire_routes();
-        if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' expired routes '+room); }
+        //room.expire_routes();
+        //if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' expired routes '+room); }
         if (show_perf) { console.log(room+' routing table: '+roughSizeOfObject(Memory.rooms[room.name].router)+' bytes (est.)'); }
 
     }
