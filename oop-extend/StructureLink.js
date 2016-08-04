@@ -12,7 +12,7 @@ module.exports = {
     execute: function() {
         if (this.cooldown > 0) { return; } // Unable to transfer
         if (this.energy <= this.room.link_average) { return; } // We should receive, not transmit
-        var peer = this.shift_least_energy(this.room.links.clone());
+        var peer = this.shift_least_energy(this.room.links.slice());
         var amount = this.room.link_average - peer.energy;
         console.log(this.room+' '+this+' transferring '+amount+' to '+peer);
         this.transferEnergy(peer, amount);
