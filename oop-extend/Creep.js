@@ -290,7 +290,7 @@ module.exports = {
     },
 
     task_feed_link: function() {
-        var target = this.shift_nearest(this.room.links.slice())); // Always switch to nearest
+        var target = this.shift_nearest(this.room.links.slice()); // Always switch to nearest
         this.target = target.id;
         if (this.pos.inRangeTo(target, 1)) {
             this.transfer(target, RESOURCE_ENERGY);
