@@ -44,7 +44,7 @@ ScreepsAutocomplete
     - git push origin master
 
   * Typical work cycle
-    - git merge master
+    - git pull // Sync local files with Github
     - (edit)
     - git commit -m "Description"
     - git push origin master
