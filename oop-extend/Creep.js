@@ -115,7 +115,7 @@ module.exports = {
 
         // Consider fetching energy from a link
         //console.log(this+' considers fetching energy from a container');
-        if (this.task != 'upgrade' && this.task != 'stockpile') {
+        if (this.task == 'feed tower' || this.task == 'feed spawn' || this.task == 'feed extension') {
             var links = this.room.links.slice();
             while (links.length > 0) {
                 var link = this.shift_nearest(links);
