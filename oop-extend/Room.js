@@ -459,9 +459,9 @@ module.exports = {
         while (drones.length > 0 && links.length > 0) {
             var drone = drones.shift();
             if (links.length > 0) {
-                if (this.link_average < this.energyCapacity / 2) {
+                var link = drone.shift_nearest(links);
+                if (this.link_average < link.energyCapacity / 2) {
                     // Link network needs energy, we just need the closest link
-                    var link = drone.shift_nearest(links);
                     drone.task = 'feed link';
                     drone.target = link.id; // Will switch whenever needed
                     console.log(drone.name+' assigned to '+drone.task+' '+drone.target);
