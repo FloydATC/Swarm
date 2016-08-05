@@ -28,7 +28,11 @@ Github integration
   * Create a file ".gitignore"
 ScreepsAutocomplete
 
-  * First time setup
+  * First time installation
+    - git config --global user.name "FloydATC"
+    - git config --global user.email floyd@atc.no
+
+  * First time setup of a repo
     - git init
     - git add .
     - git commit -m "First commit"
