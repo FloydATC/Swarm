@@ -17,7 +17,7 @@ module.exports = {
         this.extensions = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTENSION; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
         this.containers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_STORAGE; } });
         this.construction_sites = this.find(FIND_CONSTRUCTION_SITES).sort( function(a,b) { return b.progress - a.progress; } ); // Nearest completion first
-        this.need_repairs = this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits && s.hits < 250000 && s.hits < s.hitsMax; } }).sort( function(a,b) { return a.hits - b.hits; } ); // Most urgent first
+        this.need_repairs = this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits && s.hits < this.hp_ambition() && s.hits < s.hitsMax; } }).sort( function(a,b) { return a.hits - b.hits; } ); // Most urgent first
 
         this.link_count = 0;
         this.link_total = 0;
@@ -509,7 +509,7 @@ module.exports = {
             var drone = drones.shift();
             while (need_repairs.length > 0) {
                 var structure = drone.shift_nearest(need_repairs);
-                if (structure.structureType == STRUCTURE_WALL && structure.hits >= 100000) { continue; }
+                if (structure.structureType == STRUCTURE_WALL && structure.hits >= this.hp_ambition()) { continue; }
                 drone.task = 'repair';
                 drone.target = structure.id;
                 //console.log(drone.name+' assigned to '+drone.task+' '+drone.target);
@@ -620,6 +620,14 @@ module.exports = {
                 }
             }
             console.log(this+' routes expired: '+count);
+        }
+    },
+
+    hp_ambition: function() {
+        if (this.controller && this.controller.my) {
+            return Math.floor(25000 * this.controller.level + (this.controller.progress / this.controller.progressTotal));
+        } else {
+            return 0;
         }
     },
 };
