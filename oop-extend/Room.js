@@ -73,12 +73,12 @@ module.exports = {
         var towers = this.towers.slice();
         var links = this.links.slice();
         var drops = this.dropped_other.slice();
-        var extensions = this.extensions.slice(0,3); // 3 with least energy
-        var containers = this.containers.reverse().slice(0,3); // 3 with least energy
+        var extensions = this.extensions.slice(0,2); // 3 with least energy
+        var containers = this.containers.reverse().slice(0,2); // 3 with least energy
         var my_creeps = this.my_creeps.slice(); // For now, all creeps are drones
         var hostile_creeps = this.hostile_creeps.slice();
-        var csites = this.construction_sites.slice(0,3); // Max 3 at a time
-        var need_repairs = this.need_repairs.slice(0,3); // Max 3 at a time
+        var csites = this.construction_sites.slice(0,2); // Max 3 at a time
+        var need_repairs = this.need_repairs.slice(0,2); // Max 3 at a time
 
         var miners = [];
         var drones = [];
@@ -170,8 +170,9 @@ module.exports = {
             // Experimental clockwork spawning of drones
 
             // FIXME! Naive scaling code
-            var result = this.createCreep([MOVE,MOVE,MOVE,MOVE,MOVE,CARRY,CARRY,CARRY,CARRY,CARRY,WORK,WORK,WORK,WORK,WORK], undefined, { class: 'Drone' });
-            if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,MOVE,MOVE,CARRY,CARRY,CARRY,CARRY,WORK,WORK,WORK,WORK], undefined, { class: 'Drone' }); }
+            var result = ERR_NOT_ENOUGH_ENERGY;
+            //if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,MOVE,MOVE,MOVE,CARRY,CARRY,CARRY,CARRY,CARRY,WORK,WORK,WORK,WORK,WORK], undefined, { class: 'Drone' }); }
+            //if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,MOVE,MOVE,CARRY,CARRY,CARRY,CARRY,WORK,WORK,WORK,WORK], undefined, { class: 'Drone' }); }
             if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,MOVE,CARRY,CARRY,CARRY,WORK,WORK,WORK], undefined, { class: 'Drone' }); }
             if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,CARRY,CARRY,WORK,WORK], undefined, { class: 'Drone' }); }
             if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Drone' }); }
