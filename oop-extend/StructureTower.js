@@ -56,7 +56,7 @@ module.exports = {
             while (damaged.length > 0) {
                 var structure = damaged.shift();
                 if (structure.structureType == STRUCTURE_WALL && structure.hits > 10000 && this.pos.getRangeTo(structure) >= TOWER_FALLOFF_RANGE) { continue; }
-                if (structure.structureType == STRUCTURE_WALL && structure.hits > 100000) { continue; }
+                if (structure.structureType == STRUCTURE_WALL && structure.hits > this.room.hp_ambition()) { continue; }
                 //console.log(this+' repairing '+structure);
                 this.repair(structure);
                 return;
