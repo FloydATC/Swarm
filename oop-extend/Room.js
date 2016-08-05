@@ -165,16 +165,8 @@ module.exports = {
             } else {
                 var result = this.createCreep([MOVE,RANGED_ATTACK], undefined, { class: 'Spitter' });
             }
-        } else if (need > 0 || (this.my_creeps[0].ticksToLive < (CREEP_LIFE_TIME / 4) && this.spawn_reserves() > 50 && upgraders < 4)) {
-            /*
-            console.log(this+' needs '+need);
-            console.log('  sources: '+sources.length);
-            console.log('  towers: '+towers.length);
-            console.log('  spawns: '+spawns.length);
-            console.log('  extensions: '+extensions.length);
-            console.log('  construction sites: '+csites.length);
-            console.log('  repairs: '+need_repairs.length);
-            */
+        } else if (Game.time % Math.floor(CREEP_LIFE_TIME / this.want_drones()) == 0) {
+            // Experimental clockwork spawning of drones
 
             // FIXME! Naive scaling code
             var result = this.createCreep([MOVE,MOVE,MOVE,MOVE,MOVE,CARRY,CARRY,CARRY,CARRY,CARRY,WORK,WORK,WORK,WORK,WORK], undefined, { class: 'Drone' });
@@ -191,6 +183,11 @@ module.exports = {
             var result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Swarmer', destination: Game.request_drones });
         }
 
+    },
+
+    want_drones: function() {
+        // TODO: Calculate the optimal number of drones for this room
+        return (this.sources.length * 2) + 4; // Naive calculation
     },
 
     optimize: function() {
