@@ -270,7 +270,7 @@ module.exports = {
             }
             if (link != null) {
                 this.transfer(link, RESOURCE_ENERGY);
-            } else {}
+            } else {
                 // Container with free space within reach?
                 var containers = this.pos.findInRange(STRUCTURE_CONTAINER, 1);
                 var container = null;
