@@ -17,7 +17,7 @@ module.exports = {
         //console.log('  peer '+peer+' has '+peer.energy+' energy');
         var amount = this.room.link_average - peer.energy;
         if (amount >= 50) {
-            console.log(this.room+' '+this+' transferring '+amount+' to '+peer);
+            //console.log(this.room+' '+this+' transferring '+amount+' to '+peer);
             this.transferEnergy(peer, amount);
         }
     },
