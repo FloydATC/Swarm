@@ -55,10 +55,16 @@ module.exports = {
             var damaged = this.room.need_repairs.slice();
             while (damaged.length > 0) {
                 var structure = damaged.shift();
-                if (structure.structureType == STRUCTURE_WALL && structure.hits > 10000 && this.pos.getRangeTo(structure) >= TOWER_FALLOFF_RANGE) { continue; }
+                var range = this.pos.getRangeTo(structure);
+                if (structure.repairing && structure.repairing + structure.hits > structure.hitsMax) { continue; } // Someone else already repairing
+                if (structure.structureType == STRUCTURE_WALL && structure.hits > 10000 && range >= TOWER_FALLOFF_RANGE) { continue; }
                 if (structure.structureType == STRUCTURE_WALL && structure.hits > this.room.hp_ambition()) { continue; }
                 //console.log(this+' repairing '+structure);
                 this.repair(structure);
+                var effect = TOWER_POWER_REPAIR;
+                if (range > TOWER_OPTIMAL_RANGE) { effect = TOWER_POWER_REPAIR - ((range - TOWER_OPTIMAL_RANGE) * (TOWER_POWER_REPAIR / TOWER_FALLOFF_RANGE)); }
+                if (range > TOWER_FALLOFF_RANGE) { effect = TOWER_POWER_REPAIR / 4; }
+                structure.repairing = (structure.repairing + effect) || effect;
                 return;
             }
         }
