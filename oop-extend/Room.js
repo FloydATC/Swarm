@@ -17,7 +17,8 @@ module.exports = {
         this.extensions = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTENSION; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
         this.containers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_STORAGE; } });
         this.construction_sites = this.find(FIND_CONSTRUCTION_SITES).sort( function(a,b) { return b.progress - a.progress; } ); // Nearest completion first
-        this.need_repairs = this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits && s.hits < this.hp_ambition() && s.hits < s.hitsMax; } }).sort( function(a,b) { return a.hits - b.hits; } ); // Most urgent first
+        var ambition = this.hp_ambition();
+        this.need_repairs = this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits && s.hits < ambition && s.hits < s.hitsMax; } }).sort( function(a,b) { return a.hits - b.hits; } ); // Most urgent first
 
         this.link_count = 0;
         this.link_total = 0;
