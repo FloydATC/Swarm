@@ -49,6 +49,10 @@ ScreepsAutocomplete
     - git commit -m "Description"
     - git push origin master
 
+  * Cache credentials
+    - git config --global credential.helper cache
+    - git config --global credential.helper "cache --timeout=3600"
+
 
 Comments? Contact me: floyd@atc.no
 Pull requests not accepted, sorry. I don't know how to deal with them.
