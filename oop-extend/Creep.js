@@ -261,18 +261,29 @@ module.exports = {
         var target = Game.getObjectById(this.target);
         if (this.pos.inRangeTo(target, 1)) {
             this.harvest(target);
-            // Container with space within reach?
-            var containers = this.pos.findInRange(STRUCTURE_CONTAINER, 1);
-            var container = null;
-            for (var i=0; i<containers.length; i++) {
-                if (containers[i].free == 0) { continue; }
-                container = containers[i]
+            // Link with free space within reach?
+            var links = this.pos.findInRange(STRUCTURE_LINK, 1);
+            var link = null;
+            for (var i=0; i<links.length; i++) {
+                if (links[i].free == 0) { continue; }
+                link = links[i]
             }
-            if (container != null) {
-                this.transfer(container, RESOURCE_ENERGY);
-            } else {
-                // Nope. Just drop the energy on the ground then
-                this.drop(RESOURCE_ENERGY);
+            if (link != null) {
+                this.transfer(link, RESOURCE_ENERGY);
+            } else {}
+                // Container with free space within reach?
+                var containers = this.pos.findInRange(STRUCTURE_CONTAINER, 1);
+                var container = null;
+                for (var i=0; i<containers.length; i++) {
+                    if (containers[i].free == 0) { continue; }
+                    container = containers[i]
+                }
+                if (container != null) {
+                    this.transfer(container, RESOURCE_ENERGY);
+                } else {
+                    // Nope. Just drop the energy on the ground then
+                    this.drop(RESOURCE_ENERGY);
+                }
             }
             this.memory.tracking = false;
         } else {
