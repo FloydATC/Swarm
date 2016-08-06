@@ -52,16 +52,18 @@ module.exports = {
 
         // Carrying something else than energy? Ignore task and store it somewhere!
         if (_.sum(this.carry) > this.carry.energy) {
-            var target = this.shift_nearest(this.room.containers.splice()); // Find nearest container
-            if (this.pos.inRangeTo(target, 1)) {
-                for (var cargo in this.carry) { this.transfer(target, cargo); break; }
-                this.memory.tracking = false;
+            var target = this.shift_nearest(this.room.containers.splice());
+            if (target != null) {
+                if (this.pos.inRangeTo(target, 1)) {
+                    for (var cargo in this.carry) { this.transfer(target, cargo); break; }
+                    this.memory.tracking = false;
 
-            } else {
-                this.move_to(target);
-                this.memory.tracking = false;
+                } else {
+                    this.move_to(target);
+                    this.memory.tracking = false;
+                }
+                return;
             }
-            return;
         }
 
         // Tasks that do not consume energy (continued)
