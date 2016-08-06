@@ -206,7 +206,7 @@ module.exports = {
             if (creep_a.range_to_target <= 1) { continue; } // Pointless
             if (creep_a.memory.working == false) { continue; } // Out of energy
             var target_a = Game.getObjectById(creep_a.target);
-            if (target_a == null) { continue;  // Target no longer valid}
+            if (target_a == null) { continue; } // Target no longer valid}
             for (var j=0; j<this.my_creeps.length; j++) {
                 var creep_b = this.my_creeps[j];
                 if (creep_a.id == creep_b.id) { continue; } // Same creep
@@ -216,7 +216,6 @@ module.exports = {
                 var target_b = Game.getObjectById(creep_b.target);
                 if (target_b == null) { continue; } // Target no longer valid
                 if (target_a.id == target_b.id) { continue; } // Same target
-
                 var catb = creep_a.pos.getRangeTo(target_b)
                 var cbta = creep_b.pos.getRangeTo(target_a)
                 if (cbta+1 < creep_b.range_to_target && catb+1 < creep_a.range_to_target) {
