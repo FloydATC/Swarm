@@ -189,7 +189,7 @@ module.exports = {
 
     want_drones: function() {
         // TODO: Calculate the optimal number of drones for this room
-        return (this.sources.length * 2) + 4; // Naive calculation
+        return (this.sources.length * 2) + 5; // Naive calculation
     },
 
     optimize: function() {
