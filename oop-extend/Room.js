@@ -627,7 +627,7 @@ module.exports = {
 
     hp_ambition: function() {
         if (this.controller && this.controller.my) {
-            return Math.floor(25000 * this.controller.level + (this.controller.progress / this.controller.progressTotal));
+            return Math.floor(25000 * this.controller.level + (this.controller.progress / this.controller.progressTotal).toFixed(1));
         } else {
             return 0;
         }
