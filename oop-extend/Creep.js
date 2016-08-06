@@ -52,7 +52,7 @@ module.exports = {
 
         // Carrying something else than energy? Ignore task and store it somewhere!
         if (_.sum(this.carry) > this.carry.energy) {
-            var target = shift_nearest(this.room.containers.splice());
+            var target = this.shift_nearest(this.room.containers.splice());
             if (this.pos.inRangeTo(target, 1)) {
                 for (var cargo in this.carry) { this.transfer(target, cargo); break; }
                 this.memory.tracking = false;
