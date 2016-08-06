@@ -37,8 +37,12 @@ module.exports = {
         //console.log(this+' executing task: '+this.task+' '+(target || ''));
         //this.say(this.task);
         // For debugging, place task+target in memory as human readable strings
-        this.memory.task = this.task;
-        this.memory.target = target.toString();
+        // For sticky targeting we must keep track of how much time has been invested
+        if (typeof this.memory.task == 'object' && this.memory.task.type == this.task && this.memory.task.target == target.toString()) {
+            this.memory.task.ticks = (this.memory.task.ticks + 1) || 1;
+        } else {
+            this.memory.task = { type: this.task, target: target.toString(), ticks: 0 };
+        }
 
         // Tasks that do not consume energy
         if (this.task == 'attack') { this.task_attack(); return; }
@@ -208,6 +212,7 @@ module.exports = {
         var target = Game.getObjectById(this.target);
         if (this.pos.inRangeTo(target, 1)) {
             this.attack(target);
+            this.add_stats('attack')
             this.memory.tracking = false;
         } else {
             this.move_to(target);
@@ -220,6 +225,7 @@ module.exports = {
         var target = Game.getObjectById(this.target);
         if (this.pos.inRangeTo(target, 3)) {
             this.rangedAttack(target);
+            this.add_stats('ranged attack')
             this.memory.tracking = false;
         } else {
             this.move_to(target);
@@ -336,7 +342,8 @@ module.exports = {
     task_build: function() {
         var target = Game.getObjectById(this.target);
         if (this.pos.inRangeTo(target, 3)) {
-            this.build(target)
+            this.build(target);
+            this.add_stats('build')
             this.memory.tracking = false;
         } else {
             this.move_to(target);
@@ -349,6 +356,7 @@ module.exports = {
         var target = Game.getObjectById(this.target);
         if (this.pos.inRangeTo(target, 3)) {
             this.repair(target)
+            this.add_stats('repair')
             this.memory.tracking = false;
         } else {
             this.move_to(target, { maxRooms: 0 }); // Stay in this room!
@@ -361,6 +369,7 @@ module.exports = {
         var target = Game.getObjectById(this.target);
         if (this.pos.inRangeTo(target, 3)) {
             this.upgradeController(target);
+            this.add_stats('upgrade')
         } else {
             this.move_to(target);
         }
@@ -415,6 +424,7 @@ module.exports = {
     move_to: function(target) {
         if (this.fatigue > 0) { return; }
         this.moveTo(target);
+        this.add_stats('move')
         return;
         /*
         if (this.pos.roomName == target.pos.roomName) {
@@ -466,6 +476,11 @@ module.exports = {
         }
         this.memory.moving_to = { x: pos.x, y: pos.y }; // Make reservation
         return true;
+    },
+
+    add_stats: function(label) {
+        if (!this.memory.stats) { this.memory.stats = {}; }
+        this.memory.stats[label] = (this.memory.stats[label] + 1) || 1;
     },
 
 };
