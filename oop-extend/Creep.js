@@ -305,7 +305,7 @@ module.exports = {
                     console.log('Miner '+this+' approaching controller ('+ctrl+' in '+this.memory.home+')');
                     return;
                 } else {
-                    this.upgrade(ctrl);
+                    this.upgradeController(ctrl);
                     console.log('Miner '+this+' upgrading controller ('+ctrl+' in '+this.memory.home+')');
                     return;
                 }
