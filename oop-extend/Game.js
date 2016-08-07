@@ -32,10 +32,15 @@ module.exports = {
                     }
                 }
                 //console.log('  assigned to room '+room);
-                flag.memory = { owner: lo_room.name };
+                if (typeof flag.memory == 'undefined') { flag.memory = {}; }
+                flag.memory.owner = lo_room.name;
                 // Add this flag to that room
                 if (!lo_room.harvest_flags) { lo_room.harvest_flags = []; }
                 lo_room.harvest_flags.push(flag);
+
+                // Calculate and set spawn interval in ticks
+                flag.memory.frequency = 500;
+                flag.memory.ticks = (flag.memory.ticks + 1) || 0;
             }
 
             // Colonize rooms with "spawn" flag

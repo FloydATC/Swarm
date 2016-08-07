@@ -183,6 +183,16 @@ module.exports = {
             var result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Swarmer', destination: Game.request_drones });
         } else if (this.harvest_flags) {
             console.log(this+' has harvest flags to consider: '+this.harvest_flags);
+            for (var i in this.harvest_flags) {
+                var flag = this.harvest_flags[i];
+                if (flag.memory.ticks > flag.memory.frequency) {
+                    // Time to spawn another Miner to work this flag
+                    console.log(this+' spawning a remote miner for '+flag.pos.roomName);
+                    this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.id } );
+                    flag.memory.ticks = 0;
+                    return;
+                }
+            }
         }
 
     },
