@@ -23,7 +23,7 @@ module.exports = {
                 for (var name in this.rooms) {
                     var room = this.rooms[name];
                     if (room.controller && room.controller.my == true) {
-                        var range = Map.getRoomLinearDistance(flag.pos.roomName, room.name);
+                        var range = Game.map.getRoomLinearDistance(flag.pos.roomName, room.name);
                         console.log('  candidate room '+room+' range is '+range);
                         if (lo_range == null || range < lo_range) {
                             lo_range = range;
