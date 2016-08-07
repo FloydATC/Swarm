@@ -12,26 +12,26 @@ module.exports = {
         // Act on flags
         for (var name in this.flags) {
             var flag = this.flags[name];
-            console.log(this+' flag '+flag+' type '+flag.type()+' at '+flag.pos);
+            //console.log(this+' flag '+flag+' type '+flag.type()+' at '+flag.pos);
 
             // Remote mine sources tagged with a "harvest" flag
             if (flag.type() == 'harvest') {
                 // Find nearest room with an owned controller
-                console.log('Assigning owner room to flag '+flag);
+                //console.log('Assigning owner room to flag '+flag);
                 var lo_range = null;
                 var lo_room = null;
                 for (var name in this.rooms) {
                     var room = this.rooms[name];
                     if (room.controller && room.controller.my == true) {
                         var range = this.manhattanDistance(flag.pos.roomName, room.name);
-                        console.log('  candidate room '+room+' range is '+range);
+                        //console.log('  candidate room '+room+' range is '+range);
                         if (lo_range == null || range < lo_range) {
                             lo_range = range;
                             lo_room = room;
                         }
                     }
                 }
-                console.log('  assigned to room '+room);
+                //console.log('  assigned to room '+room);
                 flag.memory = { owner: lo_room.name };
                 // Add this flag to that room
                 if (!lo_room.harvest_flags) { lo_room.harvest_flags = []; }
@@ -71,6 +71,8 @@ module.exports = {
     },
 
     manhattanDistance: function(r1, r2) {
+        // The Manhattan distance between two rooms, calculated from the names.
+        // = same as linear distance except no diagonal moves allowed (as is the actual case)
         var regex = /([EW])(\d+)([NS])(\d+)/;
         var r1_parts = regex.exec(r1);
         var r2_parts = regex.exec(r2);
