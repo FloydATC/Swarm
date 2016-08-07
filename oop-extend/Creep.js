@@ -280,18 +280,18 @@ module.exports = {
                 if (this.pos.getRangeTo(source) > 1) {
                     // Move closer
                     this.move_to(source);
-                    console.log('Miner '+this+' approaching source ('+source+' in '+this.memory.mine+')');
+                    //console.log('Miner '+this+' approaching source ('+source+' in '+this.memory.mine+')');
                     return;
                 } else {
                     // Get energy
                     this.harvest(source);
-                    console.log('Miner '+this+' harvesting source ('+source+' in '+this.memory.mine+')');
+                    //console.log('Miner '+this+' harvesting source ('+source+' in '+this.memory.mine+')');
                     return;
                 }
             } else {
                 // No
                 this.move_to(flag);
-                console.log('Miner '+this+' moving to flag ('+flag+' in '+this.memory.mine+')');
+                //console.log('Miner '+this+' moving to flag ('+flag+' in '+this.memory.mine+')');
                 return;
             }
         }
@@ -302,17 +302,17 @@ module.exports = {
                 // Yes, approach controller
                 if (this.pos.getRangeTo(ctrl) > 3) {
                     this.move_to(ctrl);
-                    console.log('Miner '+this+' approaching controller ('+ctrl+' in '+this.memory.home+')');
+                    //console.log('Miner '+this+' approaching controller ('+ctrl+' in '+this.memory.home+')');
                     return;
                 } else {
                     this.upgradeController(ctrl);
-                    console.log('Miner '+this+' upgrading controller ('+ctrl+' in '+this.memory.home+')');
+                    //console.log('Miner '+this+' upgrading controller ('+ctrl+' in '+this.memory.home+')');
                     return;
                 }
             } else {
                 // No
                 this.move_to(ctrl);
-                console.log('Miner '+this+' moving to upgrade ('+ctrl+' in '+this.memory.home+')');
+                //console.log('Miner '+this+' moving to upgrade ('+ctrl+' in '+this.memory.home+')');
                 return;
             }
         }
