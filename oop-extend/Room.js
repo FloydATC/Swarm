@@ -182,7 +182,7 @@ module.exports = {
             console.log(this+' spawning a creep to build spawn in '+Game.request_drones);
             var result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Swarmer', destination: Game.request_drones });
         } else if (this.harvest_flags) {
-            console.log(this+' has harvest flags to consider: '+this.harvest_flags);
+            //console.log(this+' has harvest flags to consider: '+this.harvest_flags);
             for (var i in this.harvest_flags) {
                 var flag = this.harvest_flags[i];
                 if (flag.memory.ticks > flag.memory.frequency) {
@@ -417,7 +417,7 @@ module.exports = {
             var miner = miners.shift();
             miner.task = 'remote mine';
             miner.target = miner.id; // Dummy because flag doesn't have an id. Duh.
-            console.log(miner.name+' assigned to '+miner.task+' '+miner.target);
+            //console.log(miner.name+' assigned to '+miner.task+' '+miner.target);
         }
     },
 
