@@ -22,17 +22,17 @@ module.exports = {
                 for (var name in this.rooms) {
                     var room = this.rooms[name];
                     if (room.controller && room.controller.my == true) {
-                        var range = getRoomLinearDistance(this.room.name, room.name);
+                        var range = getRoomLinearDistance(flag.room.name, room.name);
                         if (lo_range == null || range < lo_range) {
                             lo_range = range;
                             lo_room = room;
                         }
                     }
                 }
-                this.memory = { owner: lo_room.name };
+                flag.memory = { owner: lo_room.name };
                 // Add this flag to that room
                 if (!lo_room.harvest_flags) { lo_room.harvest_flags = []; }
-                lo_room.harvest_flags.push(this);
+                lo_room.harvest_flags.push(flag);
             }
 
             // Colonize rooms with "spawn" flag
