@@ -9,8 +9,10 @@ module.exports = {
     type: function() {
         // Return name without trailing numbers
         // E.g. name='harvest2' -> type='harvest'
-        var matches = this.name.match(/^([a-z]+)/);
-        return matches[0];
+        var regex = /^([a-zA-Z]+)/;
+        return regex.exec(this.name);
+        //var matches = this.name.match(/^([a-z]+)/);
+        //return matches[0];
     },
 
     workers: function() {
