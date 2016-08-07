@@ -70,7 +70,12 @@ module.exports = {
 
     },
 
-    manhattanDistance: function() {
+    manhattanDistance: function(r1, r2) {
+        var regex = /([EW])(\d+)([NS])(\d+)/;
+        var r1_parts = regex.exec(r1);
+        var r2_parts = regex.exec(r2);
+        console.log(r1+' parts: '+JSON.stringify(r1_parts));
+        console.log(r2+' parts: '+JSON.stringify(r2_parts));
         return 1;
     },
 };
