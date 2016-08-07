@@ -2,6 +2,7 @@
 var extend_game = require('Game');
 var extend_creep = require('Creep');
 var extend_flag = require('Flag');
+var extend_map = require('Map');
 var extend_room = require('Room');
 var extend_source = require('Source');
 var extend_s_container = require('StructureContainer');
@@ -32,6 +33,7 @@ module.exports.loop = function () {
     // Extend game classes with custom methods
     for (var key in extend_creep) { Creep.prototype[key] = extend_creep[key]; }
     for (var key in extend_flag) { Flag.prototype[key] = extend_flag[key]; }
+    for (var key in extend_map) { Map.prototype[key] = extend_map[key]; }
     for (var key in extend_room) { Room.prototype[key] = extend_room[key]; }
     for (var key in extend_source) { Source.prototype[key] = extend_source[key]; }
     for (var key in extend_s_container) { StructureContainer.prototype[key] = extend_s_container[key]; }
