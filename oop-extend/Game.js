@@ -15,7 +15,7 @@ module.exports = {
             console.log(this+' flag '+flag+' type '+flag.type()+' at '+flag.pos);
 
             // Remote mine sources tagged with a "harvest" flag
-            if (flag.type == 'harvest') {
+            if (flag.type() == 'harvest') {
                 // Find nearest room with an owned controller
                 console.log('Assigning owner room to flag '+flag);
                 var lo_range = null;
@@ -39,7 +39,7 @@ module.exports = {
             }
 
             // Colonize rooms with "spawn" flag
-            if (flag.type == 'spawn') {
+            if (flag.type() == 'spawn') {
                 var room_name = flag.pos.roomName;
                 if (Game.rooms[room_name] && Game.rooms[room_name].controller && Game.rooms[room_name].controller.my) {
                     var result = Game.rooms[room_name].createConstructionSite(flag.pos, STRUCTURE_SPAWN);
@@ -54,7 +54,7 @@ module.exports = {
             }
 
             // Place tower at "tower" when possible
-            if (flag.type == 'tower') {
+            if (flag.type() == 'tower') {
                 var room_name = flag.pos.roomName;
                 if (Game.rooms[room_name] && Game.rooms[room_name].controller && Game.rooms[room_name].controller.my && Game.rooms[room_name].controller.level >= 3) {
                     var result = Game.rooms[room_name].createConstructionSite(flag.pos, STRUCTURE_TOWER);
