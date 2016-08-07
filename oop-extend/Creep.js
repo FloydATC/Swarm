@@ -273,7 +273,7 @@ module.exports = {
             // In the right room yet?
             if (this.room.name == this.memory.mine) {
                 // Yes. Locate source at flag
-                var found = this.room.look.lookForAt(LOOK_SOURCES, flag);
+                var found = this.room.lookForAt(LOOK_SOURCES, flag);
                 var source = found[0];
                 if (source == null) { flag.remove(); return; } // User error
                 if (this.pos.getRangeTo(source) > 1) {
