@@ -10,7 +10,8 @@ module.exports = {
         // Return name without trailing numbers
         // E.g. name='harvest2' -> type='harvest'
         var regex = /^([a-zA-Z]+)/;
-        return regex.exec(this.name);
+        var result = regex.exec(this.name);
+        return result[0];
         //var matches = this.name.match(/^([a-z]+)/);
         //return matches[0];
     },
