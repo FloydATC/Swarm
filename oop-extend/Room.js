@@ -188,8 +188,8 @@ module.exports = {
                 if (flag.memory.ticks > flag.memory.frequency) {
                     // Time to spawn another Miner to work this flag
                     console.log(this+' spawning a remote miner for '+flag.pos.roomName);
-                    this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.id } );
-                    flag.memory.ticks = 0;
+                    var result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.id } );
+                    if (result == OK) { flag.memory.ticks = 0; }
                     return;
                 }
             }
