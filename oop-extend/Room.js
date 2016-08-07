@@ -149,16 +149,10 @@ module.exports = {
         this.assign_task_stockpile(drones, containers);
 
         // FINALLY: Any leftover drones? Upgrade
-        var want_upgraders = 2;
-        var upgraders = this.assign_task_upgrade(drones);
-        var need_upgraders = (upgraders < want_upgraders ? want_upgraders - upgraders : 0);
+        this.assign_task_upgrade(drones);
 
 
-        // Rudimentary spawn code
-        // Count remaining goals. More creeps needed?
-        var need = sources.length + towers.length + spawns.length + extensions.length + csites.length + need_repairs.length + need_upgraders;
-
-
+        // Under attack and we have no towers? Spawn biters and spitters and hope for the best
         if (this.hostile_creeps.length > 0 && this.towers.length == 0) {
             // Emergency, spawn biters and spitters
             if (Math.random() > 0.5) {
@@ -166,7 +160,10 @@ module.exports = {
             } else {
                 var result = this.createCreep([MOVE,RANGED_ATTACK], undefined, { class: 'Spitter' });
             }
-        } else if (Game.time % Math.floor(CREEP_LIFE_TIME / this.want_drones()) == 0) {
+            return;
+        };
+
+        if (Game.time % Math.floor(CREEP_LIFE_TIME / this.want_drones()) == 0) {
             // Experimental clockwork spawning of drones
 
             // FIXME! Naive scaling code
@@ -177,12 +174,15 @@ module.exports = {
             if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,CARRY,CARRY,WORK,WORK], undefined, { class: 'Drone' }); }
             if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Drone' }); }
             //console.log(this+' spawn result='+result);
+            return;
         } else if (Game.colonize && Game.time % 50 == 0) {
             console.log(this+' spawning a creep to claim '+Game.colonize);
             var result = this.createCreep([MOVE,CARRY,WORK,CLAIM], undefined, { class: 'Swarmer', destination: Game.colonize });
         } else if (Game.request_drones && Game.time % 50 == 0) {
             console.log(this+' spawning a creep to build spawn in '+Game.request_drones);
             var result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Swarmer', destination: Game.request_drones });
+        } else if (this.harvest_flags) {
+            console.log(this+' has harvest flags to consider: '+this.harvest_flags);
         }
 
     },

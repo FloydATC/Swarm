@@ -29,7 +29,7 @@ module.exports = {
                         }
                     }
                 }
-                this.memory.owner = lo_room.name;
+                this.memory = { owner: lo_room.name };
                 // Add this flag to that room
                 if (!lo_room.harvest_flags) { lo_room.harvest_flags = []; }
                 lo_room.harvest_flags.push(this);
