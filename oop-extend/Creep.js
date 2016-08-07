@@ -267,9 +267,10 @@ module.exports = {
     },
 
     task_remote_mine: function() {
-        if (typeof this.memory.phase == 'undefined') { this.memory.phase = 'mining'; }
         var flag = Game.flags[this.memory.flag];
-        if (this.memory.phase == 'mining') {
+        if (this.memory.working == true && this.is_empty()) { this.memory.working = false; }
+        if (this.memory.working == false && this.is_full()) { this.memory.working = true; }
+        if (this.memory.working == false) {
             // In the right room yet?
             if (this.room.name == this.memory.mine) {
                 // Yes. Locate source at flag
@@ -282,14 +283,10 @@ module.exports = {
                     console.log('Miner '+this+' approaching source ('+source+' in '+this.memory.mine+')');
                     return;
                 } else {
-                    if (this.is_full()) {
-                        this.memory_phase = 'unloading';
-                    } else {
-                        // Get energy
-                        this.harvest(source);
-                        console.log('Miner '+this+' harvesting source ('+source+' in '+this.memory.mine+')');
-                        return;
-                    }
+                    // Get energy
+                    this.harvest(source);
+                    console.log('Miner '+this+' harvesting source ('+source+' in '+this.memory.mine+')');
+                    return;
                 }
             } else {
                 // No
@@ -298,7 +295,7 @@ module.exports = {
                 return;
             }
         }
-        if (this.memory.phase == 'unloading') {
+        if (this.memory.working == true) {
             var ctrl = Game.rooms[this.memory.home].controller;
             // In the right room yet?
             if (this.room.name == this.memory.home) {
@@ -308,14 +305,9 @@ module.exports = {
                     console.log('Miner '+this+' approaching controller ('+ctrl+' in '+this.memory.home+')');
                     return;
                 } else {
-                    if (this.is_empty()) {
-                        this.memory.phase = 'mining';
-                        return;
-                    } else {
-                        this.upgrade(ctrl);
-                        console.log('Miner '+this+' upgrading controller ('+ctrl+' in '+this.memory.home+')');
-                        return;
-                    }
+                    this.upgrade(ctrl);
+                    console.log('Miner '+this+' upgrading controller ('+ctrl+' in '+this.memory.home+')');
+                    return;
                 }
             } else {
                 // No
