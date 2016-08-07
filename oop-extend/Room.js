@@ -420,6 +420,7 @@ module.exports = {
             var miner = miners.shift();
             miner.task = 'remote mine';
             miner.target = miner.memory.flag;
+            console.log(miner.name+' assigned to '+miner.task+' '+miner.target);
         }
     },
 
