@@ -115,9 +115,6 @@ module.exports = {
         // Infectors? Use them to capture control point, then morph into Drone
         this.assign_task_claim(infectors);
 
-        // Sources. The energy must flow. For each source, assign a miner.
-        this.assign_task_mine(miners, sources);
-
         // Sources. The energy must flow. For each source, assign a drone.
         this.assign_task_mine(drones, sources);
 
