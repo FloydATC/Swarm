@@ -268,7 +268,7 @@ module.exports = {
 
     task_remote_mine: function() {
         if (typeof this.memory.phase == 'undefined') { this.memory.phase = 'mining'; }
-        var flag = Game.getObjectById(this.memory.flag);
+        var flag = Game.flags[this.memory.flag];
         if (this.memory.phase == 'mining') {
             // In the right room yet?
             if (this.room.name == this.memory.mine) {

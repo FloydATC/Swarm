@@ -188,7 +188,7 @@ module.exports = {
                 if (flag.memory.ticks > flag.memory.frequency) {
                     // Time to spawn another Miner to work this flag
                     console.log(this+' spawning a remote miner for '+flag.pos.roomName);
-                    var result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.id } );
+                    var result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
                     if (result == OK) { flag.memory.ticks = 0; }
                     return;
                 }
@@ -416,7 +416,7 @@ module.exports = {
         while (miners.length > 0) {
             var miner = miners.shift();
             miner.task = 'remote mine';
-            miner.target = miner.memory.flag;
+            miner.target = miner.id; // Dummy because flag doesn't have an id. Duh.
             console.log(miner.name+' assigned to '+miner.task+' '+miner.target);
         }
     },
