@@ -17,18 +17,21 @@ module.exports = {
             // Remote mine sources tagged with a "harvest" flag
             if (flag.type == 'harvest') {
                 // Find nearest room with an owned controller
+                console.log('Assigning owner room to flag '+flag);
                 var lo_range = null;
                 var lo_room = null;
                 for (var name in this.rooms) {
                     var room = this.rooms[name];
                     if (room.controller && room.controller.my == true) {
                         var range = getRoomLinearDistance(flag.room.name, room.name);
+                        console.log('  candidate room '+room+' range is '+range);
                         if (lo_range == null || range < lo_range) {
                             lo_range = range;
                             lo_room = room;
                         }
                     }
                 }
+                console.log('  assigned to room '+room);
                 flag.memory = { owner: lo_room.name };
                 // Add this flag to that room
                 if (!lo_room.harvest_flags) { lo_room.harvest_flags = []; }
