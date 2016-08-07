@@ -151,6 +151,9 @@ module.exports = {
         // FINALLY: Any leftover drones? Upgrade
         this.assign_task_upgrade(drones);
 
+        // Remote miners
+        this.assign_task_remote_mine(miners);
+
 
         // Under attack and we have no towers? Spawn biters and spitters and hope for the best
         if (this.hostile_creeps.length > 0 && this.towers.length == 0) {
@@ -409,6 +412,14 @@ module.exports = {
             miner.target = source.id;
             //console.log(drone.name+' assigned to '+drone.task+' '+drone.target);
             if (miners.length < 3) { break; } // Bootstrap/emergency
+        }
+    },
+
+    assign_task_remote_mine: function(miners) {
+        while (miners.length > 0) {
+            var miner = miners.shift();
+            miner.task = 'remote mine';
+            miner.target = miner.memory.flag;
         }
     },
 

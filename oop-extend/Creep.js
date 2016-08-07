@@ -67,6 +67,7 @@ module.exports = {
         }
 
         // Tasks that do not consume energy (continued)
+        if (this.task == 'remote mine') { this.task_remote_mine(); return; }
         if (this.task == 'mine') { this.task_mine(); return; }
         if (this.task == 'claim') { this.task_claim(); return; }
         if (this.task == 'travel') { this.task_travel(); return; }
@@ -263,6 +264,66 @@ module.exports = {
             this.memory.tracking = false;
         }
         return;
+    },
+
+    task_remote_mine: function() {
+        if (typeof this.memory.phase == 'undefined') { this.memory.phase = 'mining'; }
+        var flag = Game.getObjectById(this.memory.flag);
+        if (this.memory.phase == 'mining') {
+            // In the right room yet?
+            if (this.room.name == this.memory.mine) {
+                // Yes. Locate source at flag
+                var found = this.room.look.lookForAt(LOOK_SOURCES, flag);
+                var source = found[0];
+                if (source == null) { flag.remove(); return; } // User error
+                if (this.pos.getRangeTo(source) > 1) {
+                    // Move closer
+                    this.move_to(source);
+                    console.log('Miner '+this+' approaching source ('+source+' in '+this.memory.mine+')');
+                    return;
+                } else {
+                    if (this.is_full()) {
+                        this.memory_phase = 'unloading';
+                    } else {
+                        // Get energy
+                        this.harvest(source);
+                        console.log('Miner '+this+' harvesting source ('+source+' in '+this.memory.mine+')');
+                        return;
+                    }
+                }
+            } else {
+                // No
+                this.move_to(flag);
+                console.log('Miner '+this+' moving to flag ('+flag+' in '+this.memory.mine+')');
+                return;
+            }
+        }
+        if (this.memory.phase == 'unloading') {
+            var ctrl = Game.rooms[this.memory.home].controller;
+            // In the right room yet?
+            if (this.room.name == this.memory.home) {
+                // Yes, approach controller
+                if (this.pos.getRangeTo(ctrl) > 3) {
+                    this.move_to(ctrl);
+                    console.log('Miner '+this+' approaching controller ('+ctrl+' in '+this.memory.home+')');
+                    return;
+                } else {
+                    if (this.is_empty()) {
+                        this.memory.phase = 'mining';
+                        return;
+                    } else {
+                        this.upgrade(ctrl);
+                        console.log('Miner '+this+' upgrading controller ('+ctrl+' in '+this.memory.home+')');
+                        return;
+                    }
+                }
+            } else {
+                // No
+                this.move_to(ctrl);
+                console.log('Miner '+this+' moving to upgrade ('+ctrl+' in '+this.memory.home+')');
+                return;
+            }
+        }
     },
 
     task_mine: function() {
