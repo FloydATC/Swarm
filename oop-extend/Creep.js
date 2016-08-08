@@ -313,6 +313,26 @@ module.exports = {
                 // No
                 this.move_to(ctrl);
                 //console.log('Miner '+this+' moving to upgrade ('+ctrl+' in '+this.memory.home+')');
+                // Experimental: Road maintenance here?
+                var structures = this.pos.lookFor(LOOK_STRUCTURES);
+                for (var i in structures) {
+                    var s = structures[i];
+                    if (s.structureType == STRUCTURE_ROAD && s.hits < s.hitsMax) {
+                        this.repair(s);
+                        break;
+                    }
+                }
+
+                // Experimental: Road construction here?
+                var csites = this.pos.lookFor(LOOK_CONSTRUCTION_SITES);
+                for (var i in csites) {
+                    var cs = csites[i];
+                    if (cs.structureType == STRUCTURE_ROAD) {
+                        this.build(cs);
+                        break;
+                    }
+                }
+                
                 return;
             }
         }
