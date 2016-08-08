@@ -115,3 +115,16 @@ doctorpc
 1:21 "V2 added checks to see if the spawn was my own"
 1:21 xD
 */
+
+/*
+
+daboross
+8:38 AM yeah, I'm pretty sure it's possible to get values that are currently in the memory tree from an external API - I'm not sure of the officialness of it
+8:38 there are things like https://github.com/screepers/screeps-stats which do this, that and https://github.com/screepers/screeps-grafana might both be good sources for usages of that API
+GitHub
+screepers/screeps-stats
+screeps-stats - Access Screeps Console, Performance, and Statistics Data via Kibana and ElasticSearch
+GitHub
+screepers/screeps-grafana
+screeps-grafana - Pretty graphs for screeps
+*/
