@@ -79,7 +79,7 @@ module.exports = {
 
         // Energy within reach? Try to grab it.
         if (this.free > 0) {
-            var treasures = this.pos.findInRange(RESOURCE_ENERGY, 1);
+            var treasures = this.pos.findInRange(FIND_DROPPED_ENERGY, 1);
             if (treasures.length > 0) { this.pickup(treasures[0]); this.say('Treasure'); return; }
         }
 
@@ -281,13 +281,17 @@ module.exports = {
                     // Move closer
                     this.move_to(source);
                     //console.log('Miner '+this+' approaching source ('+source+' in '+this.memory.mine+')');
-                    return;
                 } else {
                     // Get energy
                     this.harvest(source);
                     //console.log('Miner '+this+' harvesting source ('+source+' in '+this.memory.mine+')');
-                    return;
                 }
+                // Dropped energy within reach? Grab it.
+                var treasures = this.pos.findInRange(FIND_DROPPED_ENERGY, 1);
+                if (treasures.length > 0) {
+                    this.pickup(treasures[0]);
+                }
+                return;
             } else {
                 // No
                 this.move_to(flag);
@@ -332,7 +336,7 @@ module.exports = {
                         break;
                     }
                 }
-                
+
                 return;
             }
         }

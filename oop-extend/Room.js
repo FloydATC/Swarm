@@ -103,6 +103,15 @@ module.exports = {
             }
         }
 
+        // EXPERIMENTAL
+        // If the room has miners but no drones, morph one miner into a drone. This drone will then stay at the source.
+        if (drones.length == 0 && miners.length >= 1) {
+            var creep = miners.shift();
+            creep.memory.class = 'Drone';
+            drones.push(creep);
+            console.log(this+' morphed '+creep+' into a Drone');
+        }
+
         // Biters swarm and attack threats. Recycle when no longer needed.
         this.assign_task_attack(biters);
 
@@ -188,7 +197,7 @@ module.exports = {
                 if (flag.memory.ticks > flag.memory.frequency) {
                     // Time to spawn another Miner to work this flag
                     console.log(this+' spawning a remote miner for '+flag.pos.roomName);
-                    var result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
+                    var result = this.createCreep([MOVE,MOVE,CARRY,CARRY,WORK,WORK], undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
                     if (result == OK) { flag.memory.ticks = 0; }
                     return;
                 }
