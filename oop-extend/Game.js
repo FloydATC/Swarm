@@ -39,7 +39,7 @@ module.exports = {
                 lo_room.harvest_flags.push(flag);
 
                 // Calculate and set spawn interval in ticks
-                flag.memory.frequency = 300;
+                flag.memory.frequency = 250; // TTL / 6
                 flag.memory.ticks = (flag.memory.ticks + 1) || 0;
             }
 

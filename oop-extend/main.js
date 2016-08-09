@@ -128,3 +128,19 @@ GitHub
 screepers/screeps-grafana
 screeps-grafana - Pretty graphs for screeps
 */
+
+/*
+puciek
+12:06 PM
+
+Dear [sir and/or madam],
+
+You have been [removed/harassed/starved out] from [insert room here] on [date].
+
+Main reason for [removal/harassment/starvation] was [I want your room/boredom/smacktalking] and the main reason why it
+worked so well were [empty turrets/broken turret code/not sufficent storage/awful turret placement]. If you need to
+[write angry words/call someone a noob/get revenge/get help and git gut] then you are best to [undefined/undefined/respawn/join screeps slack] or message [person who removed you] directly.
+
+[Have a great day/Praise the sun]
+[Person who removed you]
+*/
