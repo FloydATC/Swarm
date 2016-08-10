@@ -96,14 +96,14 @@ Routingtable.prototype.setDirectionTo = function(address, direction) {
             continue;
         }
         // Finish span and start a new one
-        routes.push(span_a1 == span_a2 ? span_a1+'='+span_dir : span_a1+'-'+span_a2+'='+span_dir);
+        routes.push(span_a1 == span_a2 ? ('0'+span_a1).slice(-4)+'='+span_dir : ('0'+span_a1).slice(-4)+'-'+('0'+span_a2).slice(-4)+'='+span_dir);
         span_a1 = addr;
         span_a2 = addr;
         span_dir = dir;
     }
     if (span_a1 != null) {
         // Finish last span
-        routes.push(span_a1 == span_a2 ? span_a1+'='+span_dir : span_a1+'-'+span_a2+'='+span_dir);
+        routes.push(span_a1 == span_a2 ? ('0'+span_a1).slice(-4)+'='+span_dir : ('0'+span_a1).slice(-4)+'-'+('0'+span_a2).slice(-4)+'='+span_dir);
     }
     this.table = routes.join(',');
 }
