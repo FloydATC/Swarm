@@ -268,6 +268,7 @@ module.exports = {
 
     task_remote_mine: function() {
         var flag = Game.flags[this.memory.flag];
+        this.memory.tracking = true;
         if (this.memory.working == true && this.is_empty()) { this.memory.working = false; }
         if (this.memory.working == false && this.is_full()) { this.memory.working = true; }
         if (this.memory.working == false) {
@@ -456,6 +457,7 @@ module.exports = {
     },
 
     direction_vector: function(direction) {
+        if (!(direction >= 0 && direction <= 8)) { return [0,0]; } // Invalid direction
         var vec = [[0,0], [0,-1], [1,-1], [1,0], [1,1], [0,1], [-1,1], [-1,0], [-1,-1] ];
         return vec[direction];
     },
@@ -502,10 +504,10 @@ module.exports = {
 
     move_to: function(target) {
         if (this.fatigue > 0) { return; }
-        this.moveTo(target);
+        //this.moveTo(target);
         this.add_stats('move')
-        return;
-        /*
+        //return;
+
         if (this.pos.roomName == target.pos.roomName) {
             var direction = this.room.get_direction(this.pos, target.pos);
             if (direction >= 1 && direction <= 8) {
@@ -525,7 +527,7 @@ module.exports = {
         //console.log('#DEBUG '+this+' moveTo('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+')');
         this.moveTo(target, { ignoreCreeps: true } );
         this.learn_path();
-        */
+
     },
 
     next_position: function(direction) {
