@@ -5,6 +5,7 @@ function Routingtable(table) {
 
 Routingtable.prototype.getDirectionTo = function(address) {
     var a = address * 1;
+    if (typeof this.table == 'undefined') { return null; }
     var routes = this.table.split(',');
     for (var i=0; i<routes.length; i++) {
         var route = routes[i];
@@ -30,7 +31,8 @@ Routingtable.prototype.setDirectionTo = function(address, direction) {
     var a = address * 1;
     var expanded = [];
     // Expand routing table while maintaining sort order
-    var routes = this.table.split(',');
+    var routes = [];
+    if (!(typeof this.table == 'undefined')) { routes = this.table.split(','); }
     for (var i=0; i<routes.length; i++) {
         var route = routes[i];
         var a1 = route.substring(0,4) * 1;
