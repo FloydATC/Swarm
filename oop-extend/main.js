@@ -10,8 +10,6 @@ var extend_s_spawn = require('StructureSpawn');
 var extend_s_storage = require('StructureStorage');
 var extend_s_tower = require('StructureTower');
 
-var Routingtable = require('Routingtable');
-
 var show_perf = true;
 
 module.exports.loop = function () {
