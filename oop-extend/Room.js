@@ -621,8 +621,11 @@ module.exports = {
         var pos2 = ('0'+dst.x).slice(-2) + ('0'+dst.y).slice(-2); // Format as XXYY
         if (!this.memory.router) { this.memory.router = {}; }
         if (!this.memory.router[pos1]) { this.memory.router[pos1] = {}; }
+        var table = new Routingtable(this.memory.router[pos1]['table']);
+        table.setDirectionTo(pos2, direction);
+        this.memory.router[pos1]['table'] = table;
         //console.log('-->:'+pos1+'-'+pos2+'='+direction);
-        this.memory.router[pos1][pos2] = direction;
+        //this.memory.router[pos1][pos2] = direction;
         this.memory.router[pos1]['mru'] = Game.time;
     },
 
@@ -632,9 +635,11 @@ module.exports = {
         //console.log('???:'+pos1+'-'+pos2);
         if (!this.memory.router) { return null; }
         if (!this.memory.router[pos1]) { return null; }
-        if (!this.memory.router[pos1][pos2]) { return null; }
-        var direction = this.memory.router[pos1][pos2];
+        //if (!this.memory.router[pos1][pos2]) { return null; }
+        //var direction = this.memory.router[pos1][pos2];
         this.memory.router[pos1]['mru'] = Game.time;
+        var table = new Routingtable(this.memory.router[pos1]['table']);
+        var direction = table.getDirectionTo(pos2);
         //console.log('HIT:'+pos1+'-'+pos2+'='+direction);
         return direction;
     },
