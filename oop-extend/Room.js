@@ -624,7 +624,7 @@ module.exports = {
         if (!this.memory.router[pos1]) { this.memory.router[pos1] = {}; }
         var table = new Routingtable(this.memory.router[pos1]['table']);
         table.setDirectionTo(pos2, direction);
-        this.memory.router[pos1]['table'] = table;
+        this.memory.router[pos1]['table'] = table.asString();
         //console.log('-->:'+pos1+'-'+pos2+'='+direction);
         //this.memory.router[pos1][pos2] = direction;
         this.memory.router[pos1]['mru'] = Game.time;

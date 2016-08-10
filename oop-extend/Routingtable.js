@@ -3,6 +3,10 @@ function Routingtable(table) {
     this.table = table; // E.g '0703-0708=1,0815=2'. MUST always be in sort order!
 }
 
+Routingtable.prototype.asString = function() {
+    return this.table;
+}
+
 Routingtable.prototype.getDirectionTo = function(address) {
     var a = address * 1;
     if (typeof this.table == 'undefined') { return null; }
