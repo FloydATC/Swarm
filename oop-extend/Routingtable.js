@@ -3,7 +3,7 @@ function Routingtable(table) {
     this.table = table; // E.g '0703-0708=1,0815=2'. MUST always be in sort order!
 }
 
-Routingtable.prototype.getDirectionTo: function(address) {
+Routingtable.prototype.getDirectionTo = function(address) {
     var a = address * 1;
     var routes = this.table.split(',');
     for (var i=0; i<routes.length; i++) {
@@ -25,7 +25,7 @@ Routingtable.prototype.getDirectionTo: function(address) {
     }
 }
 
-Routingtable.prototype.setDirectionTo: function(address, direction) {
+Routingtable.prototype.setDirectionTo = function(address, direction) {
     if (this.getDirectionTo(address) == direction) { return; } // No change
     var a = address * 1;
     var expanded = [];
