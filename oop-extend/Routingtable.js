@@ -90,7 +90,7 @@ Routingtable.prototype.setDirectionTo = function(address, direction) {
             span_dir = dir;
             continue;
         }
-        if (span_dir == dir && span_a2*1 == addr*1 + 1) {
+        if (span_dir == dir && span_a2*1 + 1 == addr*1) {
             // Continue span
             span_a2 = addr;
             continue;
