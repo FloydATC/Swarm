@@ -4,6 +4,27 @@ function Routingtable(table) {
     this.expanded = null;
 }
 
+// Each room tile may have a single routing table
+
+// A routing table is stored as a single string containing one or more
+// comma separated KEY=VALUE pairs, where each pair indicates the
+// next movement needed to reach one (XXYY) or more (XXY1-XXY2) consecutive
+// tiles. The KEY order always sorted, this must not be tampered with.
+
+// Typical use for lookups:
+// var table = room.load_routing_table(X1Y1);
+// var direction = table.getDirectionTo(X2Y2);
+
+// Typical use for learning:
+// var table = room.load_routing_table(X1Y1);
+// table.setDirectionTo(X2Y2, direction); // Repeat for each destination
+// room.save_routing_table(X1Y1, table);
+
+// When making changes with setDirectionTo(), the routing table is expanded
+// When saving the Routingtable, the caller is expected to access its contents
+// via the .asString() method which (if needed) will compress the contents by
+// aggregating consecutive tiles back into XXY1-XXY2 format.
+
 Routingtable.prototype.asString = function() {
     this.compress();
     return this.table;
