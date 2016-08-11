@@ -617,6 +617,21 @@ module.exports = {
         return upgraders;
     },
 
+    load_routing_table: function(tile) {
+        if (!this.memory.router) { this.memory.router = {}; }
+        if (!this.memory.router[tile]) { this.memory.router[tile] = {}; }
+        this.memory.router[tile]['mru'] = Game.time;
+        var table = new Routingtable(this.memory.router[tile]['table']);
+        return table;
+    },
+
+    save_routing_table: function(tile, table) {
+        if (!this.memory.router) { this.memory.router = {}; }
+        if (!this.memory.router[tile]) { this.memory.router[tile] = {}; }
+        this.memory.router[tile]['table'] = table.asString();
+    }
+
+    /*
     set_direction: function(src, dst, direction) {
         var pos1 = ('0'+src.x).slice(-2) + ('0'+src.y).slice(-2); // Format as XXYY
         var pos2 = ('0'+dst.x).slice(-2) + ('0'+dst.y).slice(-2); // Format as XXYY
@@ -629,6 +644,7 @@ module.exports = {
         //this.memory.router[pos1][pos2] = direction;
         this.memory.router[pos1]['mru'] = Game.time;
     },
+    */
 
     get_direction: function(src, dst) {
         var pos1 = ('0'+src.x).slice(-2) + ('0'+src.y).slice(-2); // Format as XXYY
