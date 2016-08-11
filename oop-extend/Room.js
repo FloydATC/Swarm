@@ -629,7 +629,7 @@ module.exports = {
         if (!this.memory.router) { this.memory.router = {}; }
         if (!this.memory.router[tile]) { this.memory.router[tile] = {}; }
         this.memory.router[tile]['table'] = table.asString();
-    }
+    },
 
     /*
     set_direction: function(src, dst, direction) {
