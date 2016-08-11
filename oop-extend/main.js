@@ -15,16 +15,18 @@ var show_perf = true;
 module.exports.loop = function () {
 
     // Scavenge dead creeps
-    var memory_names = Object.keys(Memory.creeps);
-    for(var i in memory_names) {
-        var name = memory_names[i];
-        var tombstone = Memory.creeps[name];
-        if (Game.creeps[name] == null) {
-            console.log(tombstone.class+' '+name+' has died in '+tombstone.where+' at age '+tombstone.age);
-            delete Memory.creeps[name];
+    if (Game.time % 87 == 0) {
+        var memory_names = Object.keys(Memory.creeps);
+        for(var i in memory_names) {
+            var name = memory_names[i];
+            var tombstone = Memory.creeps[name];
+            if (Game.creeps[name] == null) {
+                console.log(tombstone.class+' '+name+' has died in '+tombstone.where+' at age '+tombstone.age);
+                delete Memory.creeps[name];
+            }
         }
+        if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' scavenged dead creeps'); }
     }
-    if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' scavenged dead creeps'); }
 
     // Extend game object instance (can't extend class?)
     for (var key in extend_game) { Game[key] = extend_game[key]; }
@@ -54,9 +56,19 @@ module.exports.loop = function () {
         if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' optimized '+room); }
         room.execute();
         if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' executed '+room); }
-        room.expire_routes();
-        if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' expired routes '+room); }
-        if (show_perf) { console.log(room+' routing table: '+roughSizeOfObject(Memory.rooms[room.name].router)+' bytes (est.)'); }
+
+        if (Game.time % 100 == 0) {
+            room.expire_routes();
+            if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' expired routes '+room); }
+            if (show_perf) { console.log(room+' routing table: '+roughSizeOfObject(Memory.rooms[room.name].router)+' bytes (est.)'); }
+
+
+        }
+
+        if (Game.time % 1000 == 0) {
+            // Reset road votes
+            for (var name in Memory.rooms) { delete Memory.rooms[name].votes; }
+        }
 
     }
     if (show_perf) { console.log('(finished)'); }
