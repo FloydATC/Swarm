@@ -64,7 +64,7 @@ Routingtable.prototype.setDirectionTo = function(address, direction) {
         var a1 = route.substring(0,4) * 1;
         if (a1 < a) { continue; }
         if (a1 == a) {
-            expanded[i] = address+'='+direction; // Update existing
+            this.expanded[i] = address+'='+direction; // Update existing
             found = true;
             break;
         }
