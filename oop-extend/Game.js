@@ -86,6 +86,7 @@ module.exports = {
         var r2_parts = regex.exec(r2);
         //console.log(r1+' parts: '+JSON.stringify(r1_parts));
         //console.log(r2+' parts: '+JSON.stringify(r2_parts));
+        if (r1_parts == null || r2_parts == null) { return 0; } // This happens in simulator
         if (r1_parts[1] != r2_parts[1]) { r1_parts[2] = r1_parts[2] * -1 } // East is opposite of west
         if (r1_parts[3] != r2_parts[3]) { r1_parts[4] = r1_parts[4] * -1 } // North is opposite of south
         return Math.abs(r1_parts[2] - r2_parts[2]) + Math.abs(r1_parts[4] - r2_parts[4]);
