@@ -590,6 +590,7 @@ module.exports = {
                 x2 = this.memory._move.dest.x;
                 y2 = this.memory._move.dest.y;
                 var dst = ('0'+x2).slice(-2)+('0'+y2).slice(-2); // XXYY
+                console.log('  learning route src='+src+' dst='+dst+' nexthop='+nexthop);
                 table.setDirectionTo(dst, nexthop);
 //            }
             this.room.save_routing_table(src, table);
