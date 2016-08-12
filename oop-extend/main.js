@@ -27,6 +27,7 @@ Object.defineProperty(Source.prototype, 'memory', {
         Memory.sources[this.id] = value;
     }
 });
+*/
 Object.defineProperty(StructureSpawn.prototype, 'memory', {
     get: function() {
         if(_.isUndefined(Memory.spawns)) { Memory.spawns = {}; }
@@ -39,7 +40,6 @@ Object.defineProperty(StructureSpawn.prototype, 'memory', {
         Memory.spawns[this.id] = value;
     }
 });
-*/
 
 profiler.enable(); // Game.profiler.profile(100) -or- Game.profiler.email(100)
 module.exports.loop = function() {
