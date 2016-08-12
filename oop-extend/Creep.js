@@ -222,8 +222,23 @@ module.exports = {
     shift_nearest: function(targets) {
         var x = this.pos.x;
         var y = this.pos.y;
-        var targets_by_range = targets.sort( function(a,b) { return a.pos.getRangeTo(x,y) - b.pos.getRangeTo(x,y); } );
-        return targets_by_range.shift();
+        //var targets_by_range = targets.sort( function(a,b) { return a.pos.getRangeTo(x,y) - b.pos.getRangeTo(x,y); } );
+        var lo_range = null;
+        var lo_index = null;
+        for (var i=0; i<targets.length; i++) {
+            var range = targets[i].pos.getRangeTo(x, y);
+            if (lo_range == null || range < lo_range) {
+                lo_range = range;
+                lo_index = i;
+                if (lo_range == 1) { break; } // Close enough
+            }
+        }
+        if (lo_index == null) {
+            return null;
+        } else {
+            return targets.splice(lo_index, 1);
+        }
+        //return targets_by_range.shift();
     },
 
     is_full: function() {
