@@ -9,7 +9,7 @@ module.exports = {
         for (var i=0; i<this.memory.workers.length; i++) {
             var id = this.memory.workers[i];
             var creep = Game.getObjectById(id);
-            if (creep != null) { this.workers.push(creep); }
+            if (creep != null) { this.workers.push(creep.id); }
         }
         this.memory.workers = this.workers;
         this.memory.lead_time = this.memory.lead_time || 100;
