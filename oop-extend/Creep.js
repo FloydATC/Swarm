@@ -336,11 +336,6 @@ module.exports = {
             // In the right room yet?
             if (this.room.name == this.memory.home) {
                 // Yes, approach upgrader (or controller if no upgrader is present)
-                if (this.pos.getRangeTo(target) > 1) {
-                    this.move_to(target);
-                    //console.log('Fetcher '+this+' approaching target ('+target+' in '+this.memory.home+')');
-                    return;
-                };
                 if (upgrader && this.pos.getRangeTo(target) <= 1) {
                     this.transfer(target, RESOURCE_ENERGY);
                     this.drop(RESOURCE_ENERGY);
@@ -352,6 +347,11 @@ module.exports = {
                     //console.log('Fetcher '+this+' upgrading controller ('+ctrl+' in '+this.memory.home+')');
                     return;
                 }
+                if (this.pos.getRangeTo(target) > 1) {
+                    this.move_to(target);
+                    //console.log('Fetcher '+this+' approaching target ('+target+' in '+this.memory.home+')');
+                    return;
+                };
             } else {
                 // No
                 this.move_to(ctrl);
