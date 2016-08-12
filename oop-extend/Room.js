@@ -28,7 +28,7 @@ module.exports = {
         // Owned controller? There should be a flag on it coordinating the upgrading efforts
         if (this.controller && this.controller.my && this.flag == null) {
             var flagname = 'controller '+this.name;
-            this.createFlag(this.controller.pos, 'controller '+flagname);
+            this.createFlag(this.controller.pos, flagname);
             Memory.flags[flagname].controller = this.controller.id;
         }
 

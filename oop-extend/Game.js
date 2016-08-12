@@ -56,7 +56,7 @@ module.exports = {
                         flag.remove();
                         continue;
                     }
-                    ctrl.flag = this;
+                    ctrl.flag = flag;
 
                     // Calculate and set spawn parameters
                     flag.memory.lead_time = 20; // How many ticks from spawn to arrival? FIXME!!!
