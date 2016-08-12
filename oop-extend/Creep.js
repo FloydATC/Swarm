@@ -590,7 +590,7 @@ module.exports = {
                 x2 = this.memory._move.dest.x;
                 y2 = this.memory._move.dest.y;
                 var dst = ('0'+x2).slice(-2)+('0'+y2).slice(-2); // XXYY
-                console.log('  learning route src='+src+' dst='+dst+' nexthop='+nexthop);
+                //console.log('  learning route src='+src+' dst='+dst+' nexthop='+nexthop);
                 table.setDirectionTo(dst, nexthop);
 //            }
             this.room.save_routing_table(src, table);
@@ -608,7 +608,7 @@ module.exports = {
         if (this.pos.roomName == target.pos.roomName) {
             var direction = this.room.get_direction(this.pos, target.pos);
             if (direction >= 1 && direction <= 8) {
-                console.log('#DEBUG '+this+' ROUTER move('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+')');
+                //console.log('#DEBUG '+this+' ROUTER move('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+')');
                 var newpos = this.next_position(direction);
                 if (this.reserve_position(newpos) == true) {
                     this.move(direction);
@@ -652,7 +652,7 @@ module.exports = {
             // Another creep is sitting there but has not indicated a movement (yet)
             if (!creep.memory.moving_to && !creep.memory._move && creep.pos.x == pos.x && creep.pos.y == pos.y) { return false; }
         }
-        console.log(this+' can not see anyone blocking '+pos);
+        //console.log(this+' can not see anyone blocking '+pos);
         if (this.memory.moving_to && this.memory.moving_to.x == pos.x && this.memory.moving_to.y == pos.y) {
             // We already tried this move
             delete this.memory.moving_to;
