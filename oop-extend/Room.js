@@ -203,14 +203,14 @@ module.exports = {
                 var needs = flag.needs();
                 if (needs == 'Miner') {
                     console.log(this+' spawning a remote miner for '+flag.pos.roomName);
-                    var result = this.createCreep([WORK,WORK,WORK,WORK,WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
+                    var result = this.createCreep([WORK,WORK,WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
                     if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } ); }
                     if (result == OK) { flag.spawned('Miner'); }
                     return;
                 }
                 if (needs == 'Fetcher') {
                     console.log(this+' spawning a remote fetcher for '+flag.pos.roomName);
-                    var result = this.createCreep([WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE], undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
+                    var result = this.createCreep([WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE], undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
                     if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } ); }
                     if (result == OK) { flag.spawned('Fetcher'); }
                     return;
