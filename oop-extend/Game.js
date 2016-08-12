@@ -59,7 +59,7 @@ module.exports = {
                     ctrl.flag = flag;
 
                     // Calculate and set spawn parameters
-                    flag.memory.lead_time = 40; // How many ticks from spawn to arrival? FIXME!!!
+                    flag.memory.lead_time = 20; // How many ticks from spawn to arrival? FIXME!!!
                     flag.memory.cooldown = 600; // How many ticks minimum between spawns? FIXME!!!
                     flag.memory.workforce = { 'Zealot': 1 };
                 }
