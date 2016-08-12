@@ -10,6 +10,7 @@ module.exports = {
         }
 
         // Act on flags
+        console.log('flags: '+flags);
         for (var name in this.flags) {
             var flag = this.flags[name];
             //console.log(this+' flag '+flag+' type '+flag.type()+' at '+flag.pos);
