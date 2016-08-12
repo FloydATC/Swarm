@@ -28,6 +28,7 @@ Object.defineProperty(Source.prototype, 'memory', {
     }
 });
 */
+/*
 Object.defineProperty(StructureSpawn.prototype, 'memory', {
     get: function() {
         if(_.isUndefined(Memory.spawns)) { Memory.spawns = {}; }
@@ -40,7 +41,7 @@ Object.defineProperty(StructureSpawn.prototype, 'memory', {
         Memory.spawns[this.id] = value;
     }
 });
-
+*/
 profiler.enable(); // Game.profiler.profile(100) -or- Game.profiler.email(100)
 module.exports.loop = function() {
     profiler.wrap(function() {
@@ -78,8 +79,8 @@ module.exports.loop = function() {
     // Apply shared traits
     for (var key in traits_task_coordinator) {
         Flag.prototype[key] = traits_task_coordinator[key];
-        Source.prototype[key] = traits_task_coordinator[key];
-        StructureSpawn.prototype[key] = traits_task_coordinator[key];
+        //Source.prototype[key] = traits_task_coordinator[key];
+        //StructureSpawn.prototype[key] = traits_task_coordinator[key];
     }
 
     if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' extended game classes'); }
