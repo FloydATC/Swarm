@@ -99,7 +99,7 @@ module.exports = {
     get_energy: function() {
 
         // Consider energy dropped on the ground
-        //console.log(this+' looking for energy on the ground');
+        console.log(this+' looking for energy on the ground');
         var all_dropped_energy = this.room.dropped_energy.slice();
         while (all_dropped_energy.length > 0) {
             var energy = this.shift_nearest(all_dropped_energy);
@@ -121,7 +121,7 @@ module.exports = {
         }
 
         // Consider fetching energy from a link
-        //console.log(this+' considers fetching energy from a container');
+        console.log(this+' considers fetching energy from a container');
         if (this.task == 'feed tower' || this.task == 'feed spawn' || this.task == 'feed extension') {
             var links = this.room.links.slice();
             while (links.length > 0) {
@@ -143,7 +143,7 @@ module.exports = {
         }
 
         // Consider fetching energy from a container
-        //console.log(this+' considers fetching energy from a container');
+        console.log(this+' considers fetching energy from a container');
         if (this.task != 'upgrade' && this.task != 'stockpile') {
             var containers = this.room.containers.slice();
             while (containers.length > 0) {
@@ -165,7 +165,7 @@ module.exports = {
         }
 
         // Consider mining
-        //console.log(this+' considers mining for energy');
+        console.log(this+' considers mining for energy');
         var sources = this.room.sources.slice();
         while (sources.length > 0) {
             var source = this.shift_nearest(sources);
