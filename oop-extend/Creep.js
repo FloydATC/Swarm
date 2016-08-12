@@ -73,16 +73,16 @@ module.exports = {
             }
         }
 
+        // Free energy within reach? Try to grab it.
+        if (this.free > 0) {
+            var treasures = this.pos.findInRange(FIND_DROPPED_ENERGY, 1);
+            if (treasures.length > 0) { this.pickup(treasures[0]); this.say('Treasure'); return; }
+        }
+
         // Get energy if needed
         if (this.memory.working == true && this.is_empty()) { this.memory.working = false; }
         if (this.memory.working == false && this.is_full()) { this.memory.working = true; }
         if (this.memory.working == false) { this.get_energy(); return; }
-
-        // Energy within reach? Try to grab it.
-//        if (this.free > 0) {
-//            var treasures = this.pos.findInRange(FIND_DROPPED_ENERGY, 1);
-//            if (treasures.length > 0) { this.pickup(treasures[0]); this.say('Treasure'); return; }
-//        }
 
         // Tasks that consume energy
         if (this.task == 'feed spawn') { this.task_feed(); return; }
@@ -369,7 +369,6 @@ module.exports = {
             if (this.room.name == this.memory.home) {
                 // Yes, approach upgrader (or controller if no upgrader is present)
                 if (upgrader && this.pos.getRangeTo(target) <= 1) {
-                    this.transfer(target, RESOURCE_ENERGY);
                     this.drop(RESOURCE_ENERGY);
                     console.log('Fetcher '+this+' assisting ('+upgrader+' in '+this.memory.home+')');
                     return;
@@ -521,6 +520,10 @@ module.exports = {
         var flag = Game.flags[this.memory.flag];
         if (flag != null) { flag.assign_worker(this); } // Check in with flag
         if (this.pos.inRangeTo(target, 3)) {
+            if (this.free > 0) {
+                var treasures = this.pos.findInRange(FIND_DROPPED_ENERGY, 1);
+                if (treasures.length > 0) { this.pickup(treasures[0]); this.say('Treasure'); return; }
+            }
             if (this.energy > 0) {
                 this.upgradeController(target);
                 this.add_stats('upgrade');
