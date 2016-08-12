@@ -678,7 +678,7 @@ module.exports = {
             drone.task = 'upgrade';
             drone.target = this.controller.id;
             upgraders++;
-            //console.log(drone.name+' assigned to '+drone.task+' '+drone.target);
+            console.log(drone.name+' assigned to '+drone.task+' '+drone.target);
         }
         return upgraders;
     },
