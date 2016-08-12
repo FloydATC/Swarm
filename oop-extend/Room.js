@@ -65,6 +65,7 @@ module.exports = {
     creep_by_id: function(id) {
         for (var i=0; i<this.my_creeps.length; i++) {
             var creep = this.my_creeps[i];
+            console.log(this+' ==> looking for '+id+', found '+creep.id);
             if (creep.id == id) { return creep; }
         }
         return null;
