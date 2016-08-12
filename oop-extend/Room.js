@@ -98,7 +98,7 @@ module.exports = {
 
         var miners = [];        // Mine energy (in remote rooms for now)
         var fetchers = [];      // Fetch energy from remote mines
-        var upgraders = [];     // Camp next to controller and upgrade it
+        var zealots = [];     // Camp next to controller and upgrade it
         var drones = [];        // Generic workers
         var swarmers = [];      // Move to remote room then mutate into Infectors
         var infectors = [];     // Claim controller then mutate into Drone
@@ -112,7 +112,8 @@ module.exports = {
                 if (!creep.memory.class) { creep.memory.class = 'Drone'; console.log(this+' AMNESIAC '+creep+' assigned to Drone class'); }
                 if (creep.memory.class == 'Miner') { miners.push(creep); }
                 if (creep.memory.class == 'Fetcher') { fetchers.push(creep); }
-                if (creep.memory.class == 'Upgrader') { upgraders.push(creep); }
+                if (creep.memory.class == 'Upgrader') { creep.memory.class = 'Zealot'; } // TEMP
+                if (creep.memory.class == 'Zealot') { zealots.push(creep); }
                 if (creep.memory.class == 'Drone') { drones.push(creep); }
                 if (creep.memory.class == 'Swarmer') { swarmers.push(creep); }
                 if (creep.memory.class == 'Infector') { infectors.push(creep); }
@@ -174,8 +175,8 @@ module.exports = {
         // Containers needs energy?
         this.assign_task_stockpile(drones, containers);
 
-        // Upgraders always upgrade
-        this.assign_task_upgrade(upgraders);
+        // Zealots always upgrade
+        this.assign_task_upgrade(zealots);
 
         // FINALLY: Any leftover drones? Upgrade
         this.assign_task_upgrade(drones);
@@ -224,11 +225,11 @@ module.exports = {
         if (this.controller && this.controller.flag) {
             var flag = this.controller.flag;
             var needs = flag.needs();
-            if (needs == 'Upgrader') {
-                console.log(this+' spawning an upgrader for '+flag.pos.roomName);
-                var result = this.createCreep([WORK,WORK,WORK,WORK,WORK,CARRY,MOVE], undefined, { class: 'Upgrader', home: this.name, flag: flag.name } );
-                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Upgrader', home: this.name, flag: flag.name } ); }
-                if (result == OK) { flag.spawned('Upgrader'); }
+            if (needs == 'Zealot') {
+                console.log(this+' spawning a zealot for '+flag.pos.roomName);
+                var result = this.createCreep([WORK,WORK,WORK,WORK,WORK,CARRY,MOVE], undefined, { class: 'Zealot', home: this.name, flag: flag.name } );
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Zealot', home: this.name, flag: flag.name } ); }
+                if (result == OK) { flag.spawned('Zealot'); }
                 return;
             }
         }

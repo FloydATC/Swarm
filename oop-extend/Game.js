@@ -61,7 +61,7 @@ module.exports = {
                     // Calculate and set spawn parameters
                     flag.memory.lead_time = 20; // How many ticks from spawn to arrival? FIXME!!!
                     flag.memory.cooldown = 600; // How many ticks minimum between spawns? FIXME!!!
-                    flag.memory.workforce = { 'Upgrader': 1 };
+                    flag.memory.workforce = { 'Zealot': 1 };
                 }
             }
 
