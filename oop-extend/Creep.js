@@ -521,6 +521,7 @@ module.exports = {
         if (flag != null) { flag.assign_worker(this); } // Check in with flag
         if (this.pos.inRangeTo(target, 3)) {
             delete this.memory._move;
+            delete creep.memory.moving_to;
             if (this.carry.energy > 0) {
                 //console.log(this+' has energy and should upgrade '+target);
                 this.upgradeController(target);
