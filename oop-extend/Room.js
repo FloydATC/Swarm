@@ -41,7 +41,7 @@ module.exports = {
         if (this.memory.upgrader != null) {
             var creep = Game.getObjectById(this.memory.upgrader);
             if (creep != null && creep.memory.working == true && creep.memory.task.type == 'upgrade') {
-                this.memory.upgrader = creep.id;
+                this.upgrader = creep;
             } else {
                 this.memory.upgrader = null;
             }
