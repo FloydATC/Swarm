@@ -531,7 +531,7 @@ module.exports = {
                 }
             }
             if (this.memory.class == 'Zealot') {
-                console.log(this+' is the designated upgrader for '+this.room);
+                console.log(this+' is the designated upgrader for '+this.room+' ('+this.id+')');
                 this.room.memory.upgrader = this.id;
             }
             if (this.free > 0) {
