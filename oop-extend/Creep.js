@@ -234,11 +234,11 @@ module.exports = {
             }
         }
         if (lo_index == null) {
-            console.log('unable to find nearest in '+targets);
+            //console.log('unable to find nearest in '+targets);
             return null;
         } else {
             var nearest = targets.splice(lo_index, 1);
-            console.log(this+' nearest target is '+nearest[0]+' at range '+lo_range);
+            //console.log(this+' nearest target is '+nearest[0]+' at range '+lo_range);
             return nearest[0];
         }
         //return targets_by_range.shift();
