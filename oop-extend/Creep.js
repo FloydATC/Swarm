@@ -621,11 +621,13 @@ module.exports = {
                 return;
             }
         }
-        this.moveTo(target, { ignoreCreeps: true } );
-        console.log('#DEBUG '+this+' moveTo('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+' IGNORING CREEPS) = '+this.memory._move.path);
-        this.learn_path();
-        delete this.memory._move;
-        this.moveTo(target, { ignoreCreeps: false } );
+        if (this.pos.roomName == target.pos.roomName) {
+            this.moveTo(target, { ignoreCreeps: true } );
+            //console.log('#DEBUG '+this+' moveTo('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+' IGNORING CREEPS) = '+this.memory._move.path);
+            this.learn_path();
+        } else {
+            this.moveTo(target, { ignoreCreeps: false } );
+        }
 
     },
 
