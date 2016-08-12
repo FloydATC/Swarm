@@ -34,35 +34,36 @@ module.exports = {
         this.memory.workers.push(creep.id);
     },
 
-    worker_count: function(class) {
+    worker_count: function(c) {
         var count = 0;
         for (var i in this.workers) {
             var creep = Game.getObjectById(this.workers[i]);
-            if (creep.memory.class == class) { count++; }
+            if (creep.memory.class == c) { count++; }
         }
         return count;
     },
 
-    worker_lowest_ttl: function(class) {
+    worker_lowest_ttl: function(c) {
         var lowest_ttl = CREEP_LIFE_TIME;
         for (var i in this.workers) {
             var creep = Game.getObjectById(this.workers[i]);
+            if (creep.memory.class != c) { continue; } // Not the class we are looking for
             if (creep.ticksToLive < lowest_ttl) { lowest_ttl = creep.ticksToLive; }
         }
         return lowest_ttl;
     },
 
     needs: function() {
-        for (var class in this.memory.workforce) {
-            var minimum = this.memory.workforce[class];
-            var count = this.worker_count(class);
-            if (count < minimum || (count == minimum && this.worker_lowest_ttl(class) < this.memory.lead_time)) {
-                return class;
+        for (var c in this.memory.workforce) {
+            var minimum = this.memory.workforce[c];
+            var count = this.worker_count(c);
+            if (count < minimum || (count == minimum && this.worker_lowest_ttl(c) < this.memory.lead_time)) {
+                return c;
             }
         }
     },
 
-    spawned: function(class) {
-        this.memory.last_spawn[class] = Game.time;
+    spawned: function(c) {
+        this.memory.last_spawn[c] = Game.time;
     },
 };
