@@ -13,6 +13,32 @@ var traits_task_coordinator = require('TaskCoordinator');
 var profiler = require('Profiler');
 var show_perf = true;
 
+// Give sources and spawns memory
+Object.defineProperty(Source.prototype, 'memory', {
+    get: function() {
+        if(_.isUndefined(Memory.sources)) { Memory.sources = {}; }
+        if(!_.isObject(Memory.sources)) { return undefined; }
+        return Memory.sources[this.id] = Memory.sources[this.id] || {};
+    },
+    set: function(value) {
+        if(_.isUndefined(Memory.sources)) { Memory.sources = {}; }
+        if(!_.isObject(Memory.sources)) { throw new Error('Could not set source memory'); }
+        Memory.sources[this.id] = value;
+    }
+});
+Object.defineProperty(StructureSpawn.prototype, 'memory', {
+    get: function() {
+        if(_.isUndefined(Memory.spawns)) { Memory.spawns = {}; }
+        if(!_.isObject(Memory.spawns)) { return undefined; }
+        return Memory.spawns[this.id] = Memory.spawns[this.id] || {};
+    },
+    set: function(value) {
+        if(_.isUndefined(Memory.spawns)) { Memory.spawns = {}; }
+        if(!_.isObject(Memory.spawns)) { throw new Error('Could not set spawn memory'); }
+        Memory.spawns[this.id] = value;
+    }
+});
+
 
 profiler.enable(); // Game.profiler.profile(100) -or- Game.profiler.email(100)
 module.exports.loop = function() {
@@ -37,31 +63,6 @@ module.exports.loop = function() {
     // Extend game object instance (can't extend class?)
     for (var key in extend_game) { Game[key] = extend_game[key]; }
 
-    // Give sources and spawns memory
-    Object.defineProperty(Source.prototype, 'memory', {
-        get: function() {
-            if(_.isUndefined(Memory.sources)) { Memory.sources = {}; }
-            if(!_.isObject(Memory.sources)) { return undefined; }
-            return Memory.sources[this.id] = Memory.sources[this.id] || {};
-        },
-        set: function(value) {
-            if(_.isUndefined(Memory.sources)) { Memory.sources = {}; }
-            if(!_.isObject(Memory.sources)) { throw new Error('Could not set source memory'); }
-            Memory.sources[this.id] = value;
-        }
-    });
-    Object.defineProperty(StructureSpawn.prototype, 'memory', {
-        get: function() {
-            if(_.isUndefined(Memory.spawns)) { Memory.spawns = {}; }
-            if(!_.isObject(Memory.spawns)) { return undefined; }
-            return Memory.spawns[this.id] = Memory.spawns[this.id] || {};
-        },
-        set: function(value) {
-            if(_.isUndefined(Memory.spawns)) { Memory.spawns = {}; }
-            if(!_.isObject(Memory.spawns)) { throw new Error('Could not set spawn memory'); }
-            Memory.spawns[this.id] = value;
-        }
-    });
 
     // Extend game classes with custom methods
     for (var key in extend_creep) { Creep.prototype[key] = extend_creep[key]; }
