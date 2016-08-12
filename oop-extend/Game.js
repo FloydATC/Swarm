@@ -41,6 +41,7 @@ module.exports = {
 
                 // Calculate and set spawn parameters
                 flag.memory.lead_time = 200; // How many ticks from spawn to arrival? FIXME!!!
+                flag.memory.cooldown = 300; // How many ticks minimum between spawns? FIXME!!!
                 flag.memory.workforce = { 'Miner': 1, 'Fetcher': 2 };
 
                 //flag.memory.frequency = 250; // TTL / 6
