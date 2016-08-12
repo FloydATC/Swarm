@@ -678,7 +678,6 @@ module.exports = {
             drone.target = this.controller.id;
             console.log(drone.memory.class+' '+drone.name+' assigned to '+drone.task+' '+drone.target);
         }
-        return upgraders;
     },
 
     load_routing_table: function(tile) {
