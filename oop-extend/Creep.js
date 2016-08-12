@@ -151,8 +151,9 @@ module.exports = {
                 if (container instanceof StructureContainer) {
                     var reserved = container.reserved_amount || 0;
                     var wanted = this.carryCapacity - _.sum(this.carry);
-                    if (reserved >= container.store.energy) { continue; } // Not enough left for me
-                    console.log(this+' decided to fetch from '+container+' (has='+container.store.energy+' , reserved='+reserved+', wanted='+wanted+')');
+                    var available = container.store.energy;
+                    if (available < reserved + wanted) { continue; } // Not enough left for me
+                    console.log(this+' decided to fetch from '+container+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')');
                     container.reserved_amount = reserved + wanted;
                     if (this.pos.inRangeTo(container, 1)) {
                         this.withdraw(container, RESOURCE_ENERGY);
