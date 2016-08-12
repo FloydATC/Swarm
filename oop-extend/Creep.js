@@ -495,7 +495,7 @@ module.exports = {
     },
 
     direction_vector: function(direction) {
-        if (!(direction >= 0 && direction <= 8)) { return [0,0]; } // Invalid direction
+        if (!(direction >= 0 && direction <= 8)) { return vec[0]; } // Invalid direction
         var vec = [[0,0], [0,-1], [1,-1], [1,0], [1,1], [0,1], [-1,1], [-1,0], [-1,-1] ];
         return vec[direction];
     },
