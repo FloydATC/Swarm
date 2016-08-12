@@ -40,6 +40,7 @@ module.exports = {
         // Check if dedicated upgrader is alive
         if (this.memory.upgrader != null) {
             var creep = Game.getObjectById(this.memory.upgrader);
+            console.log(this+' this.memory.upgrader '+this.memory.upgrader);
             if (creep != null && creep.memory.working == true && creep.memory.task.type == 'upgrade') {
                 console.log(this+' dedicated upgrader is '+creep);
                 this.upgrader = creep;
