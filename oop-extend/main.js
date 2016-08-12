@@ -14,6 +14,7 @@ var profiler = require('Profiler');
 var show_perf = true;
 
 // Give sources and spawns memory
+/*
 Object.defineProperty(Source.prototype, 'memory', {
     get: function() {
         if(_.isUndefined(Memory.sources)) { Memory.sources = {}; }
@@ -38,7 +39,7 @@ Object.defineProperty(StructureSpawn.prototype, 'memory', {
         Memory.spawns[this.id] = value;
     }
 });
-
+*/
 
 profiler.enable(); // Game.profiler.profile(100) -or- Game.profiler.email(100)
 module.exports.loop = function() {
