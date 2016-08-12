@@ -448,7 +448,7 @@ module.exports = {
         }
     },
 
-    assign_task_remote_mine: function(fetchers) {
+    assign_task_remote_fetch: function(fetchers) {
         while (fetchers.length > 0) {
             var fetcher = fetchers.shift();
             fetcher.task = 'remote fetch';
