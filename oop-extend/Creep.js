@@ -104,7 +104,7 @@ module.exports = {
         while (all_dropped_energy.length > 0) {
             var energy = this.shift_nearest(all_dropped_energy);
             if (energy instanceof Resource) {
-                var reserved = link.reserved_amount || 0;
+                var reserved = energy.reserved_amount || 0;
                 var wanted = this.carryCapacity - _.sum(this.carry);
                 var available = energy.amount;
                 if (available < reserved + wanted) { continue; } // Not enough left for me
