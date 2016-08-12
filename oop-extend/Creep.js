@@ -150,8 +150,10 @@ module.exports = {
                 var container = this.shift_nearest(containers);
                 if (container instanceof StructureContainer) {
                     var reserved = container.reserved_amount || 0;
+                    var wanted = this.carryCapacity - _.sum(this.carry);
                     if (reserved >= container.store.energy) { continue; } // Not enough left for me
-                    container.reserved_amount = reserved + this.carryCapacity - _.sum(this.carry);
+                    console.log(this+' decided to fetch from '+container+' (has='+container.store.energy+' , reserved='+reserved+', wanted='+wanted+')');
+                    container.reserved_amount = reserved + wanted;
                     if (this.pos.inRangeTo(container, 1)) {
                         this.withdraw(container, RESOURCE_ENERGY);
                         this.memory.tracking = true;
