@@ -39,7 +39,8 @@ module.exports = {
 
         // Check if dedicated upgrader is alive
         if (this.memory.upgrader != null) {
-            var creep = Game.getObjectById(this.memory.upgrader);
+//            var creep = Game.getObjectById(this.memory.upgrader);
+            var creep = this.creep_by_id(this.memory.upgrader);
             console.log(this+' this.memory.upgrader '+this.memory.upgrader);
             if (creep != null && creep.memory.working == true && creep.memory.task.type == 'upgrade') {
                 console.log(this+' dedicated upgrader is '+creep);
@@ -60,6 +61,14 @@ module.exports = {
         this.containers = this.containers.sort( function(a,b) { return a.free - b.free; } ); // Note: Must initialize before sorting
 
     },
+
+    creep_by_id: function(id) {
+        for (var i=0; i<this.my_creeps.length; i++) {
+            var creep = this.my_creeps[i];
+            if (creep.id == id) { return creep; }
+        }
+        return null;
+    }
 
     repairable: function() {
         return this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits != undefined && s.hits < s.hitsMax; } });
