@@ -520,6 +520,10 @@ module.exports = {
         var flag = Game.flags[this.memory.flag];
         if (flag != null) { flag.assign_worker(this); } // Check in with flag
         if (this.pos.inRangeTo(target, 3)) {
+            if (this.free > 0) {
+                var treasures = this.pos.findInRange(FIND_DROPPED_ENERGY, 1);
+                if (treasures.length > 0) { this.pickup(treasures[0]); this.say('Treasure'); return; }
+            }
             if (this.energy > 0) {
                 this.upgradeController(target);
                 this.add_stats('upgrade');
@@ -527,10 +531,6 @@ module.exports = {
                     this.say('Praise GCL!');
                     this.room.memory.upgrader = this.id;
                 }
-            }
-            if (this.free > 0) {
-                var treasures = this.pos.findInRange(FIND_DROPPED_ENERGY, 1);
-                if (treasures.length > 0) { this.pickup(treasures[0]); this.say('Treasure'); return; }
             }
         } else {
             this.move_to(target);
