@@ -4,6 +4,7 @@ module.exports = {
 
     initialize: function() {
         //console.log(this+' initializing');
+        this.memory.workers = this.memory.workers || [];
         this.workers = [];
         for (var i in this.memory.workers) {
             var id = this.memory.workers[i];
@@ -30,7 +31,15 @@ module.exports = {
         return this.workers;
     },
 
+    has_worker: function(creep) {
+        for (var i in this.workers) {
+            if (this.workers[i] == creep.id) { return true; }
+        }
+        return false;
+    },
+
     assign_worker: function(creep) {
+        if (this.has_worker(creep)) { return; }
         this.memory.workers.push(creep.id);
     },
 

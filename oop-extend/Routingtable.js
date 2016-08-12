@@ -105,7 +105,7 @@ Routingtable.prototype.setDirectionTo = function(address, direction) {
 Routingtable.prototype.compress = function() {
     if (this.expanded == null) { return; }
     // Compress routing table
-    routes = [];
+    var routes = [];
     var span_a1 = null;
     var span_a2 = null;
     var span_dir = null;

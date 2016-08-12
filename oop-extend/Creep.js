@@ -534,7 +534,7 @@ module.exports = {
                 y2 = y2 + vector2[1];
                 //console.log(this+' path='+p+' length='+p.length+' p1='+offset1+' ('+x1+','+y1+') p2='+offset2+' ('+x2+','+y2+') direction='+nexthop);
                 //this.room.set_direction({ 'x': x1, 'y': y1 }, { 'x': x2, 'y': y2 }, nexthop);
-                dst = ('0'+x2).slice(-2)+('0'+y2).slice(-2); // XXYY
+                var dst = ('0'+x2).slice(-2)+('0'+y2).slice(-2); // XXYY
                 table.setDirectionTo(dst, nexthop);
             }
             this.room.save_routing_table(src, table);
@@ -573,6 +573,7 @@ module.exports = {
 
     next_position: function(direction) {
         var vector = this.direction_vector(direction);
+        if (vector == null) { vector = [0,0]; } // Should never happen
         var newpos = new RoomPosition(this.pos.x + vector[0], this.pos.y + vector[1], this.pos.roomName);
         if (newpos.x < 0 || newpos.y < 0 || newpos.x > 49 || newpos.y > 49) { return null; } // Boundary checks
         return newpos;
