@@ -128,7 +128,9 @@ module.exports = {
                 var link = this.shift_nearest(links);
                 if (link instanceof StructureLink) {
                     var reserved = link.reserved_amount || 0;
-                    if (reserved >= link.energy) { continue; } // Not enough left for me
+                    var wanted = this.carryCapacity - _.sum(this.carry);
+                    var available = link.store.energy;
+                    if (available < reserved + wanted) { continue; } // Not enough left for me
                     link.reserved_amount = reserved + this.carryCapacity - _.sum(this.carry);
                     if (this.pos.inRangeTo(link, 1)) {
                         this.withdraw(link, RESOURCE_ENERGY);
@@ -175,7 +177,6 @@ module.exports = {
                 var reserved = storage.reserved_amount || 0;
                 var wanted = this.carryCapacity - _.sum(this.carry);
                 var available = storage.store.energy;
-                if (available < reserved + wanted) { continue; } // Not enough left for me
                 if (available >= reserved + wanted) {
                     console.log(this+' decided to fetch from '+storage+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')');
                     storage.reserved_amount = reserved + this.carryCapacity - _.sum(this.carry);
