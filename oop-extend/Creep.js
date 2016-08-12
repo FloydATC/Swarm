@@ -238,7 +238,7 @@ module.exports = {
             return null;
         } else {
             var nearest = targets.splice(lo_index, 1);
-            console.log(this+' nearest target is '+nearest[0]);
+            console.log(this+' nearest target is '+nearest[0]+' at range '+lo_range);
             return nearest[0];
         }
         //return targets_by_range.shift();
