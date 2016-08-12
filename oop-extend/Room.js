@@ -41,10 +41,10 @@ module.exports = {
         if (this.memory.upgrader != null) {
             var creep = Game.getObjectById(this.memory.upgrader);
             if (creep != null && creep.memory.working == true && creep.memory.task.type == 'upgrade') {
-                console.log(this+' dedicated upgrader is '+creep);
+                //console.log(this+' dedicated upgrader is '+creep);
                 this.upgrader = creep;
             } else {
-                console.log(this+' this.memory.upgrader '+this.memory.upgrader+' ** INVALID/MISSING **');
+                //console.log(this+' this.memory.upgrader '+this.memory.upgrader+' ** INVALID/MISSING **');
                 this.memory.upgrader = null;
             }
         }

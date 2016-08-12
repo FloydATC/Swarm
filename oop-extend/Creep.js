@@ -364,7 +364,7 @@ module.exports = {
             var ctrl = Game.rooms[this.memory.home].controller;
             var upgrader = Game.rooms[this.memory.home].upgrader;
             var target = upgrader || ctrl;
-            console.log(this.room+' '+this+' ctrl='+ctrl+' upgrader='+upgrader+' target='+target);
+            //console.log(this.room+' '+this+' ctrl='+ctrl+' upgrader='+upgrader+' target='+target);
             // In the right room yet?
             if (this.room.name == this.memory.home) {
                 // Yes, approach upgrader (or controller if no upgrader is present)
@@ -521,7 +521,7 @@ module.exports = {
         if (flag != null) { flag.assign_worker(this); } // Check in with flag
         if (this.pos.inRangeTo(target, 3)) {
             if (this.carry.energy > 0) {
-                console.log(this+' has energy and should upgrade '+target);
+                //console.log(this+' has energy and should upgrade '+target);
                 this.upgradeController(target);
                 this.add_stats('upgrade');
                 if (this.memory.class == 'Zealot') {
@@ -530,7 +530,7 @@ module.exports = {
                 }
             }
             if (this.free > 0) {
-                console.log(this+' has free space');
+                //console.log(this+' has free space');
                 var treasures = this.pos.findInRange(FIND_DROPPED_ENERGY, 1);
                 if (treasures.length > 0) { this.pickup(treasures[0]); }
             }
