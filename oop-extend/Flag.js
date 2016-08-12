@@ -6,11 +6,11 @@ module.exports = {
         console.log(this+' initializing');
         this.memory.workers = this.memory.workers || [];
         this.workers = [];
-        for (var i in this.memory.workers) {
-            var id = this.memory.workers[i];
-            var creep = Game.getObjectById(id);
-            if (creep != null) { this.workers.push(creep); }
-        }
+//        for (var i in this.memory.workers) {
+//            var id = this.memory.workers[i];
+//            var creep = Game.getObjectById(id);
+//            if (creep != null) { this.workers.push(creep); }
+//        }
         this.memory.workers = this.workers;
         this.memory.lead_time = this.memory.lead_time || 100;
         this.memory.last_spawn = this.memory.last_spawn || {};
