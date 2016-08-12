@@ -268,6 +268,7 @@ module.exports = {
 
     task_remote_mine: function() {
         var flag = Game.flags[this.memory.flag];
+        flag.assign_worker(this); // Check in with flag
         this.memory.tracking = true;
         // In the right room yet?
         if (this.room.name == this.memory.mine) {
@@ -295,6 +296,7 @@ module.exports = {
 
     task_remote_fetch: function() {
         var flag = Game.flags[this.memory.flag];
+        flag.assign_worker(this); // Check in with flag
         this.memory.tracking = true;
         if (this.memory.working == true && this.is_empty()) { this.memory.working = false; }
         if (this.memory.working == false && this.is_full()) { this.memory.working = true; }
