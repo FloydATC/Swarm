@@ -15,7 +15,7 @@ module.exports = {
         this.memory.lead_time = this.memory.lead_time || 100;
         this.memory.last_spawn = this.memory.last_spawn || {};
         this.memory.workforce = this.memory.workforce || {};
-        console.log(this+' initialized');
+        console.log(this+' initialized. workers='+this.workers);
     },
 
     type: function() {
