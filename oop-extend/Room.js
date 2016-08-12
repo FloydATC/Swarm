@@ -41,6 +41,7 @@ module.exports = {
         if (this.memory.upgrader != null) {
             var creep = Game.getObjectById(this.memory.upgrader);
             if (creep != null && creep.memory.working == true && creep.memory.task.type == 'upgrade') {
+                this.memory.upgrader = creep.id;
             } else {
                 this.memory.upgrader = null;
             }
@@ -678,6 +679,7 @@ module.exports = {
             drone.target = this.controller.id;
             console.log(drone.memory.class+' '+drone.name+' assigned to '+drone.task+' '+drone.target);
         }
+
     },
 
     load_routing_table: function(tile) {
