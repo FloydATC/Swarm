@@ -108,6 +108,7 @@ module.exports = {
                 var wanted = this.carryCapacity - _.sum(this.carry);
                 var available = energy.amount;
                 if (available < reserved + wanted) { continue; } // Not enough left for me
+                console.log(this+' decided to pick up '+energy+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')');
                 energy.reserved_amount = reserved + wanted;
                 if (this.pos.inRangeTo(energy, 1)) {
                     this.pickup(energy);
@@ -132,6 +133,7 @@ module.exports = {
                     var wanted = this.carryCapacity - _.sum(this.carry);
                     var available = link.energy;
                     if (available < reserved + wanted) { continue; } // Not enough left for me
+                    console.log(this+' decided to fetch from '+link+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')');
                     link.reserved_amount = reserved + this.carryCapacity - _.sum(this.carry);
                     if (this.pos.inRangeTo(link, 1)) {
                         this.withdraw(link, RESOURCE_ENERGY);
