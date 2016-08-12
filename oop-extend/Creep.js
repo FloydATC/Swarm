@@ -129,7 +129,7 @@ module.exports = {
                 if (link instanceof StructureLink) {
                     var reserved = link.reserved_amount || 0;
                     var wanted = this.carryCapacity - _.sum(this.carry);
-                    var available = link.store.energy;
+                    var available = link.energy;
                     if (available < reserved + wanted) { continue; } // Not enough left for me
                     link.reserved_amount = reserved + this.carryCapacity - _.sum(this.carry);
                     if (this.pos.inRangeTo(link, 1)) {
