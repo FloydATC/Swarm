@@ -38,9 +38,12 @@ module.exports = {
                 if (!lo_room.harvest_flags) { lo_room.harvest_flags = []; }
                 lo_room.harvest_flags.push(flag);
 
-                // Calculate and set spawn interval in ticks
-                flag.memory.frequency = 250; // TTL / 6
-                flag.memory.ticks = (flag.memory.ticks + 1) || 0;
+                // Calculate and set spawn parameters
+                flags.memory.lead_time = 200; // How many ticks from spawn to arrival? FIXME!!!
+                flags.memory.workforce = { 'Miner': 1, 'Fetcher': 2 };
+
+                //flag.memory.frequency = 250; // TTL / 6
+                //flag.memory.ticks = (flag.memory.ticks + 1) || 0;
             }
 
             // Colonize rooms with "spawn" flag

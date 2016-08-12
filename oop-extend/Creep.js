@@ -8,6 +8,7 @@ module.exports = {
         this.memory.age = (this.memory.age + 1) || 1;
         this.memory.where = this.room.name;
         this.free = this.carryCapacity - _.sum(this.carry);
+
     },
 
     speak: function() {
@@ -49,6 +50,11 @@ module.exports = {
         if (this.task == 'ranged attack') { this.task_ranged_attack(); return; }
         if (this.task == 'recycle') { this.task_recycle(); return; }
         if (this.task == 'pick up') { this.task_pick_up(); return; }
+        if (this.task == 'remote mine') { this.task_remote_mine(); return; }
+        if (this.task == 'remote fetch') { this.task_remote_fetch(); return; }
+        if (this.task == 'mine') { this.task_mine(); return; }
+        if (this.task == 'claim') { this.task_claim(); return; }
+        if (this.task == 'travel') { this.task_travel(); return; }
 
         // Carrying something else than energy? Ignore task and store it somewhere!
         if (_.sum(this.carry) > this.carry.energy) {
@@ -66,22 +72,16 @@ module.exports = {
             }
         }
 
-        // Tasks that do not consume energy (continued)
-        if (this.task == 'remote mine') { this.task_remote_mine(); return; }
-        if (this.task == 'mine') { this.task_mine(); return; }
-        if (this.task == 'claim') { this.task_claim(); return; }
-        if (this.task == 'travel') { this.task_travel(); return; }
-
         // Get energy if needed
         if (this.memory.working == true && this.is_empty()) { this.memory.working = false; }
         if (this.memory.working == false && this.is_full()) { this.memory.working = true; }
         if (this.memory.working == false) { this.get_energy(); return; }
 
         // Energy within reach? Try to grab it.
-        if (this.free > 0) {
-            var treasures = this.pos.findInRange(FIND_DROPPED_ENERGY, 1);
-            if (treasures.length > 0) { this.pickup(treasures[0]); this.say('Treasure'); return; }
-        }
+//        if (this.free > 0) {
+//            var treasures = this.pos.findInRange(FIND_DROPPED_ENERGY, 1);
+//            if (treasures.length > 0) { this.pickup(treasures[0]); this.say('Treasure'); return; }
+//        }
 
         // Tasks that consume energy
         if (this.task == 'feed spawn') { this.task_feed(); return; }
@@ -269,6 +269,33 @@ module.exports = {
     task_remote_mine: function() {
         var flag = Game.flags[this.memory.flag];
         this.memory.tracking = true;
+        // In the right room yet?
+        if (this.room.name == this.memory.mine) {
+            // Yes. Locate source at flag
+            var found = this.room.lookForAt(LOOK_SOURCES, flag);
+            var source = found[0];
+            if (source == null) { flag.remove(); return; } // User error
+            if (this.pos.getRangeTo(source) > 1) {
+                // Move closer
+                this.move_to(source);
+                //console.log('Miner '+this+' approaching source ('+source+' in '+this.memory.mine+')');
+            } else {
+                // Get energy
+                this.harvest(source);
+                //console.log('Miner '+this+' harvesting source ('+source+' in '+this.memory.mine+')');
+            }
+            return;
+        } else {
+            // No. Try to reach the room marked with a flag.
+            this.move_to(flag);
+            //console.log('Miner '+this+' moving to flag ('+flag+' in '+this.memory.mine+')');
+            return;
+        }
+    },
+
+    task_remote_fetch: function() {
+        var flag = Game.flags[this.memory.flag];
+        this.memory.tracking = true;
         if (this.memory.working == true && this.is_empty()) { this.memory.working = false; }
         if (this.memory.working == false && this.is_full()) { this.memory.working = true; }
         if (this.memory.working == false) {
@@ -281,11 +308,11 @@ module.exports = {
                 if (this.pos.getRangeTo(source) > 1) {
                     // Move closer
                     this.move_to(source);
-                    //console.log('Miner '+this+' approaching source ('+source+' in '+this.memory.mine+')');
+                    //console.log('Fetcher '+this+' approaching source ('+source+' in '+this.memory.mine+')');
                 } else {
-                    // Get energy
+                    // Get energy -- dedicated miner missing or behind schedule?
                     this.harvest(source);
-                    //console.log('Miner '+this+' harvesting source ('+source+' in '+this.memory.mine+')');
+                    //console.log('Fetcher '+this+' harvesting source ('+source+' in '+this.memory.mine+')');
                 }
                 // Dropped energy within reach? Grab it.
                 var treasures = this.pos.findInRange(FIND_DROPPED_ENERGY, 1);
@@ -296,28 +323,37 @@ module.exports = {
             } else {
                 // No
                 this.move_to(flag);
-                //console.log('Miner '+this+' moving to flag ('+flag+' in '+this.memory.mine+')');
+                //console.log('Fetcher '+this+' moving to flag ('+flag+' in '+this.memory.mine+')');
                 return;
             }
         }
         if (this.memory.working == true) {
             var ctrl = Game.rooms[this.memory.home].controller;
+            var upgrader = Game.rooms[this.memory.home].upgrader;
+            var target = upgrader || ctrl;
             // In the right room yet?
             if (this.room.name == this.memory.home) {
-                // Yes, approach controller
-                if (this.pos.getRangeTo(ctrl) > 3) {
-                    this.move_to(ctrl);
-                    //console.log('Miner '+this+' approaching controller ('+ctrl+' in '+this.memory.home+')');
+                // Yes, approach upgrader (or controller if no upgrader is present)
+                if (this.pos.getRangeTo(target) > 1) {
+                    this.move_to(target);
+                    //console.log('Fetcher '+this+' approaching target ('+target+' in '+this.memory.home+')');
                     return;
-                } else {
+                };
+                if (upgrader && this.pos.getRangeTo(target) <= 1) {
+                    this.transfer(target, RESOURCE_ENERGY);
+                    this.drop(RESOURCE_ENERGY);
+                    //console.log('Fetcher '+this+' assisting ('+upgrader+' in '+this.memory.home+')');
+                    return;
+                }
+                if (ctrl && this.pos.getRangeTo(target) <= 3) {
                     this.upgradeController(ctrl);
-                    //console.log('Miner '+this+' upgrading controller ('+ctrl+' in '+this.memory.home+')');
+                    //console.log('Fetcher '+this+' upgrading controller ('+ctrl+' in '+this.memory.home+')');
                     return;
                 }
             } else {
                 // No
                 this.move_to(ctrl);
-                //console.log('Miner '+this+' moving to upgrade ('+ctrl+' in '+this.memory.home+')');
+                //console.log('Fetcher '+this+' fetching energy to '+this.memory.home+')');
                 // Experimental: Road maintenance here?
                 var structures = this.pos.lookFor(LOOK_STRUCTURES);
                 for (var i in structures) {

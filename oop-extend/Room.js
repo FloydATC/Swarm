@@ -76,17 +76,18 @@ module.exports = {
         var drops = this.dropped_other.slice();
         var extensions = this.extensions.slice(0,2); // 3 with least energy
         var containers = this.containers.reverse().slice(0,2); // 3 with least energy
-        var my_creeps = this.my_creeps.slice(); // For now, all creeps are drones
+        var my_creeps = this.my_creeps.slice(); // All classes
         var hostile_creeps = this.hostile_creeps.slice();
         var csites = this.construction_sites.slice(0,2); // Max 3 at a time
         var need_repairs = this.need_repairs.slice(0,2); // Max 3 at a time
 
-        var miners = [];
-        var drones = [];
-        var swarmers = [];
-        var infectors = [];
-        var biters = [];
-        var spitters = [];
+        var miners = [];        // Mine energy (in remote rooms for now)
+        var fetchers = [];      // Fetch energy from remote mines
+        var drones = [];        // Generic workers
+        var swarmers = [];      // Move to remote room then mutate into Infectors
+        var infectors = [];     // Claim controller then mutate into Drone
+        var biters = [];        // Attack unit
+        var spitters = [];      // Ranged attack unit
 
         // Sort creeps into classes
         for (var i in my_creeps) {
@@ -94,6 +95,7 @@ module.exports = {
             if (typeof creep == 'object') {
                 if (!creep.memory.class) { creep.memory.class = 'Drone'; console.log(this+' AMNESIAC '+creep+' assigned to Drone class'); }
                 if (creep.memory.class == 'Miner') { miners.push(creep); }
+                if (creep.memory.class == 'Fetcher') { fetchers.push(creep); }
                 if (creep.memory.class == 'Drone') { drones.push(creep); }
                 if (creep.memory.class == 'Swarmer') { swarmers.push(creep); }
                 if (creep.memory.class == 'Infector') { infectors.push(creep); }
@@ -106,12 +108,12 @@ module.exports = {
 
         // EXPERIMENTAL
         // If the room has miners but no drones, morph one miner into a drone. This drone will then stay at the source.
-        if (drones.length == 0 && miners.length >= 1) {
+/*        if (drones.length == 0 && miners.length >= 1) {
             var creep = miners.shift();
             creep.memory.class = 'Drone';
             drones.push(creep);
             console.log(this+' morphed '+creep+' into a Drone');
-        }
+        }*/
 
         // Biters swarm and attack threats. Recycle when no longer needed.
         this.assign_task_attack(biters);
@@ -161,6 +163,9 @@ module.exports = {
         // Remote miners
         this.assign_task_remote_mine(miners);
 
+        // Remote fetchers
+        this.assign_task_remote_fetch(fetchers);
+
 
         // Under attack and we have no towers? Spawn biters and spitters and hope for the best
         if (this.hostile_creeps.length > 0 && this.towers.length == 0) {
@@ -195,13 +200,25 @@ module.exports = {
             //console.log(this+' has harvest flags to consider: '+this.harvest_flags);
             for (var i in this.harvest_flags) {
                 var flag = this.harvest_flags[i];
-                if (flag.memory.ticks > flag.memory.frequency) {
+                if (flag.needs() == 'remote miner') {
+                    console.log(this+' spawning a remote miner for '+flag.pos.roomName);
+                    var result = this.createCreep([WORK,WORK,WORK,WORK,WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
+                    if (result == OK) { flag.spawned('Miner'); }
+                    return;
+                }
+                if (flag.needs() == 'remote fetcher') {
+                    console.log(this+' spawning a remote fetcher for '+flag.pos.roomName);
+                    var result = this.createCreep([WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE], undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
+                    if (result == OK) { flag.spawned('Fetcher'); }
+                    return;
+                }
+/*                if (flag.memory.ticks > flag.memory.frequency) {
                     // Time to spawn another Miner to work this flag
                     console.log(this+' spawning a remote miner for '+flag.pos.roomName);
                     var result = this.createCreep([MOVE,MOVE,CARRY,CARRY,WORK,WORK], undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
                     if (result == OK) { flag.memory.ticks = 0; }
                     return;
-                }
+                }*/
             }
         }
 
@@ -428,6 +445,15 @@ module.exports = {
             miner.task = 'remote mine';
             miner.target = miner.id; // Dummy because flag doesn't have an id. Duh.
             //console.log(miner.name+' assigned to '+miner.task+' '+miner.target);
+        }
+    },
+
+    assign_task_remote_mine: function(fetchers) {
+        while (fetchers.length > 0) {
+            var fetcher = fetchers.shift();
+            fetcher.task = 'remote fetch';
+            fetcher.target = fetcher.id; // Dummy because flag doesn't have an id. Duh.
+            //console.log(fetcher.name+' assigned to '+fetcher.task+' '+fetcher.target);
         }
     },
 
