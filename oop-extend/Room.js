@@ -229,7 +229,7 @@ module.exports = {
         if (this.controller && this.controller.flag) {
             var flag = this.controller.flag;
             var needs = flag.needs();
-            console.log(this+' flag '+flag+' needs '+needs);
+            //console.log(this+' flag '+flag+' needs '+needs);
             if (needs == 'Zealot') {
                 console.log(this+' spawning a zealot for '+flag.pos.roomName);
                 var result = this.createCreep([WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE], undefined, { class: 'Zealot', home: this.name, flag: flag.name } );
