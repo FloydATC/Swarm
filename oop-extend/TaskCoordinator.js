@@ -67,9 +67,9 @@ module.exports = {
 
     needs: function() {
         for (var c in this.memory.workforce) {
-            var wait_until = (this.memory.last_spawn[c] || 0) + this.memory.cooldown;
-            console.log(this+' spawn '+c+'? last='+this.memory.last_spawn[c]+' cooldown='+this.memory.cooldown+' time='+Game.time+' wait_until='+wait_until);
-            if (Game.time > this.memory.last_spawn[c] + this.memory.cooldown) { continue; }
+            var cool = (this.memory.last_spawn[c] || 0) + this.memory.cooldown;
+            console.log(this+' spawn '+c+'? last='+this.memory.last_spawn[c]+' cooldown='+this.memory.cooldown+' time='+Game.time+' cold='+cold);
+            if (Game.time < cold) { continue; }
             var minimum = this.memory.workforce[c];
             var count = this.worker_count(c);
             if (count < minimum || (count == minimum && this.worker_lowest_ttl(c) < this.memory.lead_time)) {
