@@ -50,8 +50,8 @@ module.exports.loop = function() {
     // Apply shared traits
     for (var key in traits_task_coordinator) {
         Flag.prototype[key] = traits_task_coordinator[key];
-        Source.prototype[key] = traits_task_coordinator[key];
-        StructureSpawn.prototype[key] = traits_task_coordinator[key];
+//        Source.prototype[key] = traits_task_coordinator[key];
+//        StructureSpawn.prototype[key] = traits_task_coordinator[key];
     }
 
     if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' extended game classes'); }
