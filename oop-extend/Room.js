@@ -25,6 +25,11 @@ module.exports = {
         this.link_total = 0;
         this.link_average = 0;
 
+        // Owned controller? There should be a flag on it coordinating the upgrading efforts
+        if (this.controller && this.controller.my && this.flag == null) {
+            this.createFlag(this.controller.pos, 'controller '+this.name);
+        }
+
         // Request reinforcements if room is owned but has no spawn
         if (this.controller && this.controller.my && this.spawns.length == 0 && this.my_creeps.length < 10) {
             Game.request_drones = this.name;

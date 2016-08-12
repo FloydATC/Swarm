@@ -48,6 +48,23 @@ module.exports = {
                 //flag.memory.ticks = (flag.memory.ticks + 1) || 0;
             }
 
+            // All owned controllers should have a flag. Non-owned should not.
+            if (flag.type() == 'controller') {
+                if (flag.memory.controller) {
+                    var ctrl = Game.getObjectById(flag.memory.controller);
+                    if (ctrl == null || ctrl.my == false) {
+                        flag.remove();
+                        continue;
+                    }
+                    ctrl.flag = this;
+
+                    // Calculate and set spawn parameters
+                    flag.memory.lead_time = 20; // How many ticks from spawn to arrival? FIXME!!!
+                    flag.memory.cooldown = 600; // How many ticks minimum between spawns? FIXME!!!
+                    flag.memory.workforce = { 'Upgrader': 1 };
+                }
+            }
+
             // Colonize rooms with "spawn" flag
             if (flag.type() == 'spawn') {
                 var room_name = flag.pos.roomName;
