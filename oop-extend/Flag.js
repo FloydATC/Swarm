@@ -67,10 +67,11 @@ module.exports = {
     needs: function() {
         for (var c in this.memory.workforce) {
             var cooled = (this.memory.last_spawn[c] || 0) + this.memory.cooldown;
-            //console.log(this+' spawn '+c+'? last='+this.memory.last_spawn[c]+' cooldown='+this.memory.cooldown+' time='+Game.time+' cooled='+cooled);
+            console.log(this+' spawn '+c+'? last='+this.memory.last_spawn[c]+' cooldown='+this.memory.cooldown+' time='+Game.time+' cooled='+cooled);
             if (Game.time < cooled) { continue; }
             var minimum = this.memory.workforce[c];
             var count = this.worker_count(c);
+            console.log(this+' spawn '+c+' have='+count+' want='+minimum);
             if (count < minimum || (count == minimum && this.worker_lowest_ttl(c) < this.memory.lead_time)) {
                 console.log(this.pos.roomName+' '+this+' needs a '+c);
                 return c;
