@@ -9,39 +9,9 @@ var extend_s_link = require('StructureLink');
 var extend_s_spawn = require('StructureSpawn');
 var extend_s_storage = require('StructureStorage');
 var extend_s_tower = require('StructureTower');
-var traits_task_coordinator = require('TaskCoordinator');
 var profiler = require('Profiler');
 var show_perf = false;
 
-// Give sources and spawns memory
-/*
-Object.defineProperty(Source.prototype, 'memory', {
-    get: function() {
-        if(_.isUndefined(Memory.sources)) { Memory.sources = {}; }
-        if(!_.isObject(Memory.sources)) { return undefined; }
-        return Memory.sources[this.id] = Memory.sources[this.id] || {};
-    },
-    set: function(value) {
-        if(_.isUndefined(Memory.sources)) { Memory.sources = {}; }
-        if(!_.isObject(Memory.sources)) { throw new Error('Could not set source memory'); }
-        Memory.sources[this.id] = value;
-    }
-});
-*/
-/*
-Object.defineProperty(StructureSpawn.prototype, 'memory', {
-    get: function() {
-        if(_.isUndefined(Memory.spawns)) { Memory.spawns = {}; }
-        if(!_.isObject(Memory.spawns)) { return undefined; }
-        return Memory.spawns[this.id] = Memory.spawns[this.id] || {};
-    },
-    set: function(value) {
-        if(_.isUndefined(Memory.spawns)) { Memory.spawns = {}; }
-        if(!_.isObject(Memory.spawns)) { throw new Error('Could not set spawn memory'); }
-        Memory.spawns[this.id] = value;
-    }
-});
-*/
 profiler.enable(); // Game.profiler.profile(100) -or- Game.profiler.email(100)
 module.exports.loop = function() {
     profiler.wrap(function() {
@@ -76,12 +46,6 @@ module.exports.loop = function() {
     for (var key in extend_s_spawn) { StructureSpawn.prototype[key] = extend_s_spawn[key]; }
     for (var key in extend_s_storage) { StructureStorage.prototype[key] = extend_s_storage[key]; }
     for (var key in extend_s_tower) { StructureTower.prototype[key] = extend_s_tower[key]; }
-    // Apply shared traits
-    for (var key in traits_task_coordinator) {
-        Flag.prototype[key] = traits_task_coordinator[key];
-        //Source.prototype[key] = traits_task_coordinator[key];
-        //StructureSpawn.prototype[key] = traits_task_coordinator[key];
-    }
 
     if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' extended game classes'); }
 
