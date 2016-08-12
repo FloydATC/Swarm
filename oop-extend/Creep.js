@@ -517,6 +517,8 @@ module.exports = {
 
     task_upgrade: function() {
         var target = Game.getObjectById(this.target);
+        var flag = Game.flags[this.memory.flag];
+        if (flag != null) { flag.assign_worker(this); } // Check in with flag
         if (this.pos.inRangeTo(target, 3)) {
             this.upgradeController(target);
             this.add_stats('upgrade');
