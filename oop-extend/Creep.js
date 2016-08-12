@@ -514,6 +514,7 @@ module.exports = {
         var p = this.memory._move.path;
         var offset = 4;
         var direction = p.charAt(offset);
+        if (direction == 'u') { return; }
         var vector = this.direction_vector(direction);
         var opposite = this.opposite_vector(vector[0], vector[1]);
         var x1 = p.substring(0,2)*1 + opposite[0];
