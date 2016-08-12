@@ -9,6 +9,7 @@ var extend_s_link = require('StructureLink');
 var extend_s_spawn = require('StructureSpawn');
 var extend_s_storage = require('StructureStorage');
 var extend_s_tower = require('StructureTower');
+var traits_task_coordinator = require('TaskCoordinator');
 var profiler = require('Profiler');
 var show_perf = true;
 
@@ -46,6 +47,13 @@ module.exports.loop = function() {
     for (var key in extend_s_spawn) { StructureSpawn.prototype[key] = extend_s_spawn[key]; }
     for (var key in extend_s_storage) { StructureStorage.prototype[key] = extend_s_storage[key]; }
     for (var key in extend_s_tower) { StructureTower.prototype[key] = extend_s_tower[key]; }
+    // Apply shared traits
+    for (var key in traits_task_coordinator) {
+        Flag.prototype[key] = traits_task_coordinator[key];
+        Source.prototype[key] = traits_task_coordinator[key];
+        StructureSpawn.prototype[key] = traits_task_coordinator[key];
+    }
+
     if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' extended game classes'); }
 
     Game.initialize(); // Model current game state

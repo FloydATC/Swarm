@@ -6,7 +6,7 @@ module.exports = {
         //console.log(this+' initializing');
 
         this.slots = this.find_slots();
-
+        this.initialize_tc();
     },
 
     find_slots: function() {
