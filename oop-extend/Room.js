@@ -29,7 +29,7 @@ module.exports = {
         if (this.controller && this.controller.my && this.flag == null) {
             var flagname = 'controller '+this.name;
             this.createFlag(this.controller.pos, 'controller '+flagname);
-            Memory.flags[flagname].controller = this.controller;
+            Memory.flags[flagname].controller = this.controller.id;
         }
 
         // Request reinforcements if room is owned but has no spawn
