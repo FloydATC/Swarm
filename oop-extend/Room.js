@@ -200,13 +200,14 @@ module.exports = {
             //console.log(this+' has harvest flags to consider: '+this.harvest_flags);
             for (var i in this.harvest_flags) {
                 var flag = this.harvest_flags[i];
-                if (flag.needs() == 'remote miner') {
+                var needs = flag.needs();
+                if (needs == 'remote miner') {
                     console.log(this+' spawning a remote miner for '+flag.pos.roomName);
                     var result = this.createCreep([WORK,WORK,WORK,WORK,WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
                     if (result == OK) { flag.spawned('Miner'); }
                     return;
                 }
-                if (flag.needs() == 'remote fetcher') {
+                if (needs == 'remote fetcher') {
                     console.log(this+' spawning a remote fetcher for '+flag.pos.roomName);
                     var result = this.createCreep([WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE], undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
                     if (result == OK) { flag.spawned('Fetcher'); }
