@@ -606,7 +606,7 @@ module.exports = {
         if (this.pos.roomName == target.pos.roomName) {
             var direction = this.room.get_direction(this.pos, target.pos);
             if (direction >= 1 && direction <= 8) {
-                //console.log('#DEBUG '+this+' ROUTER move('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+')');
+                console.log('#DEBUG '+this+' ROUTER move('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+')');
                 var newpos = this.next_position(direction);
                 if (this.reserve_position(newpos) == true) {
                     this.move(direction);
