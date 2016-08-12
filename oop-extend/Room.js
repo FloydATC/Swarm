@@ -210,7 +210,7 @@ module.exports = {
                 }
                 if (needs == 'Fetcher') {
                     console.log(this+' spawning a remote fetcher for '+flag.pos.roomName);
-                    var result = this.createCreep([WORK,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE], undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
+                    var result = this.createCreep([WORK,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE], undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
                     if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } ); }
                     if (result == OK) { flag.spawned('Fetcher'); }
                     return;
