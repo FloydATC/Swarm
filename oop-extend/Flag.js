@@ -4,7 +4,7 @@ module.exports = {
 
     initialize: function() {
         console.log(this+' initializing');
-        this.memory.workers = this.memory.workers || [];
+        if (typeof this.memory.workers == 'undefined') this.memory.workers = [];
         this.workers = [];
 //        for (var i in this.memory.workers) {
 //            var id = this.memory.workers[i];
