@@ -11,7 +11,7 @@ var extend_s_storage = require('StructureStorage');
 var extend_s_tower = require('StructureTower');
 var traits_task_coordinator = require('TaskCoordinator');
 var profiler = require('Profiler');
-var show_perf = true;
+var show_perf = false;
 
 // Give sources and spawns memory
 /*

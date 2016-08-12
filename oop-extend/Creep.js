@@ -99,7 +99,7 @@ module.exports = {
     get_energy: function() {
 
         // Consider energy dropped on the ground
-        console.log(this+' looking for energy on the ground');
+        //console.log(this+' looking for energy on the ground');
         var all_dropped_energy = this.room.dropped_energy.slice();
         while (all_dropped_energy.length > 0) {
             var energy = this.shift_nearest(all_dropped_energy);
@@ -108,7 +108,7 @@ module.exports = {
                 var wanted = this.carryCapacity - _.sum(this.carry);
                 var available = energy.amount;
                 if (available < reserved + wanted) { continue; } // Not enough left for me
-                console.log(this+' decided to pick up '+energy+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')');
+                //console.log(this+' decided to pick up '+energy+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')');
                 energy.reserved_amount = reserved + wanted;
                 if (this.pos.inRangeTo(energy, 1)) {
                     this.pickup(energy);
@@ -123,7 +123,7 @@ module.exports = {
         }
 
         // Consider fetching energy from a link
-        console.log(this+' considers fetching energy from a link');
+        //console.log(this+' considers fetching energy from a link');
         if (this.task == 'feed tower' || this.task == 'feed spawn' || this.task == 'feed extension') {
             var links = this.room.links.slice();
             while (links.length > 0) {
@@ -133,7 +133,7 @@ module.exports = {
                     var wanted = this.carryCapacity - _.sum(this.carry);
                     var available = link.energy;
                     if (available < reserved + wanted) { continue; } // Not enough left for me
-                    console.log(this+' decided to fetch from '+link+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')');
+                    //console.log(this+' decided to fetch from '+link+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')');
                     link.reserved_amount = reserved + this.carryCapacity - _.sum(this.carry);
                     if (this.pos.inRangeTo(link, 1)) {
                         this.withdraw(link, RESOURCE_ENERGY);
@@ -148,7 +148,7 @@ module.exports = {
         }
 
         // Consider fetching energy from a container
-        console.log(this+' considers fetching energy from a container');
+        //console.log(this+' considers fetching energy from a container');
         if (this.task != 'upgrade' && this.task != 'stockpile') {
             var containers = this.room.containers.slice();
             while (containers.length > 0) {
@@ -158,7 +158,7 @@ module.exports = {
                     var wanted = this.carryCapacity - _.sum(this.carry);
                     var available = container.store.energy;
                     if (available < reserved + wanted) { continue; } // Not enough left for me
-                    console.log(this+' decided to fetch from '+container+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')');
+                    //console.log(this+' decided to fetch from '+container+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')');
                     container.reserved_amount = reserved + wanted;
                     if (this.pos.inRangeTo(container, 1)) {
                         this.withdraw(container, RESOURCE_ENERGY);
@@ -173,7 +173,7 @@ module.exports = {
         }
 
         // Consider fetching energy from storage
-        console.log(this+' considers fetching energy from storage');
+        //console.log(this+' considers fetching energy from storage');
         if (this.task != 'upgrade' && this.task != 'stockpile') {
             var storage = this.room.storage;
             if (storage instanceof StructureStorage) {
@@ -181,7 +181,7 @@ module.exports = {
                 var wanted = this.carryCapacity - _.sum(this.carry);
                 var available = storage.store.energy;
                 if (available >= reserved + wanted) {
-                    console.log(this+' decided to fetch from '+storage+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')');
+                    //console.log(this+' decided to fetch from '+storage+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')');
                     storage.reserved_amount = reserved + this.carryCapacity - _.sum(this.carry);
                     if (this.pos.inRangeTo(storage, 1)) {
                         this.withdraw(storage, RESOURCE_ENERGY);
@@ -196,7 +196,7 @@ module.exports = {
         }
 
         // Consider mining
-        console.log(this+' considers mining for energy');
+        //console.log(this+' considers mining for energy');
         var sources = this.room.sources.slice();
         while (sources.length > 0) {
             var source = this.shift_nearest(sources);
