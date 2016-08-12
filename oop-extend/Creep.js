@@ -108,7 +108,7 @@ module.exports = {
                 var wanted = this.carryCapacity - _.sum(this.carry);
                 var available = energy.amount;
                 if (available < reserved + wanted) { continue; } // Not enough left for me
-                energy.reserved_amount = reserved + want;
+                energy.reserved_amount = reserved + wanted;
                 if (this.pos.inRangeTo(energy, 1)) {
                     this.pickup(energy);
                     this.memory.tracking = false;
