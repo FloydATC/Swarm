@@ -3,7 +3,7 @@
 module.exports = {
 
     initialize: function() {
-        console.log(this+' initializing');
+        //console.log(this+' initializing');
         if (typeof this.memory.workers == 'undefined') this.memory.workers = [];
         this.workers = [];
         for (var i=0; i<this.memory.workers.length; i++) {
@@ -15,7 +15,7 @@ module.exports = {
         this.memory.lead_time = this.memory.lead_time || 100;
         this.memory.last_spawn = this.memory.last_spawn || {};
         this.memory.workforce = this.memory.workforce || {};
-        console.log(this+' initialized. workers='+this.workers);
+        //console.log(this+' initialized. workers='+this.workers);
     },
 
     type: function() {
@@ -40,7 +40,7 @@ module.exports = {
     },
 
     assign_worker: function(creep) {
-        console.log(this+' creep checking in: '+creep);
+        //console.log(this+' creep checking in: '+creep);
         if (this.has_worker(creep)) { return; }
         this.memory.workers.push(creep.id);
     },

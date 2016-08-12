@@ -529,16 +529,19 @@ module.exports = {
             var nexthop = p.charAt(offset1);
             var vector1 = this.direction_vector(nexthop);
             var table = this.room.load_routing_table(src);
-            for (var offset2=offset1; offset2<p.length; offset2++) {
-                var direction2 = p.charAt(offset2);
-                var vector2 = this.direction_vector(direction2);
-                x2 = x2 + vector2[0];
-                y2 = y2 + vector2[1];
+//            for (var offset2=offset1; offset2<p.length; offset2++) {
+//                var direction2 = p.charAt(offset2);
+//                var vector2 = this.direction_vector(direction2);
+//                x2 = x2 + vector2[0];
+//                y2 = y2 + vector2[1];
                 //console.log(this+' path='+p+' length='+p.length+' p1='+offset1+' ('+x1+','+y1+') p2='+offset2+' ('+x2+','+y2+') direction='+nexthop);
                 //this.room.set_direction({ 'x': x1, 'y': y1 }, { 'x': x2, 'y': y2 }, nexthop);
+//                var dst = ('0'+x2).slice(-2)+('0'+y2).slice(-2); // XXYY
+                x2 = this.memory._move.dest.x;
+                y2 = this.memory._move.dest.y;
                 var dst = ('0'+x2).slice(-2)+('0'+y2).slice(-2); // XXYY
                 table.setDirectionTo(dst, nexthop);
-            }
+//            }
             this.room.save_routing_table(src, table);
             x1 = x1 + vector1[0];
             y1 = y1 + vector1[1];
