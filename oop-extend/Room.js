@@ -41,12 +41,12 @@ module.exports = {
         if (this.memory.upgrader != null) {
 //            var creep = Game.getObjectById(this.memory.upgrader);
             var creep = this.creep_by_id(this.memory.upgrader);
-            console.log(this+' this.memory.upgrader '+this.memory.upgrader+' is '+creep);
+            //console.log(this+' this.memory.upgrader '+this.memory.upgrader+' is '+creep);
             if (creep != null && creep.memory.class == 'Zealot') {
-                console.log(this+' dedicated upgrader is '+creep);
+                //console.log(this+' dedicated upgrader is '+creep);
                 this.upgrader = creep;
             } else {
-                console.log(this+' this.memory.upgrader '+this.memory.upgrader+' ** INVALID/MISSING **');
+                //console.log(this+' this.memory.upgrader '+this.memory.upgrader+' ** INVALID/MISSING **');
                 this.memory.upgrader = null;
             }
         }
@@ -65,7 +65,7 @@ module.exports = {
     creep_by_id: function(id) {
         for (var i=0; i<this.my_creeps.length; i++) {
             var creep = this.my_creeps[i];
-            console.log(this+' ==> looking for '+id+', found '+creep.id);
+            //console.log(this+' ==> looking for '+id+', found '+creep.id);
             if (creep.id == id) { return creep; }
         }
         return null;
