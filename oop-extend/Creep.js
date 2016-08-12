@@ -45,7 +45,7 @@ module.exports = {
             this.memory.task = { type: this.task, target: target.toString(), ticks: 0 };
         }
 
-        // Tasks that do not consume energy
+        // Tasks that do not involve a work/fetch cycle
         if (this.task == 'attack') { this.task_attack(); return; }
         if (this.task == 'ranged attack') { this.task_ranged_attack(); return; }
         if (this.task == 'recycle') { this.task_recycle(); return; }
@@ -55,6 +55,7 @@ module.exports = {
         if (this.task == 'mine') { this.task_mine(); return; }
         if (this.task == 'claim') { this.task_claim(); return; }
         if (this.task == 'travel') { this.task_travel(); return; }
+        if (this.task == 'upgrade') { this.task_upgrade(); return; }
 
         // Carrying something else than energy? Ignore task and store it somewhere!
         if (_.sum(this.carry) > this.carry.energy) {
@@ -91,7 +92,6 @@ module.exports = {
         if (this.task == 'stockpile') { this.task_feed(); return; }
         if (this.task == 'build') { this.task_build(); return; }
         if (this.task == 'repair') { this.task_repair(); return; }
-        if (this.task == 'upgrade') { this.task_upgrade(); return; }
 
         console.log(this.room+' '+this+' has unhandled task '+this.task);
     },
