@@ -68,7 +68,7 @@ module.exports = {
             if (creep.id == id) { return creep; }
         }
         return null;
-    }
+    },
 
     repairable: function() {
         return this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits != undefined && s.hits < s.hitsMax; } });
