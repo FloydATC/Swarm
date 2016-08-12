@@ -67,7 +67,8 @@ module.exports = {
 
     needs: function() {
         for (var c in this.memory.workforce) {
-            console.log(this+' spawn '+c+'? last='+this.memory.last_spawn[c]+' cooldown='+this.memory.cooldown+' time='+Game.time);
+            var wait = Game.time - this.memory.cooldown;
+            console.log(this+' spawn '+c+'? last='+this.memory.last_spawn[c]+' cooldown='+this.memory.cooldown+' time='+Game.time+' wait='+wait);
             if (Game.time > this.memory.last_spawn[c] + this.memory.cooldown) { continue; }
             var minimum = this.memory.workforce[c];
             var count = this.worker_count(c);
