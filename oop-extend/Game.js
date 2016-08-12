@@ -3,7 +3,7 @@
 module.exports = {
 
     initialize: function() {
-        //console.log(this+' initializing');
+        console.log(this+' initializing');
         for (var name in this.rooms) {
             var room = this.rooms[name];
             room.initialize();
@@ -13,7 +13,7 @@ module.exports = {
         for (var name in this.flags) {
             var flag = this.flags[name];
             //flag.initialize();
-            //console.log(this+' flag '+flag+' type '+flag.type()+' at '+flag.pos);
+            console.log(this+' flag '+flag+' type '+flag.type()+' at '+flag.pos);
 
             // Remote mine sources tagged with a "harvest" flag
             if (flag.type() == 'harvest') {
