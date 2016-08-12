@@ -10,7 +10,6 @@ module.exports = {
         }
 
         // Act on flags
-        console.log('flags: '+flags);
         for (var name in this.flags) {
             var flag = this.flags[name];
             //console.log(this+' flag '+flag+' type '+flag.type()+' at '+flag.pos);
@@ -40,8 +39,8 @@ module.exports = {
                 lo_room.harvest_flags.push(flag);
 
                 // Calculate and set spawn parameters
-                flags.memory.lead_time = 200; // How many ticks from spawn to arrival? FIXME!!!
-                flags.memory.workforce = { 'Miner': 1, 'Fetcher': 2 };
+                flag.memory.lead_time = 200; // How many ticks from spawn to arrival? FIXME!!!
+                flag.memory.workforce = { 'Miner': 1, 'Fetcher': 2 };
 
                 //flag.memory.frequency = 250; // TTL / 6
                 //flag.memory.ticks = (flag.memory.ticks + 1) || 0;
