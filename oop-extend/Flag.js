@@ -13,6 +13,7 @@ module.exports = {
         }
         this.memory.workers = this.workers;
         this.memory.lead_time = this.memory.lead_time || 100;
+        this.memory.cooldown = this.memory.lead_time || 300;
         this.memory.last_spawn = this.memory.last_spawn || {};
         this.memory.workforce = this.memory.workforce || {};
         //console.log(this+' initialized. workers='+this.workers);
@@ -66,6 +67,7 @@ module.exports = {
 
     needs: function() {
         for (var c in this.memory.workforce) {
+            if (Game.time > this.memory.last_spawn[c] + this.memory.cooldown) { continue; }
             var minimum = this.memory.workforce[c];
             var count = this.worker_count(c);
             if (count < minimum || (count == minimum && this.worker_lowest_ttl(c) < this.memory.lead_time)) {

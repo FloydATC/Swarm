@@ -32,11 +32,10 @@ module.exports = {
 
         // Check if dedicated upgrader is alive
         if (this.memory.upgrader != null) {
-            var upgrader = Game.getObjectById(this.memory.upgrader);
-            if (upgrader == null) {
-                this.memory.upgrader = null;
+            var creep = Game.getObjectById(this.memory.upgrader);
+            if (creep != null && creep.memory.working == true && creep.memory.task.type == 'upgrade') {
             } else {
-                this.upgrader = upgrader.id;
+                this.memory.upgrader = null;
             }
         }
 
