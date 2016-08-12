@@ -3,7 +3,7 @@
 module.exports = {
 
     initialize: function() {
-        //console.log(this+' initializing');
+        console.log(this+' initializing');
         this.memory.workers = this.memory.workers || [];
         this.workers = [];
         for (var i in this.memory.workers) {
@@ -15,6 +15,7 @@ module.exports = {
         this.memory.lead_time = this.memory.lead_time || 100;
         this.memory.last_spawn = this.memory.last_spawn || {};
         this.memory.workforce = this.memory.workforce || {};
+        console.log(this+' initialized');
     },
 
     type: function() {
