@@ -96,6 +96,7 @@ module.exports = {
 
         var miners = [];        // Mine energy (in remote rooms for now)
         var fetchers = [];      // Fetch energy from remote mines
+        var upgraders = [];     // Camp next to controller and upgrade it
         var drones = [];        // Generic workers
         var swarmers = [];      // Move to remote room then mutate into Infectors
         var infectors = [];     // Claim controller then mutate into Drone
@@ -109,6 +110,7 @@ module.exports = {
                 if (!creep.memory.class) { creep.memory.class = 'Drone'; console.log(this+' AMNESIAC '+creep+' assigned to Drone class'); }
                 if (creep.memory.class == 'Miner') { miners.push(creep); }
                 if (creep.memory.class == 'Fetcher') { fetchers.push(creep); }
+                if (creep.memory.class == 'Upgrader') { upgraders.push(creep); }
                 if (creep.memory.class == 'Drone') { drones.push(creep); }
                 if (creep.memory.class == 'Swarmer') { swarmers.push(creep); }
                 if (creep.memory.class == 'Infector') { infectors.push(creep); }
@@ -170,6 +172,9 @@ module.exports = {
         // Containers needs energy?
         this.assign_task_stockpile(drones, containers);
 
+        // Upgraders always upgrade
+        this.assign_task_upgrade(upgraders);
+
         // FINALLY: Any leftover drones? Upgrade
         this.assign_task_upgrade(drones);
 
@@ -203,13 +208,29 @@ module.exports = {
             if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Drone' }); }
             //console.log(this+' spawn result='+result);
             return;
-        } else if (Game.colonize && Game.time % 50 == 0) {
+        }
+        if (Game.colonize && Game.time % 50 == 0) {
             console.log(this+' spawning a creep to claim '+Game.colonize);
             var result = this.createCreep([MOVE,CARRY,WORK,CLAIM], undefined, { class: 'Swarmer', destination: Game.colonize });
-        } else if (Game.request_drones && Game.time % 50 == 0) {
+            return;
+        }
+        if (Game.request_drones && Game.time % 50 == 0) {
             console.log(this+' spawning a creep to build spawn in '+Game.request_drones);
             var result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Swarmer', destination: Game.request_drones });
-        } else if (this.harvest_flags) {
+            return;
+        }
+        if (this.controller && this.controller.flag) {
+            var flag = this.controller.flag;
+            var needs = flag.needs();
+            if (needs == 'Upgrader') {
+                console.log(this+' spawning an upgrader for '+flag.pos.roomName);
+                var result = this.createCreep([WORK,WORK,WORK,WORK,WORK,CARRY,MOVE], undefined, { class: 'Upgrader', home: this.name, flag: flag.name } );
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Upgrader', home: this.name, flag: flag.name } ); }
+                if (result == OK) { flag.spawned('Upgrader'); }
+                return;
+            }
+        }
+        if (this.harvest_flags) {
             //console.log(this+' has harvest flags to consider: '+this.harvest_flags);
             for (var i in this.harvest_flags) {
                 var flag = this.harvest_flags[i];
