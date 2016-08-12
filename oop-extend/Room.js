@@ -93,8 +93,8 @@ module.exports = {
         var towers = this.towers.slice();
         var links = this.links.slice();
         var drops = this.dropped_other.slice();
-        var extensions = this.extensions.slice(0,2); // 3 with least energy
-        var containers = this.containers.reverse().slice(0,2); // 3 with least energy
+        var extensions = this.extensions;
+        var containers = this.containers.reverse(); // 3 with least energy
         var my_creeps = this.my_creeps.slice(); // All classes
         var hostile_creeps = this.hostile_creeps.slice();
         var csites = this.construction_sites.slice(0,2); // Max 3 at a time
@@ -587,13 +587,15 @@ module.exports = {
     },
 
     assign_task_feed_extension: function(drones, extensions) {
-        while (drones.length > 0 && extensions.length > 0) {
+        var count = 0;
+        while (drones.length > 0 && extensions.length > 0 && count < 3) {
             var drone = drones.shift();
             while (extensions.length > 0) {
                 var extension = drone.shift_nearest(extensions);
                 if (extension.energy < extension.energyCapacity) {
                     drone.task = 'feed extension';
                     drone.target = extension.id;
+                    count++;
                     //console.log(drone.name+' assigned to '+drone.task+' '+extension);
                     break;
                 }
