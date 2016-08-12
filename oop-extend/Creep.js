@@ -370,12 +370,12 @@ module.exports = {
                 if (upgrader && this.pos.getRangeTo(target) <= 1) {
                     this.transfer(target, RESOURCE_ENERGY);
                     this.drop(RESOURCE_ENERGY);
-                    //console.log('Fetcher '+this+' assisting ('+upgrader+' in '+this.memory.home+')');
+                    console.log('Fetcher '+this+' assisting ('+upgrader+' in '+this.memory.home+')');
                     return;
                 }
                 if (ctrl && this.pos.getRangeTo(target) <= 3) {
                     this.upgradeController(ctrl);
-                    //console.log('Fetcher '+this+' upgrading controller ('+ctrl+' in '+this.memory.home+')');
+                    console.log('Fetcher '+this+' upgrading controller ('+ctrl+' in '+this.memory.home+')');
                     return;
                 }
                 if (this.pos.getRangeTo(target) > 1) {

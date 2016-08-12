@@ -672,12 +672,10 @@ module.exports = {
     },
 
     assign_task_upgrade: function(drones) {
-        var upgraders = 0;
         while (drones.length > 0 && this.controller && this.controller.my) {
             var drone = drones.shift();
             drone.task = 'upgrade';
             drone.target = this.controller.id;
-            upgraders++;
             console.log(drone.memory.class+' '+drone.name+' assigned to '+drone.task+' '+drone.target);
         }
         return upgraders;
