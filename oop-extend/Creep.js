@@ -173,7 +173,11 @@ module.exports = {
             var storage = this.room.storage;
             if (storage instanceof StructureStorage) {
                 var reserved = storage.reserved_amount || 0;
-                if (reserved < storage.store.energy) {
+                var wanted = this.carryCapacity - _.sum(this.carry);
+                var available = storage.store.energy;
+                if (available < reserved + wanted) { continue; } // Not enough left for me
+                if (available >= reserved + wanted) {
+                    console.log(this+' decided to fetch from '+storage+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')');
                     storage.reserved_amount = reserved + this.carryCapacity - _.sum(this.carry);
                     if (this.pos.inRangeTo(storage, 1)) {
                         this.withdraw(storage, RESOURCE_ENERGY);
