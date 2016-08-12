@@ -232,7 +232,7 @@ module.exports = {
             //console.log(this+' flag '+flag+' needs '+needs);
             if (needs == 'Zealot') {
                 console.log(this+' spawning a zealot for '+flag.pos.roomName);
-                var result = this.createCreep([WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE], undefined, { class: 'Zealot', home: this.name, flag: flag.name } );
+                var result = this.createCreep([WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,MOVE], undefined, { class: 'Zealot', home: this.name, flag: flag.name } );
                 if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Zealot', home: this.name, flag: flag.name } ); }
                 if (result == OK) { flag.spawned('Zealot'); }
                 return;
