@@ -44,7 +44,7 @@ module.exports = {
                 console.log(this+' dedicated upgrader is '+creep);
                 this.upgrader = creep;
             } else {
-                console.log(this+' this.memory.upgrader '+this.memory.upgrader+' invalid/missing');
+                console.log(this+' this.memory.upgrader '+this.memory.upgrader+' ** INVALID/MISSING **');
                 this.memory.upgrader = null;
             }
         }

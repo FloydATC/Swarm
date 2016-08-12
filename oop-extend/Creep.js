@@ -522,8 +522,10 @@ module.exports = {
         if (this.pos.inRangeTo(target, 3)) {
             this.upgradeController(target);
             this.add_stats('upgrade');
-            this.say('Praise GCL!');
-            this.room.memory.upgrader = this.id;
+            if (this.memory.class == 'Zealot') {
+                this.say('Praise GCL!');
+                this.room.memory.upgrader = this.id;
+            }
         } else {
             this.move_to(target);
         }
