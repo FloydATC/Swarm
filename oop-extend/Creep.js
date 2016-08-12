@@ -121,7 +121,7 @@ module.exports = {
         }
 
         // Consider fetching energy from a link
-        console.log(this+' considers fetching energy from a container');
+        console.log(this+' considers fetching energy from a link');
         if (this.task == 'feed tower' || this.task == 'feed spawn' || this.task == 'feed extension') {
             var links = this.room.links.slice();
             while (links.length > 0) {
@@ -161,6 +161,25 @@ module.exports = {
                     }
                     return;
                 }
+            }
+        }
+
+        // Consider fetching energy from storage
+        console.log(this+' considers fetching energy from storage');
+        if (this.task != 'upgrade' && this.task != 'stockpile') {
+            var storage = this.room.storage;
+            if (storage instanceof StructureStorage) {
+                var reserved = storage.reserved_amount || 0;
+                if (reserved >= storage.store.energy) { continue; } // Not enough left for me
+                storage.reserved_amount = reserved + this.carryCapacity - _.sum(this.carry);
+                if (this.pos.inRangeTo(storage, 1)) {
+                    this.withdraw(storage, RESOURCE_ENERGY);
+                    this.memory.tracking = true;
+                } else {
+                    this.move_to(storage);
+                    this.memory.tracking = false;
+                }
+                return;
             }
         }
 
