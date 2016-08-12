@@ -39,8 +39,7 @@ module.exports = {
 
         // Check if dedicated upgrader is alive
         if (this.memory.upgrader != null) {
-//            var creep = Game.getObjectById(this.memory.upgrader);
-            var creep = this.creep_by_id(this.memory.upgrader);
+            var creep = Game.getObjectById(this.memory.upgrader);
             //console.log(this+' this.memory.upgrader '+this.memory.upgrader+' is '+creep);
             if (creep != null && creep.memory.class == 'Zealot') {
                 //console.log(this+' dedicated upgrader is '+creep);
@@ -60,15 +59,6 @@ module.exports = {
 
         this.containers = this.containers.sort( function(a,b) { return a.free - b.free; } ); // Note: Must initialize before sorting
 
-    },
-
-    creep_by_id: function(id) {
-        for (var i=0; i<this.my_creeps.length; i++) {
-            var creep = this.my_creeps[i];
-            //console.log(this+' ==> looking for '+id+', found '+creep.id);
-            if (creep.id == id) { return creep; }
-        }
-        return null;
     },
 
     repairable: function() {
