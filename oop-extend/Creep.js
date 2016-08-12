@@ -487,7 +487,8 @@ module.exports = {
         var target = Game.getObjectById(this.target);
         if (this.pos.inRangeTo(target, 3)) {
             this.upgradeController(target);
-            this.add_stats('upgrade')
+            this.add_stats('upgrade');
+            this.room.memory.upgrader = this.id;
         } else {
             this.move_to(target);
         }

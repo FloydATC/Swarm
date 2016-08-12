@@ -30,6 +30,15 @@ module.exports = {
             Game.request_drones = this.name;
         }
 
+        // Check if dedicated upgrader is alive
+        if (this.memory.upgrader != null) {
+            var upgrader = Game.getObjectById(this.memory.upgrader);
+            if (upgrader == null) {
+                this.memory.upgrader = null;
+            } else {
+                this.upgrader = upgrader.id;
+            }
+        }
 
         for (var i=0; i<this.links.length; i++) { this.links[i].initialize(); }
         for (var i=0; i<this.my_creeps.length; i++) { this.my_creeps[i].initialize(); }
