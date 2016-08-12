@@ -647,6 +647,7 @@ module.exports = {
             // Another creep is sitting there but has not indicated a movement (yet)
             if (!creep.memory.moving_to && !creep.memory._move && creep.pos.x == pos.x && creep.pos.y == pos.y) { return false; }
         }
+        console.log(this+' can not see anyone blocking '+pos);
         if (this.memory.moving_to && this.memory.moving_to.x == pos.x && this.memory.moving_to.y == pos.y) {
             // We already tried this move
             delete this.memory.moving_to;
