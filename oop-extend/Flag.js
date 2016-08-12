@@ -58,9 +58,11 @@ module.exports = {
             var minimum = this.memory.workforce[c];
             var count = this.worker_count(c);
             if (count < minimum || (count == minimum && this.worker_lowest_ttl(c) < this.memory.lead_time)) {
+                console.log(this.pos.roomName+' '+this+' needs a '+c);
                 return c;
             }
         }
+        return null;
     },
 
     spawned: function(c) {
