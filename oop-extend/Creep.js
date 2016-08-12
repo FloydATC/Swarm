@@ -364,6 +364,7 @@ module.exports = {
             var ctrl = Game.rooms[this.memory.home].controller;
             var upgrader = Game.rooms[this.memory.home].upgrader;
             var target = upgrader || ctrl;
+            console.log(this.room.name+' '+this+' ctrl='+ctrl+' upgrader='+upgrader+' target='+target);
             // In the right room yet?
             if (this.room.name == this.memory.home) {
                 // Yes, approach upgrader (or controller if no upgrader is present)
