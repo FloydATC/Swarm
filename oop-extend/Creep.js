@@ -525,7 +525,7 @@ module.exports = {
                 var treasures = this.pos.findInRange(FIND_DROPPED_ENERGY, 1);
                 if (treasures.length > 0) { this.pickup(treasures[0]); this.say('Treasure'); }
             }*/
-            if (this.energy > 0) {
+            if (this.carry.energy > 0) {
                 console.log(this+' has energy and should upgrade '+target);
                 this.upgradeController(target);
                 this.add_stats('upgrade');
