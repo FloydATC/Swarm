@@ -1,7 +1,7 @@
 
 module.exports = {
 
-    initialize_tc: function() {
+    initialize: function() {
         //console.log(this+' initializing');
         if (typeof this.memory.workers == 'undefined') this.memory.workers = [];
         this.workers = [];
