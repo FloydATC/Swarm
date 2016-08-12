@@ -384,6 +384,7 @@ module.exports = {
                     console.log('Fetcher '+this+' upgrading controller ('+ctrl+' in '+this.memory.home+')');
                     return;
                 }
+                return;
             } else {
                 // No
                 this.move_to(ctrl);
@@ -520,11 +521,13 @@ module.exports = {
         var flag = Game.flags[this.memory.flag];
         if (flag != null) { flag.assign_worker(this); } // Check in with flag
         if (this.pos.inRangeTo(target, 3)) {
-            this.upgradeController(target);
-            this.add_stats('upgrade');
-            if (this.memory.class == 'Zealot') {
-                this.say('Praise GCL!');
-                this.room.memory.upgrader = this.id;
+            if (this.energy > 0) {
+                this.upgradeController(target);
+                this.add_stats('upgrade');
+                if (this.memory.class == 'Zealot') {
+                    this.say('Praise GCL!');
+                    this.room.memory.upgrader = this.id;
+                }
             }
         } else {
             this.move_to(target);
