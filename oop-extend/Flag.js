@@ -40,6 +40,7 @@ module.exports = {
     },
 
     assign_worker: function(creep) {
+        console.log(this+' creep checking in: '+creep);
         if (this.has_worker(creep)) { return; }
         this.memory.workers.push(creep.id);
     },
