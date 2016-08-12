@@ -528,8 +528,10 @@ module.exports = {
                 this.add_stats('upgrade');
                 if (this.memory.class == 'Zealot') {
                     this.say('Praise GCL!');
-                    this.room.memory.upgrader = this.id;
                 }
+            }
+            if (this.memory.class == 'Zealot') {
+                this.room.memory.upgrader = this.id;
             }
             if (this.free > 0) {
                 //console.log(this+' has free space');
