@@ -257,18 +257,51 @@ Room.prototype.plan = function() {
                 if (result == OK) { flag.spawned('Fetcher'); }
                 return;
             }
-/*                if (flag.memory.ticks > flag.memory.frequency) {
-                // Time to spawn another Miner to work this flag
-                console.log(this.link()+' spawning a remote miner for '+flag.pos.roomName);
-                var result = this.createCreep([MOVE,MOVE,CARRY,CARRY,WORK,WORK], undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
-                if (result == OK) { flag.memory.ticks = 0; }
-                return;
-            }*/
         }
     }
-
 }
 
+Room.prototype.optimize = function() {
+    // Swap tasks where it makes sense
+
+    // Calculate each creep's range to target
+    for (var i=0; i<this.my_creeps.length; i++) {
+        this.my_creeps[i].range_to_target = this.my_creeps[i].pos.getRangeTo(Game.getObjectById(this.my_creeps[i].target));
+    }
+
+    // For each creep, if both are same class, would they benefit from swapping targets?
+    for (var i=0; i<this.my_creeps.length; i++) {
+        var creep_a = this.my_creeps[i];
+        if (creep_a.range_to_target <= 1) { continue; } // Pointless
+        if (creep_a.memory.working == false) { continue; } // Out of energy
+        var target_a = Game.getObjectById(creep_a.target);
+        if (target_a == null) { continue; } // Target no longer valid}
+        for (var j=0; j<this.my_creeps.length; j++) {
+            var creep_b = this.my_creeps[j];
+            if (creep_a.id == creep_b.id) { continue; } // Same creep
+            if (creep_b.range_to_target <= 1) { continue; } // Pointless
+            if (creep_b.memory.working == false) { continue; } // Out of energy
+            if (creep_a.memory.class != creep_b.memory.class) { continue; } // Not same class of creep
+            var target_b = Game.getObjectById(creep_b.target);
+            if (target_b == null) { continue; } // Target no longer valid
+            if (target_a.id == target_b.id) { continue; } // Same target
+            var catb = creep_a.pos.getRangeTo(target_b)
+            var cbta = creep_b.pos.getRangeTo(target_a)
+            if (cbta+1 < creep_b.range_to_target && catb+1 < creep_a.range_to_target) {
+                // Both would benefit
+                //console.log(this.link()+' creeps '+creep_a+' ('+creep_a.range_to_target+'>'+catb+') and '+creep_b+' ('+creep_b.range_to_target+'>'+cbta+')  swapped targets');
+                var target = creep_a.target;
+                var task = creep_a.task;
+                creep_a.target = creep_b.target;
+                creep_a.task = creep_b.task;
+                creep_b.target = creep_a.target;
+                creep_b.task = creep_a.task;
+                creep_a.say('swap');
+                creep_b.say('swap');
+            }
+        }
+    }
+}
 
 
 module.exports = {
@@ -331,47 +364,6 @@ module.exports = {
         return 5;
     },
 
-    optimize: function() {
-        // Swap tasks where it makes sense
-
-        // Calculate each creep's range to target
-        for (var i=0; i<this.my_creeps.length; i++) {
-            this.my_creeps[i].range_to_target = this.my_creeps[i].pos.getRangeTo(Game.getObjectById(this.my_creeps[i].target));
-        }
-
-        // For each creep, if both are same class, would they benefit from swapping targets?
-        for (var i=0; i<this.my_creeps.length; i++) {
-            var creep_a = this.my_creeps[i];
-            if (creep_a.range_to_target <= 1) { continue; } // Pointless
-            if (creep_a.memory.working == false) { continue; } // Out of energy
-            var target_a = Game.getObjectById(creep_a.target);
-            if (target_a == null) { continue; } // Target no longer valid}
-            for (var j=0; j<this.my_creeps.length; j++) {
-                var creep_b = this.my_creeps[j];
-                if (creep_a.id == creep_b.id) { continue; } // Same creep
-                if (creep_b.range_to_target <= 1) { continue; } // Pointless
-                if (creep_b.memory.working == false) { continue; } // Out of energy
-                if (creep_a.memory.class != creep_b.memory.class) { continue; } // Not same class of creep
-                var target_b = Game.getObjectById(creep_b.target);
-                if (target_b == null) { continue; } // Target no longer valid
-                if (target_a.id == target_b.id) { continue; } // Same target
-                var catb = creep_a.pos.getRangeTo(target_b)
-                var cbta = creep_b.pos.getRangeTo(target_a)
-                if (cbta+1 < creep_b.range_to_target && catb+1 < creep_a.range_to_target) {
-                    // Both would benefit
-                    //console.log(this.link()+' creeps '+creep_a+' ('+creep_a.range_to_target+'>'+catb+') and '+creep_b+' ('+creep_b.range_to_target+'>'+cbta+')  swapped targets');
-                    var target = creep_a.target;
-                    var task = creep_a.task;
-                    creep_a.target = creep_b.target;
-                    creep_a.task = creep_b.task;
-                    creep_b.target = creep_a.target;
-                    creep_b.task = creep_a.task;
-                    creep_a.say('swap');
-                    creep_b.say('swap');
-                }
-            }
-        }
-    },
 
     execute: function() {
         for (var i=0; i<this.towers.length; i++) { this.towers[i].execute(); }
@@ -745,72 +737,59 @@ module.exports = {
 
     },
 
-    load_routing_table: function(tile) {
-        if (!this.memory.router) { this.memory.router = {}; }
-        if (!this.memory.router[tile]) { this.memory.router[tile] = {}; }
-        this.memory.router[tile]['mru'] = Game.time;
-        var table = new Routingtable(this.memory.router[tile]['table']);
-        return table;
-    },
 
-    save_routing_table: function(tile, table) {
-        if (!this.memory.router) { this.memory.router = {}; }
-        if (!this.memory.router[tile]) { this.memory.router[tile] = {}; }
-        this.memory.router[tile]['table'] = table.asString();
-    },
-
-    /*
-    set_direction: function(src, dst, direction) {
-        var pos1 = ('0'+src.x).slice(-2) + ('0'+src.y).slice(-2); // Format as XXYY
-        var pos2 = ('0'+dst.x).slice(-2) + ('0'+dst.y).slice(-2); // Format as XXYY
-        if (!this.memory.router) { this.memory.router = {}; }
-        if (!this.memory.router[pos1]) { this.memory.router[pos1] = {}; }
-        var table = new Routingtable(this.memory.router[pos1]['table']);
-        table.setDirectionTo(pos2, direction);
-        this.memory.router[pos1]['table'] = table.asString();
-        //console.log('-->:'+pos1+'-'+pos2+'='+direction);
-        //this.memory.router[pos1][pos2] = direction;
-        this.memory.router[pos1]['mru'] = Game.time;
-    },
-    */
-
-    get_direction: function(src, dst) {
-        var pos1 = ('0'+src.x).slice(-2) + ('0'+src.y).slice(-2); // Format as XXYY
-        var pos2 = ('0'+dst.x).slice(-2) + ('0'+dst.y).slice(-2); // Format as XXYY
-        //console.log('???:'+pos1+'-'+pos2);
-        if (!this.memory.router) { return null; }
-        if (!this.memory.router[pos1]) { return null; }
-        //if (!this.memory.router[pos1][pos2]) { return null; }
-        //var direction = this.memory.router[pos1][pos2];
-        this.memory.router[pos1]['mru'] = Game.time;
-        var table = new Routingtable(this.memory.router[pos1]['table']);
-        var direction = table.getDirectionTo(pos2);
-        //console.log('HIT:'+pos1+'-'+pos2+'='+direction);
-        return direction;
-    },
-
-    expire_routes: function() {
-        if (this.memory.router) {
-          var count = 0;
-            var maxage = Game.time - 900; // Drop routing table for tiles not visited in 'maxage' ticks
-            var tiles = Object.keys(this.memory.router);
-            for (var i=0; i<tiles.length; i++) {
-                if (this.memory.router[tiles[i]]['mru'] < maxage) {
-                    delete this.memory.router[tiles[i]];
-                    count++;
-                }
-            }
-            console.log(this.link()+' routes expired: '+count);
-        }
-    },
-
-    hp_ambition: function() {
-        if (this.controller && this.controller.my) {
-            var level = this.controller.level + (this.controller.progress / this.controller.progressTotal).toFixed(1) * 1;
-            var hp = 25000 * level;
-            return hp;
-        } else {
-            return 0;
-        }
-    },
 };
+
+Room.prototype.load_routing_table = function(tile) {
+    if (!this.memory.router) { this.memory.router = {}; }
+    if (!this.memory.router[tile]) { this.memory.router[tile] = {}; }
+    this.memory.router[tile]['mru'] = Game.time;
+    var table = new Routingtable(this.memory.router[tile]['table']);
+    return table;
+}
+
+Room.prototype.save_routing_table = function(tile, table) {
+    if (!this.memory.router) { this.memory.router = {}; }
+    if (!this.memory.router[tile]) { this.memory.router[tile] = {}; }
+    this.memory.router[tile]['table'] = table.asString();
+}
+
+Room.prototype.get_direction = function(src, dst) {
+    var pos1 = ('0'+src.x).slice(-2) + ('0'+src.y).slice(-2); // Format as XXYY
+    var pos2 = ('0'+dst.x).slice(-2) + ('0'+dst.y).slice(-2); // Format as XXYY
+    //console.log('???:'+pos1+'-'+pos2);
+    if (!this.memory.router) { return null; }
+    if (!this.memory.router[pos1]) { return null; }
+    //if (!this.memory.router[pos1][pos2]) { return null; }
+    //var direction = this.memory.router[pos1][pos2];
+    this.memory.router[pos1]['mru'] = Game.time;
+    var table = new Routingtable(this.memory.router[pos1]['table']);
+    var direction = table.getDirectionTo(pos2);
+    //console.log('HIT:'+pos1+'-'+pos2+'='+direction);
+    return direction;
+}
+
+Room.prototype.expire_routes = function() {
+    if (this.memory.router) {
+      var count = 0;
+        var maxage = Game.time - 900; // Drop routing table for tiles not visited in 'maxage' ticks
+        var tiles = Object.keys(this.memory.router);
+        for (var i=0; i<tiles.length; i++) {
+            if (this.memory.router[tiles[i]]['mru'] < maxage) {
+                delete this.memory.router[tiles[i]];
+                count++;
+            }
+        }
+        console.log(this.link()+' routes expired: '+count);
+    }
+}
+
+Room.prototype.hp_ambition = function() {
+    if (this.controller && this.controller.my) {
+        var level = this.controller.level + (this.controller.progress / this.controller.progressTotal).toFixed(1) * 1;
+        var hp = 25000 * level;
+        return hp;
+    } else {
+        return 0;
+    }
+}
