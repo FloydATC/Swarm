@@ -39,7 +39,7 @@ module.exports = {
                 var source = this.sources[i];
                 if (source.flag == null) {
                     var flagname = 'source '+this.name+'-'+i;
-                    this.createFlag(this.controller.pos, flagname);
+                    this.createFlag(this.source.pos, flagname);
                     if (typeof Memory.flags[flagname] == 'undefined') { Memory.flags[flagname] = {}; }
                     Memory.flags[flagname].source = source.id;
                 }
