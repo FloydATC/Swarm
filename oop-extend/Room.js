@@ -85,12 +85,13 @@ module.exports = {
             case ('Biter') { hash[ATTACK] = 1; hash[MOVE] = 1; break; }
             default { hash[WORK] = 3; hash[CARRY] = 3; hash[MOVE] = 3; break; }
         };
+        //
         //if (c == 'Biter') { return this.build_schematic({ Game.ATTACK: 1, MOVE: 1 }); }
         //if (c == 'Spitter') { return this.build_schematic({ RANGED_ATTACK: 1, MOVE: 1 }); }
         //if (c == 'Miner') { return this.build_schematic({ Game.WORK: 5, Game.CARRY: 1, Game.MOVE: 3 }); }
         //if (c == 'Fetcher') { return this.build_schematic({ WORK: 1, CARRY: 5, MOVE: 3 }); }
         //if (c == 'Zealot') { return this.build_schematic({ WORK: 5, CARRY: 1, MOVE: 3 }); }
-        return this.build_schematic(hash); 
+        return this.build_schematic(hash);
     },
 
     build_schematic: function(hash) {
