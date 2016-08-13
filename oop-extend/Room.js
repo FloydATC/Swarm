@@ -82,17 +82,13 @@ module.exports = {
     schematic: function(c) {
         var hash = {};
         switch (c) {
+            case 'Spitter': { hash[RANGED_ATTACK] = 1; hash[MOVE] = 1; break; }
             case 'Biter': { hash[ATTACK] = 1; hash[MOVE] = 1; break; }
             case 'Miner': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
+            case 'Fetcher': { hash[WORK] = 1; hash[CARRY] = 5; hash[MOVE] = 3; break; }
             case 'Zealot': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
             default: { hash[WORK] = 3; hash[CARRY] = 3; hash[MOVE] = 3; break; }
         };
-        //
-        //if (c == 'Biter') { return this.build_schematic({ Game.ATTACK: 1, MOVE: 1 }); }
-        //if (c == 'Spitter') { return this.build_schematic({ RANGED_ATTACK: 1, MOVE: 1 }); }
-        //if (c == 'Miner') { return this.build_schematic({ Game.WORK: 5, Game.CARRY: 1, Game.MOVE: 3 }); }
-        //if (c == 'Fetcher') { return this.build_schematic({ WORK: 1, CARRY: 5, MOVE: 3 }); }
-        //if (c == 'Zealot') { return this.build_schematic({ WORK: 5, CARRY: 1, MOVE: 3 }); }
         return this.build_schematic(hash);
     },
 
@@ -249,11 +245,9 @@ module.exports = {
                 var needs = flag.needs();
                 if (needs == 'Miner') {
                     console.log(this+' spawning a local miner for '+flag.pos.roomName);
-                    var body = this.schematic('Miner');
-                    var result = this.createCreep(body, undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } );
+                    var result = this.createCreep(this.schematic('Miner'), undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } );
                     if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } ); }
                     if (result == OK) { flag.spawned('Miner'); }
-                    console.log('spawn local miner: body='+body+' result='+result);
                     //return;
                 }
             }
@@ -287,8 +281,7 @@ module.exports = {
             //console.log(this+' flag '+flag+' needs '+needs);
             if (needs == 'Zealot') {
                 console.log(this+' spawning a zealot for '+flag.pos.roomName);
-                var body = this.schematic('Zealot');
-                var result = this.createCreep(body, undefined, { class: 'Zealot', home: this.name, flag: flag.name } );
+                var result = this.createCreep(this.schematic('Zealot'), undefined, { class: 'Zealot', home: this.name, flag: flag.name } );
                 if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Zealot', home: this.name, flag: flag.name } ); }
                 if (result == OK) { flag.spawned('Zealot'); }
                 console.log('spawn zealot: '+result);
