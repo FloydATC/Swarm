@@ -113,15 +113,6 @@ Room.prototype.plan = function() {
         }
     }
 
-    // EXPERIMENTAL
-    // If the room has miners but no drones, morph one miner into a drone. This drone will then stay at the source.
-/*        if (drones.length == 0 && miners.length >= 1) {
-        var creep = miners.shift();
-        creep.memory.class = 'Drone';
-        drones.push(creep);
-        console.log(this.link()+' morphed '+creep+' into a Drone');
-    }*/
-
     // Biters swarm and attack threats. Recycle when no longer needed.
     this.assign_task_attack(biters);
 
@@ -133,9 +124,6 @@ Room.prototype.plan = function() {
 
     // Infectors? Use them to capture control point, then morph into Drone
     this.assign_task_claim(infectors);
-
-    // Sources. The energy must flow. For each source, assign a drone.
-    //this.assign_task_mine(drones, sources);
 
     // Controller critical?
     this.assign_task_controller(drones);
@@ -304,135 +292,131 @@ Room.prototype.optimize = function() {
 }
 
 
-module.exports = {
-
-    link: function() {
-        return '<A href="https://screeps.com/a/#!/room/'+this.name+'">'+this.name+'</A>';
-    },
+Room.prototype.link = function() {
+    return '<A href="https://screeps.com/a/#!/room/'+this.name+'">'+this.name+'</A>';
+}
 
 
-    repairable: function() {
-        return this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits != undefined && s.hits < s.hitsMax; } });
-    },
+Room.prototype.repairable = function() {
+    return this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits != undefined && s.hits < s.hitsMax; } });
+}
 
-    schematic: function(c) {
-        var hash = {};
-        switch (c) {
-            case 'Spitter': { hash[RANGED_ATTACK] = 1; hash[MOVE] = 1; break; }
-            case 'Biter': { hash[ATTACK] = 1; hash[MOVE] = 1; break; }
-            case 'Miner': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
-            case 'Fetcher': { hash[WORK] = 1; hash[CARRY] = 5; hash[MOVE] = 3; break; }
-            case 'Zealot': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
-            default: { hash[WORK] = 3; hash[CARRY] = 3; hash[MOVE] = 3; break; }
-        };
-        return this.build_schematic(hash);
-    },
+Room.prototype.schematic = function(c) {
+    var hash = {};
+    switch (c) {
+        case 'Spitter': { hash[RANGED_ATTACK] = 1; hash[MOVE] = 1; break; }
+        case 'Biter': { hash[ATTACK] = 1; hash[MOVE] = 1; break; }
+        case 'Miner': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
+        case 'Fetcher': { hash[WORK] = 1; hash[CARRY] = 5; hash[MOVE] = 3; break; }
+        case 'Zealot': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
+        default: { hash[WORK] = 3; hash[CARRY] = 3; hash[MOVE] = 3; break; }
+    };
+    return this.build_schematic(hash);
+}
 
-    build_schematic: function(hash) {
-        var schematic = [];
-        for (var part in hash) {
-            for (var i=0; i<hash[part]; i++) { schematic.push(part); }
-        }
-        return schematic;
-    },
+Room.prototype.build_schematic = function(hash) {
+    var schematic = [];
+    for (var part in hash) {
+        for (var i=0; i<hash[part]; i++) { schematic.push(part); }
+    }
+    return schematic;
+}
 
     // Room.createCreep()
     // Pick the spawner with most energy
-    createCreep: function(body, name, memory) {
-        if (this.spawns.length > 0) {
-            var spawn = this.spawns.sort( function(a,b) { return b.energy - a.energy; } )[0];
-            if (spawn.busy == true || spawn.spawning) { return ERR_BUSY; }
-            var result = spawn.canCreateCreep(body, name);
-            if (result == OK) {
-                result = spawn.createCreep(body, name, memory);
-                console.log(this.link()+' '+spawn+' spawn '+body+' result='+result);
-                if (_.isString(result)) { result = OK; }
-                if (result == OK) { spawn.busy = true; }
-                return result;
-            } else {
-                return result;
-            }
+Room.prototype.createCreep = function(body, name, memory) {
+    if (this.spawns.length > 0) {
+        var spawn = this.spawns.sort( function(a,b) { return b.energy - a.energy; } )[0];
+        if (spawn.busy == true || spawn.spawning) { return ERR_BUSY; }
+        var result = spawn.canCreateCreep(body, name);
+        if (result == OK) {
+            result = spawn.createCreep(body, name, memory);
+            console.log(this.link()+' '+spawn+' spawn '+body+' result='+result);
+            if (_.isString(result)) { result = OK; }
+            if (result == OK) { spawn.busy = true; }
+            return result;
         } else {
-            return ERR_NOT_FOUND;
+            return result;
         }
-    },
+    } else {
+        return ERR_NOT_FOUND;
+    }
+}
+
+Room.prototype.want_drones = function() {
+    // TODO: Calculate the optimal number of drones for this room
+    //return (this.sources.length * 2) + 4; // Naive calculation
+    return 5;
+}
 
 
-    want_drones: function() {
-        // TODO: Calculate the optimal number of drones for this room
-        //return (this.sources.length * 2) + 4; // Naive calculation
-        return 5;
-    },
+Room.prototype.execute = function() {
+    for (var i=0; i<this.towers.length; i++) { this.towers[i].execute(); }
+    for (var i=0; i<this.links.length; i++) { this.links[i].execute(); }
+    for (var i=0; i<this.my_creeps.length; i++) { this.my_creeps[i].execute(); }
+}
 
+Room.prototype.energy_reserves = function() {
+    if (this.energy_reserves) { return this.energy_reserves; }
+    var count = this.containers.length;
+    var total = 0;
+    var total_capacity = 0;
+    for (var i=0; i<count; i++) {
+        total += this.containers[i].store.energy;
+        total_capacity += this.containers[i].storeCapacity;
+    }
+    if (count > 0) {
+        var percent = total * 100 / total_capacity;
+        this.energy_reserves = percent;
+        console.log(this.link()+' energy reserves at '+percent.toFixed(1)+'%');
+        return percent;
+    } else {
+        return 0;
+    }
+}
 
-    execute: function() {
-        for (var i=0; i<this.towers.length; i++) { this.towers[i].execute(); }
-        for (var i=0; i<this.links.length; i++) { this.links[i].execute(); }
-        for (var i=0; i<this.my_creeps.length; i++) { this.my_creeps[i].execute(); }
-    },
+Room.prototype.spawn_reserves = function() {
+    if (this.spawn_reserves) { return this.spawn_reserves; }
+    var count = this.extensions.length;
+    var total = 0;
+    var total_capacity = 0;
+    for (var i=0; i<count; i++) {
+        total += this.extensions[i].energy;
+        total_capacity += this.containers[i].energyCapacity;
+    }
+    count = this.spawns.length;
+    for (var i=0; i<count; i++) {
+        total += this.spawns[i].energy;
+        total_capacity += this.spawns[i].energyCapacity;
+    }
+    if (total_capacity > 0) {
+        var percent = total * 100 / total_capacity;
+        this.spawn_reserves = percent;
+        console.log(this.link()+' spawn reserves at '+percent.toFixed(1)+'%');
+        return percent;
+    } else {
+        return 0;
+    }
+}
 
-    energy_reserves: function() {
-        if (this.energy_reserves) { return this.energy_reserves; }
-        var count = this.containers.length;
-        var total = 0;
-        var total_capacity = 0;
-        for (var i=0; i<count; i++) {
-            total += this.containers[i].store.energy;
-            total_capacity += this.containers[i].storeCapacity;
-        }
-        if (count > 0) {
-            var percent = total * 100 / total_capacity;
-            this.energy_reserves = percent;
-            console.log(this.link()+' energy reserves at '+percent.toFixed(1)+'%');
-            return percent;
-        } else {
-            return 0;
-        }
-    },
-
-    spawn_reserves: function() {
-        if (this.spawn_reserves) { return this.spawn_reserves; }
-        var count = this.extensions.length;
-        var total = 0;
-        var total_capacity = 0;
-        for (var i=0; i<count; i++) {
-            total += this.extensions[i].energy;
-            total_capacity += this.containers[i].energyCapacity;
-        }
-        count = this.spawns.length;
-        for (var i=0; i<count; i++) {
-            total += this.spawns[i].energy;
-            total_capacity += this.spawns[i].energyCapacity;
-        }
-        if (total_capacity > 0) {
-            var percent = total * 100 / total_capacity;
-            this.spawn_reserves = percent;
-            console.log(this.link()+' spawn reserves at '+percent.toFixed(1)+'%');
-            return percent;
-        } else {
-            return 0;
-        }
-    },
-
-    consider_road: function(creep) {
-        // creep.fatigue, creep.pos => construct road?
-        creep.say('Road?');
-        if (this.construction_sites.length > 2) { return; } // Throttle construction work
-        var coord = creep.pos.x + ',' + creep.pos.y;
-        var votes = this.memory.votes || {};
-        //console.log(this.link()+' vote sheet before: '+JSON.stringify(votes));
-        votes[coord] = (votes[coord] + creep.fatigue) || creep.fatigue; // Count vote
-        //console.log(this.link()+' vote sheet after: '+JSON.stringify(votes));
-        if (votes[coord] > this.roads.length) {
-            votes = {}; // Reset vote sheet
-            console.log(this.link()+' build road at '+coord+' (have '+this.roads.length+')');
-            this.createConstructionSite(creep.pos.x, creep.pos.y, STRUCTURE_ROAD);
-        } else {
-            //console.log(this.link()+' received '+votes[coord]+' votes for a road at '+coord+' (need '+this.roads.length+')');
-        }
-        this.memory.votes = votes; // Commit to memory
-    },
-};
+Room.prototype.consider_road = function(creep) {
+    // creep.fatigue, creep.pos => construct road?
+    creep.say('Road?');
+    if (this.construction_sites.length > 2) { return; } // Throttle construction work
+    var coord = creep.pos.x + ',' + creep.pos.y;
+    var votes = this.memory.votes || {};
+    //console.log(this.link()+' vote sheet before: '+JSON.stringify(votes));
+    votes[coord] = (votes[coord] + creep.fatigue) || creep.fatigue; // Count vote
+    //console.log(this.link()+' vote sheet after: '+JSON.stringify(votes));
+    if (votes[coord] > this.roads.length) {
+        votes = {}; // Reset vote sheet
+        console.log(this.link()+' build road at '+coord+' (have '+this.roads.length+')');
+        this.createConstructionSite(creep.pos.x, creep.pos.y, STRUCTURE_ROAD);
+    } else {
+        //console.log(this.link()+' received '+votes[coord]+' votes for a road at '+coord+' (need '+this.roads.length+')');
+    }
+    this.memory.votes = votes; // Commit to memory
+}
 
 Room.prototype.assign_task_attack = function(biters) {
     while (biters.length > 0) {
