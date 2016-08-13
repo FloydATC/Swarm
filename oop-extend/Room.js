@@ -252,7 +252,7 @@ module.exports = {
                 }
             }
         }
-        if (Game.time % Math.floor(CREEP_LIFE_TIME / this.want_drones()) == 0) {
+        if (this.drones.length < 2 || Game.time % Math.floor(CREEP_LIFE_TIME / this.want_drones()) == 0) {
             // Experimental clockwork spawning of drones
 
             // FIXME! Naive scaling code
