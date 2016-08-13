@@ -3,8 +3,12 @@ var Routingtable = require('Routingtable');
 
 module.exports = {
 
+    link: function() {
+        return '<A href="https://screeps.com/a/#!/room/'+this.name+'">'+this.name+'</A>';
+    }
+
     initialize: function() {
-        //console.log(this+' initializing');
+        //console.log(this.link()+' initializing');
         this.my_creeps = this.find(FIND_MY_CREEPS);
         this.my_creeps = this.my_creeps.sort( function(a,b) { return a.ticksToLive - b.ticksToLive; } );
         this.hostile_creeps = this.find(FIND_HOSTILE_CREEPS);
@@ -54,12 +58,12 @@ module.exports = {
         // Check if dedicated upgrader is alive
         if (this.memory.upgrader != null) {
             var creep = Game.getObjectById(this.memory.upgrader);
-            //console.log(this+' this.memory.upgrader '+this.memory.upgrader+' is '+creep);
+            //console.log(this.link()+' this.memory.upgrader '+this.memory.upgrader+' is '+creep);
             if (creep != null && creep.memory.class == 'Zealot') {
-                //console.log(this+' dedicated upgrader is '+creep);
+                //console.log(this.link()+' dedicated upgrader is '+creep);
                 this.upgrader = creep;
             } else {
-                //console.log(this+' this.memory.upgrader '+this.memory.upgrader+' ** INVALID/MISSING **');
+                //console.log(this.link()+' this.memory.upgrader '+this.memory.upgrader+' ** INVALID/MISSING **');
                 this.memory.upgrader = null;
             }
         }
@@ -109,7 +113,7 @@ module.exports = {
             var result = spawn.canCreateCreep(body, name);
             if (result == OK) {
                 result = spawn.createCreep(body, name, memory);
-                console.log(this+' '+spawn+' spawn '+body+' result='+result);
+                console.log(this.link()+' '+spawn+' spawn '+body+' result='+result);
                 if (_.isString(result)) { result = OK; }
                 if (result == OK) { spawn.busy = true; }
                 return result;
@@ -148,7 +152,7 @@ module.exports = {
         for (var i in my_creeps) {
             var creep = my_creeps[i];
             if (typeof creep == 'object') {
-                if (!creep.memory.class) { creep.memory.class = 'Drone'; console.log(this+' AMNESIAC '+creep+' assigned to Drone class'); }
+                if (!creep.memory.class) { creep.memory.class = 'Drone'; console.log(this.link()+' AMNESIAC '+creep+' assigned to Drone class'); }
                 if (creep.memory.class == 'Miner') { miners.push(creep); }
                 if (creep.memory.class == 'Fetcher') { fetchers.push(creep); }
                 if (creep.memory.class == 'Upgrader') { creep.memory.class = 'Zealot'; } // TEMP
@@ -159,7 +163,7 @@ module.exports = {
                 if (creep.memory.class == 'Biter') { biters.push(creep); }
                 if (creep.memory.class == 'Spitter') { spitters.push(creep); }
             } else {
-                console.log(this+' POSSIBLE SERVER ERROR: INVALID CREEP type='+(typeof creep)+' creep='+creep);
+                console.log(this.link()+' POSSIBLE SERVER ERROR: INVALID CREEP type='+(typeof creep)+' creep='+creep);
             }
         }
 
@@ -169,7 +173,7 @@ module.exports = {
             var creep = miners.shift();
             creep.memory.class = 'Drone';
             drones.push(creep);
-            console.log(this+' morphed '+creep+' into a Drone');
+            console.log(this.link()+' morphed '+creep+' into a Drone');
         }*/
 
         // Biters swarm and attack threats. Recycle when no longer needed.
@@ -239,12 +243,12 @@ module.exports = {
         };
 
         if (this.source_flags) {
-            //console.log(this+' has source flags to consider: '+this.source_flags);
+            //console.log(this.link()+' has source flags to consider: '+this.source_flags);
             for (var i in this.source_flags) {
                 var flag = this.source_flags[i];
                 var needs = flag.needs();
                 if (needs == 'Miner') {
-                    console.log(this+' spawning a local miner for '+flag.pos.roomName);
+                    console.log(this.link()+' spawning a local miner for '+flag.pos.roomName);
                     var result = this.createCreep(this.schematic('Miner'), undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } );
                     if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } ); }
                     if (result == OK) { flag.spawned('Miner'); }
@@ -262,25 +266,25 @@ module.exports = {
             if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Drone'), undefined, { class: 'Drone' }); }
             if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,CARRY,CARRY,WORK,WORK], undefined, { class: 'Drone' }); }
             if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Drone' }); }
-            //console.log(this+' spawn result='+result);
+            //console.log(this.link()+' spawn result='+result);
             return;
         }
         if (Game.colonize && Game.time % 50 == 0) {
-            console.log(this+' spawning a creep to claim '+Game.colonize);
+            console.log(this.link()+' spawning a creep to claim '+Game.colonize);
             var result = this.createCreep([MOVE,CARRY,WORK,CLAIM], undefined, { class: 'Swarmer', destination: Game.colonize });
             return;
         }
         if (Game.request_drones && Game.time % 50 == 0) {
-            console.log(this+' spawning a creep to build spawn in '+Game.request_drones);
+            console.log(this.link()+' spawning a creep to build spawn in '+Game.request_drones);
             var result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Swarmer', destination: Game.request_drones });
             return;
         }
         if (this.controller && this.controller.flag) {
             var flag = this.controller.flag;
             var needs = flag.needs();
-            //console.log(this+' flag '+flag+' needs '+needs);
+            //console.log(this.link()+' flag '+flag+' needs '+needs);
             if (needs == 'Zealot') {
-                console.log(this+' spawning a zealot for '+flag.pos.roomName);
+                console.log(this.link()+' spawning a zealot for '+flag.pos.roomName);
                 var result = this.createCreep(this.schematic('Zealot'), undefined, { class: 'Zealot', home: this.name, flag: flag.name } );
                 if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Zealot', home: this.name, flag: flag.name } ); }
                 if (result == OK) { flag.spawned('Zealot'); }
@@ -289,19 +293,19 @@ module.exports = {
             }
         }
         if (this.harvest_flags) {
-            //console.log(this+' has harvest flags to consider: '+this.harvest_flags);
+            //console.log(this.link()+' has harvest flags to consider: '+this.harvest_flags);
             for (var i in this.harvest_flags) {
                 var flag = this.harvest_flags[i];
                 var needs = flag.needs();
                 if (needs == 'Miner') {
-                    console.log(this+' spawning a remote miner for '+flag.pos.roomName);
+                    console.log(this.link()+' spawning a remote miner for '+flag.pos.roomName);
                     var result = this.createCreep(this.schematic('Miner'), undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
                     if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } ); }
                     if (result == OK) { flag.spawned('Miner'); }
                     return;
                 }
                 if (needs == 'Fetcher') {
-                    console.log(this+' spawning a remote fetcher for '+flag.pos.roomName);
+                    console.log(this.link()+' spawning a remote fetcher for '+flag.pos.roomName);
                     var result = this.createCreep(this.schematic('Fetcher'), undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
                     if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } ); }
                     if (result == OK) { flag.spawned('Fetcher'); }
@@ -309,7 +313,7 @@ module.exports = {
                 }
 /*                if (flag.memory.ticks > flag.memory.frequency) {
                     // Time to spawn another Miner to work this flag
-                    console.log(this+' spawning a remote miner for '+flag.pos.roomName);
+                    console.log(this.link()+' spawning a remote miner for '+flag.pos.roomName);
                     var result = this.createCreep([MOVE,MOVE,CARRY,CARRY,WORK,WORK], undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
                     if (result == OK) { flag.memory.ticks = 0; }
                     return;
@@ -353,7 +357,7 @@ module.exports = {
                 var cbta = creep_b.pos.getRangeTo(target_a)
                 if (cbta+1 < creep_b.range_to_target && catb+1 < creep_a.range_to_target) {
                     // Both would benefit
-                    //console.log(this+' creeps '+creep_a+' ('+creep_a.range_to_target+'>'+catb+') and '+creep_b+' ('+creep_b.range_to_target+'>'+cbta+')  swapped targets');
+                    //console.log(this.link()+' creeps '+creep_a+' ('+creep_a.range_to_target+'>'+catb+') and '+creep_b+' ('+creep_b.range_to_target+'>'+cbta+')  swapped targets');
                     var target = creep_a.target;
                     var task = creep_a.task;
                     creep_a.target = creep_b.target;
@@ -385,7 +389,7 @@ module.exports = {
         if (count > 0) {
             var percent = total * 100 / total_capacity;
             this.energy_reserves = percent;
-            console.log(this+' energy reserves at '+percent.toFixed(1)+'%');
+            console.log(this.link()+' energy reserves at '+percent.toFixed(1)+'%');
             return percent;
         } else {
             return 0;
@@ -409,7 +413,7 @@ module.exports = {
         if (total_capacity > 0) {
             var percent = total * 100 / total_capacity;
             this.spawn_reserves = percent;
-            console.log(this+' spawn reserves at '+percent.toFixed(1)+'%');
+            console.log(this.link()+' spawn reserves at '+percent.toFixed(1)+'%');
             return percent;
         } else {
             return 0;
@@ -422,15 +426,15 @@ module.exports = {
         if (this.construction_sites.length > 2) { return; } // Throttle construction work
         var coord = creep.pos.x + ',' + creep.pos.y;
         var votes = this.memory.votes || {};
-        //console.log(this+' vote sheet before: '+JSON.stringify(votes));
+        //console.log(this.link()+' vote sheet before: '+JSON.stringify(votes));
         votes[coord] = (votes[coord] + creep.fatigue) || creep.fatigue; // Count vote
-        //console.log(this+' vote sheet after: '+JSON.stringify(votes));
+        //console.log(this.link()+' vote sheet after: '+JSON.stringify(votes));
         if (votes[coord] > this.roads.length) {
             votes = {}; // Reset vote sheet
-            console.log(this+' build road at '+coord+' (have '+this.roads.length+')');
+            console.log(this.link()+' build road at '+coord+' (have '+this.roads.length+')');
             this.createConstructionSite(creep.pos.x, creep.pos.y, STRUCTURE_ROAD);
         } else {
-            //console.log(this+' received '+votes[coord]+' votes for a road at '+coord+' (need '+this.roads.length+')');
+            //console.log(this.link()+' received '+votes[coord]+' votes for a road at '+coord+' (need '+this.roads.length+')');
         }
         this.memory.votes = votes; // Commit to memory
     },
@@ -697,7 +701,7 @@ module.exports = {
     },
 
     assign_task_stockpile: function(drones, containers) {
-        //console.log(this+' container assignments:');
+        //console.log(this.link()+' container assignments:');
         while (drones.length > 0 && containers.length > 0) {
             var drone = drones.shift();
             while (containers.length > 0) {
@@ -794,7 +798,7 @@ module.exports = {
                     count++;
                 }
             }
-            console.log(this+' routes expired: '+count);
+            console.log(this.link()+' routes expired: '+count);
         }
     },
 
