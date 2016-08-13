@@ -239,7 +239,7 @@ module.exports = {
         };
 
         if (this.source_flags) {
-            console.log(this+' has source flags to consider: '+this.source_flags);
+            //console.log(this+' has source flags to consider: '+this.source_flags);
             for (var i in this.source_flags) {
                 var flag = this.source_flags[i];
                 var needs = flag.needs();
