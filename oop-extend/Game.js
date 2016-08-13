@@ -65,6 +65,25 @@ module.exports = {
                 }
             }
 
+            // All sources in owned rooms should have a flag. Non-owned should not.
+            if (flag.type() == 'source') {
+                if (flag.memory.source) {
+                    var source = Game.getObjectById(flag.memory.source);
+                    if (source == null || source.room == null || source.room.controller == null || source.room.controller.my == false) {
+                        flag.remove();
+                        continue;
+                    }
+                    source.flag = flag;
+                    if (typeof source.room.source_flags == 'undefined') { source.room.source_flags = []; }
+                    source.room.source_flags.push(flag);
+
+                    // Calculate and set spawn parameters
+                    flag.memory.lead_time = 20; // How many ticks from spawn to arrival? FIXME!!!
+                    flag.memory.cooldown = 100; // How many ticks minimum between spawns? FIXME!!!
+                    flag.memory.workforce = { 'Miner': 1 };
+                }
+            }
+
             // Colonize rooms with "spawn" flag
             if (flag.type() == 'spawn') {
                 var room_name = flag.pos.roomName;
