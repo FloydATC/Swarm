@@ -84,6 +84,7 @@ module.exports = {
         switch (c) {
             case 'Biter': { hash[ATTACK] = 1; hash[MOVE] = 1; break; }
             case 'Miner': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
+            case 'Zealot': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
             default: { hash[WORK] = 3; hash[CARRY] = 3; hash[MOVE] = 3; break; }
         };
         //
