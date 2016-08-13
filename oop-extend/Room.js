@@ -82,8 +82,8 @@ module.exports = {
     schematic: function(c) {
         var hash = {};
         switch (c) {
-            case ('Biter') { hash[ATTACK] = 1; hash[MOVE] = 1; break; }
-            default { hash[WORK] = 3; hash[CARRY] = 3; hash[MOVE] = 3; break; }
+            case 'Biter': { hash[ATTACK] = 1; hash[MOVE] = 1; break; }
+            default: { hash[WORK] = 3; hash[CARRY] = 3; hash[MOVE] = 3; break; }
         };
         //
         //if (c == 'Biter') { return this.build_schematic({ Game.ATTACK: 1, MOVE: 1 }); }
