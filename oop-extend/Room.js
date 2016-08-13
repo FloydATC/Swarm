@@ -185,7 +185,7 @@ module.exports = {
         this.assign_task_claim(infectors);
 
         // Sources. The energy must flow. For each source, assign a drone.
-        this.assign_task_mine(drones, sources);
+        //this.assign_task_mine(drones, sources);
 
         // Controller critical?
         this.assign_task_controller(drones);
