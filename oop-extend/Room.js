@@ -31,6 +31,7 @@ module.exports = {
             if (this.flag == null) {
                 var flagname = 'controller '+this.name;
                 this.createFlag(this.controller.pos, flagname);
+                if (typeof Memory.flags[flagname] == 'undefined') { Memory.flags[flagname] = {}; }
                 Memory.flags[flagname].controller = this.controller.id;
             }
             // There should also be a flag on each Source to coordinate mining efforts
@@ -39,6 +40,7 @@ module.exports = {
                 if (source.flag == null) {
                     var flagname = 'source '+this.name+'-'+i;
                     this.createFlag(this.controller.pos, flagname);
+                    if (typeof Memory.flags[flagname] == 'undefined') { Memory.flags[flagname] = {}; }
                     Memory.flags[flagname].source = source.id;
                 }
             }
