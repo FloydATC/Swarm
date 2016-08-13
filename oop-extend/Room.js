@@ -241,7 +241,8 @@ module.exports = {
                 var needs = flag.needs();
                 if (needs == 'Miner') {
                     console.log(this+' spawning a local miner for '+flag.pos.roomName);
-                    var result = this.createCreep([this.schematic('Miner')], undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } );
+                    var body = this.schematic('Miner');
+                    var result = this.createCreep(body, undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } );
                     if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } ); }
                     if (result == OK) { flag.spawned('Miner'); }
                     console.log('spawn local miner: '+result);
