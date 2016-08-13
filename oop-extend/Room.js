@@ -1,83 +1,282 @@
 
 var Routingtable = require('Routingtable');
 
+Room.prototype.initialize = function() {
+    //console.log(this.link()+' initializing');
+    this.my_creeps = this.find(FIND_MY_CREEPS);
+    this.my_creeps = this.my_creeps.sort( function(a,b) { return a.ticksToLive - b.ticksToLive; } );
+    this.hostile_creeps = this.find(FIND_HOSTILE_CREEPS);
+    this.dropped_energy = this.find(FIND_DROPPED_ENERGY);
+    this.dropped_other = this.find(FIND_DROPPED_RESOURCES, { filter: function(r) { return r.resourceType != RESOURCE_ENERGY; } });
+    this.sources = this.find(FIND_SOURCES);
+    this.spawns = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_SPAWN; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
+    this.towers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_TOWER; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
+    this.roads = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_ROAD; } });
+    this.links = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_LINK; } });
+    this.extensions = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTENSION; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
+    this.containers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_STORAGE; } });
+    this.construction_sites = this.find(FIND_CONSTRUCTION_SITES).sort( function(a,b) { return b.progress - a.progress; } ); // Nearest completion first
+    var ambition = this.hp_ambition();
+    this.need_repairs = this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits && s.hits < ambition && s.hits < s.hitsMax; } }).sort( function(a,b) { return a.hits - b.hits; } ); // Most urgent first
+
+    this.link_count = 0;
+    this.link_total = 0;
+    this.link_average = 0;
+
+    // Owned room?
+    if (this.controller && this.controller.my) {
+        // There should be a flag on the controller to coordinate the upgrading efforts
+        if (this.flag == null) {
+            var flagname = 'controller '+this.name;
+            this.createFlag(this.controller.pos, flagname);
+            if (typeof Memory.flags[flagname] == 'undefined') { Memory.flags[flagname] = {}; }
+            Memory.flags[flagname].controller = this.controller.id;
+        }
+        // There should also be a flag on each Source to coordinate mining efforts
+        for (var i=0; i<this.sources.length; i++) {
+            var source = this.sources[i];
+            if (source.flag == null) {
+                var flagname = 'source '+this.name+'-'+i;
+                this.createFlag(source.pos, flagname);
+                if (typeof Memory.flags[flagname] == 'undefined') { Memory.flags[flagname] = {}; }
+                Memory.flags[flagname].source = source.id;
+            }
+        }
+    }
+
+    // Request reinforcements if room is owned but has no spawn
+    if (this.controller && this.controller.my && this.spawns.length == 0 && this.my_creeps.length < 10) {
+        Game.request_drones = this.name;
+    }
+
+    // Check if dedicated upgrader is alive
+    if (this.memory.upgrader != null) {
+        var creep = Game.getObjectById(this.memory.upgrader);
+        //console.log(this.link()+' this.memory.upgrader '+this.memory.upgrader+' is '+creep);
+        if (creep != null && creep.memory.class == 'Zealot') {
+            //console.log(this.link()+' dedicated upgrader is '+creep);
+            this.upgrader = creep;
+        } else {
+            //console.log(this.link()+' this.memory.upgrader '+this.memory.upgrader+' ** INVALID/MISSING **');
+            this.memory.upgrader = null;
+        }
+    }
+
+    for (var i=0; i<this.links.length; i++) { this.links[i].initialize(); }
+    for (var i=0; i<this.my_creeps.length; i++) { this.my_creeps[i].initialize(); }
+    for (var i=0; i<this.towers.length; i++) { this.towers[i].initialize(); }
+    for (var i=0; i<this.sources.length; i++) { this.sources[i].initialize(); }
+    for (var i=0; i<this.spawns.length; i++) { this.spawns[i].initialize(); }
+    for (var i=0; i<this.containers.length; i++) { this.containers[i].initialize(); } // Note: Includes storage
+
+    this.containers = this.containers.sort( function(a,b) { return a.free - b.free; } ); // Note: Must initialize before sorting
+}
+
+Room.prototype.plan = function() {
+    var sources = this.sources.slice();
+    var spawns = this.spawns.slice();
+    var towers = this.towers.slice();
+    var links = this.links.slice();
+    var drops = this.dropped_other.slice();
+    var extensions = this.extensions;
+    var containers = this.containers.reverse(); // 3 with least energy
+    var my_creeps = this.my_creeps.slice(); // All classes
+    var hostile_creeps = this.hostile_creeps.slice();
+    var csites = this.construction_sites.slice(0,2); // Max 3 at a time
+    var need_repairs = this.need_repairs.slice(0,2); // Max 3 at a time
+
+    var miners = [];        // Mine energy (in remote rooms for now)
+    var fetchers = [];      // Fetch energy from remote mines
+    var zealots = [];     // Camp next to controller and upgrade it
+    var drones = [];        // Generic workers
+    var swarmers = [];      // Move to remote room then mutate into Infectors
+    var infectors = [];     // Claim controller then mutate into Drone
+    var biters = [];        // Attack unit
+    var spitters = [];      // Ranged attack unit
+
+    // Sort creeps into classes
+    for (var i in my_creeps) {
+        var creep = my_creeps[i];
+        if (typeof creep == 'object') {
+            if (!creep.memory.class) { creep.memory.class = 'Drone'; console.log(this.link()+' AMNESIAC '+creep+' assigned to Drone class'); }
+            if (creep.memory.class == 'Miner') { miners.push(creep); }
+            if (creep.memory.class == 'Fetcher') { fetchers.push(creep); }
+            if (creep.memory.class == 'Upgrader') { creep.memory.class = 'Zealot'; } // TEMP
+            if (creep.memory.class == 'Zealot') { zealots.push(creep); }
+            if (creep.memory.class == 'Drone') { drones.push(creep); }
+            if (creep.memory.class == 'Swarmer') { swarmers.push(creep); }
+            if (creep.memory.class == 'Infector') { infectors.push(creep); }
+            if (creep.memory.class == 'Biter') { biters.push(creep); }
+            if (creep.memory.class == 'Spitter') { spitters.push(creep); }
+        } else {
+            console.log(this.link()+' POSSIBLE SERVER ERROR: INVALID CREEP type='+(typeof creep)+' creep='+creep);
+        }
+    }
+
+    // EXPERIMENTAL
+    // If the room has miners but no drones, morph one miner into a drone. This drone will then stay at the source.
+/*        if (drones.length == 0 && miners.length >= 1) {
+        var creep = miners.shift();
+        creep.memory.class = 'Drone';
+        drones.push(creep);
+        console.log(this.link()+' morphed '+creep+' into a Drone');
+    }*/
+
+    // Biters swarm and attack threats. Recycle when no longer needed.
+    this.assign_task_attack(biters);
+
+    // Spitters swarm and attack threats. Recycle when no longer needed.
+    this.assign_task_ranged_attack(spitters);
+
+    // Swarmers? Send them in the right direction or morph into Infector
+    this.assign_task_travel(swarmers);
+
+    // Infectors? Use them to capture control point, then morph into Drone
+    this.assign_task_claim(infectors);
+
+    // Sources. The energy must flow. For each source, assign a drone.
+    //this.assign_task_mine(drones, sources);
+
+    // Controller critical?
+    this.assign_task_controller(drones);
+
+    // Spawn needs energy?
+    this.assign_task_feed_spawn(drones, spawns);
+
+    // Tower needs energy?
+    this.assign_task_feed_tower(drones, towers);
+
+    // Links can aid the feeding of towers
+    this.assign_task_feed_link(drones, links);
+
+    // Enemies dropped loot?
+    this.assign_task_pick_up(drones, drops);
+
+    // Extensions needs energy?
+    this.assign_task_feed_extension(drones, extensions);
+
+    // Repair stuff?
+    this.assign_task_repair(drones, need_repairs);
+
+    // Build stuff?
+    this.assign_task_build(drones, csites);
+
+    // Containers needs energy?
+    this.assign_task_stockpile(drones, containers);
+
+    // Zealots always upgrade
+    this.assign_task_upgrade(zealots);
+
+    // FINALLY: Any leftover drones? Upgrade
+    this.assign_task_upgrade(drones);
+
+    // Remote miners
+    this.assign_task_remote_mine(miners);
+
+    // Remote fetchers
+    this.assign_task_remote_fetch(fetchers);
+
+
+    // Under attack and we have no towers? Spawn biters and spitters and hope for the best
+    if (this.hostile_creeps.length > 0 && this.towers.length == 0) {
+        // Emergency, spawn biters and spitters
+        if (Math.random() > 0.5) {
+            var result = this.createCreep([MOVE,ATTACK], undefined, { class: 'Biter' });
+        } else {
+            var result = this.createCreep([MOVE,RANGED_ATTACK], undefined, { class: 'Spitter' });
+        }
+        return;
+    };
+
+    if (this.source_flags) {
+        //console.log(this.link()+' has source flags to consider: '+this.source_flags);
+        for (var i in this.source_flags) {
+            var flag = this.source_flags[i];
+            var needs = flag.needs();
+            if (needs == 'Miner') {
+                console.log(this.link()+' spawning a local miner for '+flag.pos.roomName);
+                var result = this.createCreep(this.schematic('Miner'), undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } );
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } ); }
+                if (result == OK) { flag.spawned('Miner'); }
+                return;
+            }
+        }
+    }
+    if (Game.time % Math.floor(CREEP_LIFE_TIME / this.want_drones()) == 0) {
+        // Experimental clockwork spawning of drones
+
+        // FIXME! Naive scaling code
+        var result = ERR_NOT_ENOUGH_ENERGY;
+        //if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,MOVE,MOVE,MOVE,CARRY,CARRY,CARRY,CARRY,CARRY,WORK,WORK,WORK,WORK,WORK], undefined, { class: 'Drone' }); }
+        //if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,MOVE,MOVE,CARRY,CARRY,CARRY,CARRY,WORK,WORK,WORK,WORK], undefined, { class: 'Drone' }); }
+        if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Drone'), undefined, { class: 'Drone' }); }
+        if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,CARRY,CARRY,WORK,WORK], undefined, { class: 'Drone' }); }
+        if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Drone' }); }
+        //console.log(this.link()+' spawn result='+result);
+        return;
+    }
+    if (Game.colonize && Game.time % 50 == 0) {
+        console.log(this.link()+' spawning a creep to claim '+Game.colonize);
+        var result = this.createCreep([MOVE,CARRY,WORK,CLAIM], undefined, { class: 'Swarmer', destination: Game.colonize });
+        return;
+    }
+    if (Game.request_drones && Game.time % 50 == 0) {
+        console.log(this.link()+' spawning a creep to build spawn in '+Game.request_drones);
+        var result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Swarmer', destination: Game.request_drones });
+        return;
+    }
+    if (this.controller && this.controller.flag) {
+        var flag = this.controller.flag;
+        var needs = flag.needs();
+        //console.log(this.link()+' flag '+flag+' needs '+needs);
+        if (needs == 'Zealot') {
+            console.log(this.link()+' spawning a zealot for '+flag.pos.roomName);
+            var result = this.createCreep(this.schematic('Zealot'), undefined, { class: 'Zealot', home: this.name, flag: flag.name } );
+            if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Zealot', home: this.name, flag: flag.name } ); }
+            if (result == OK) { flag.spawned('Zealot'); }
+            console.log('spawn zealot: '+result);
+            return;
+        }
+    }
+    if (this.harvest_flags) {
+        //console.log(this.link()+' has harvest flags to consider: '+this.harvest_flags);
+        for (var i in this.harvest_flags) {
+            var flag = this.harvest_flags[i];
+            var needs = flag.needs();
+            if (needs == 'Miner') {
+                console.log(this.link()+' spawning a remote miner for '+flag.pos.roomName);
+                var result = this.createCreep(this.schematic('Miner'), undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } ); }
+                if (result == OK) { flag.spawned('Miner'); }
+                return;
+            }
+            if (needs == 'Fetcher') {
+                console.log(this.link()+' spawning a remote fetcher for '+flag.pos.roomName);
+                var result = this.createCreep(this.schematic('Fetcher'), undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } ); }
+                if (result == OK) { flag.spawned('Fetcher'); }
+                return;
+            }
+/*                if (flag.memory.ticks > flag.memory.frequency) {
+                // Time to spawn another Miner to work this flag
+                console.log(this.link()+' spawning a remote miner for '+flag.pos.roomName);
+                var result = this.createCreep([MOVE,MOVE,CARRY,CARRY,WORK,WORK], undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
+                if (result == OK) { flag.memory.ticks = 0; }
+                return;
+            }*/
+        }
+    }
+
+}
+
+
+
 module.exports = {
 
     link: function() {
         return '<A href="https://screeps.com/a/#!/room/'+this.name+'">'+this.name+'</A>';
     },
 
-    initialize: function() {
-        //console.log(this.link()+' initializing');
-        this.my_creeps = this.find(FIND_MY_CREEPS);
-        this.my_creeps = this.my_creeps.sort( function(a,b) { return a.ticksToLive - b.ticksToLive; } );
-        this.hostile_creeps = this.find(FIND_HOSTILE_CREEPS);
-        this.dropped_energy = this.find(FIND_DROPPED_ENERGY);
-        this.dropped_other = this.find(FIND_DROPPED_RESOURCES, { filter: function(r) { return r.resourceType != RESOURCE_ENERGY; } });
-        this.sources = this.find(FIND_SOURCES);
-        this.spawns = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_SPAWN; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
-        this.towers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_TOWER; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
-        this.roads = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_ROAD; } });
-        this.links = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_LINK; } });
-        this.extensions = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTENSION; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
-        this.containers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_STORAGE; } });
-        this.construction_sites = this.find(FIND_CONSTRUCTION_SITES).sort( function(a,b) { return b.progress - a.progress; } ); // Nearest completion first
-        var ambition = this.hp_ambition();
-        this.need_repairs = this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits && s.hits < ambition && s.hits < s.hitsMax; } }).sort( function(a,b) { return a.hits - b.hits; } ); // Most urgent first
-
-        this.link_count = 0;
-        this.link_total = 0;
-        this.link_average = 0;
-
-        // Owned room?
-        if (this.controller && this.controller.my) {
-            // There should be a flag on the controller to coordinate the upgrading efforts
-            if (this.flag == null) {
-                var flagname = 'controller '+this.name;
-                this.createFlag(this.controller.pos, flagname);
-                if (typeof Memory.flags[flagname] == 'undefined') { Memory.flags[flagname] = {}; }
-                Memory.flags[flagname].controller = this.controller.id;
-            }
-            // There should also be a flag on each Source to coordinate mining efforts
-            for (var i=0; i<this.sources.length; i++) {
-                var source = this.sources[i];
-                if (source.flag == null) {
-                    var flagname = 'source '+this.name+'-'+i;
-                    this.createFlag(source.pos, flagname);
-                    if (typeof Memory.flags[flagname] == 'undefined') { Memory.flags[flagname] = {}; }
-                    Memory.flags[flagname].source = source.id;
-                }
-            }
-        }
-
-        // Request reinforcements if room is owned but has no spawn
-        if (this.controller && this.controller.my && this.spawns.length == 0 && this.my_creeps.length < 10) {
-            Game.request_drones = this.name;
-        }
-
-        // Check if dedicated upgrader is alive
-        if (this.memory.upgrader != null) {
-            var creep = Game.getObjectById(this.memory.upgrader);
-            //console.log(this.link()+' this.memory.upgrader '+this.memory.upgrader+' is '+creep);
-            if (creep != null && creep.memory.class == 'Zealot') {
-                //console.log(this.link()+' dedicated upgrader is '+creep);
-                this.upgrader = creep;
-            } else {
-                //console.log(this.link()+' this.memory.upgrader '+this.memory.upgrader+' ** INVALID/MISSING **');
-                this.memory.upgrader = null;
-            }
-        }
-
-        for (var i=0; i<this.links.length; i++) { this.links[i].initialize(); }
-        for (var i=0; i<this.my_creeps.length; i++) { this.my_creeps[i].initialize(); }
-        for (var i=0; i<this.towers.length; i++) { this.towers[i].initialize(); }
-        for (var i=0; i<this.sources.length; i++) { this.sources[i].initialize(); }
-        for (var i=0; i<this.spawns.length; i++) { this.spawns[i].initialize(); }
-        for (var i=0; i<this.containers.length; i++) { this.containers[i].initialize(); } // Note: Includes storage
-
-        this.containers = this.containers.sort( function(a,b) { return a.free - b.free; } ); // Note: Must initialize before sorting
-
-    },
 
     repairable: function() {
         return this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits != undefined && s.hits < s.hitsMax; } });
@@ -125,203 +324,6 @@ module.exports = {
         }
     },
 
-    plan: function() {
-
-        var sources = this.sources.slice();
-        var spawns = this.spawns.slice();
-        var towers = this.towers.slice();
-        var links = this.links.slice();
-        var drops = this.dropped_other.slice();
-        var extensions = this.extensions;
-        var containers = this.containers.reverse(); // 3 with least energy
-        var my_creeps = this.my_creeps.slice(); // All classes
-        var hostile_creeps = this.hostile_creeps.slice();
-        var csites = this.construction_sites.slice(0,2); // Max 3 at a time
-        var need_repairs = this.need_repairs.slice(0,2); // Max 3 at a time
-
-        var miners = [];        // Mine energy (in remote rooms for now)
-        var fetchers = [];      // Fetch energy from remote mines
-        var zealots = [];     // Camp next to controller and upgrade it
-        var drones = [];        // Generic workers
-        var swarmers = [];      // Move to remote room then mutate into Infectors
-        var infectors = [];     // Claim controller then mutate into Drone
-        var biters = [];        // Attack unit
-        var spitters = [];      // Ranged attack unit
-
-        // Sort creeps into classes
-        for (var i in my_creeps) {
-            var creep = my_creeps[i];
-            if (typeof creep == 'object') {
-                if (!creep.memory.class) { creep.memory.class = 'Drone'; console.log(this.link()+' AMNESIAC '+creep+' assigned to Drone class'); }
-                if (creep.memory.class == 'Miner') { miners.push(creep); }
-                if (creep.memory.class == 'Fetcher') { fetchers.push(creep); }
-                if (creep.memory.class == 'Upgrader') { creep.memory.class = 'Zealot'; } // TEMP
-                if (creep.memory.class == 'Zealot') { zealots.push(creep); }
-                if (creep.memory.class == 'Drone') { drones.push(creep); }
-                if (creep.memory.class == 'Swarmer') { swarmers.push(creep); }
-                if (creep.memory.class == 'Infector') { infectors.push(creep); }
-                if (creep.memory.class == 'Biter') { biters.push(creep); }
-                if (creep.memory.class == 'Spitter') { spitters.push(creep); }
-            } else {
-                console.log(this.link()+' POSSIBLE SERVER ERROR: INVALID CREEP type='+(typeof creep)+' creep='+creep);
-            }
-        }
-
-        // EXPERIMENTAL
-        // If the room has miners but no drones, morph one miner into a drone. This drone will then stay at the source.
-/*        if (drones.length == 0 && miners.length >= 1) {
-            var creep = miners.shift();
-            creep.memory.class = 'Drone';
-            drones.push(creep);
-            console.log(this.link()+' morphed '+creep+' into a Drone');
-        }*/
-
-        // Biters swarm and attack threats. Recycle when no longer needed.
-        this.assign_task_attack(biters);
-
-        // Spitters swarm and attack threats. Recycle when no longer needed.
-        this.assign_task_ranged_attack(spitters);
-
-        // Swarmers? Send them in the right direction or morph into Infector
-        this.assign_task_travel(swarmers);
-
-        // Infectors? Use them to capture control point, then morph into Drone
-        this.assign_task_claim(infectors);
-
-        // Sources. The energy must flow. For each source, assign a drone.
-        //this.assign_task_mine(drones, sources);
-
-        // Controller critical?
-        this.assign_task_controller(drones);
-
-        // Spawn needs energy?
-        this.assign_task_feed_spawn(drones, spawns);
-
-        // Tower needs energy?
-        this.assign_task_feed_tower(drones, towers);
-
-        // Links can aid the feeding of towers
-        this.assign_task_feed_link(drones, links);
-
-        // Enemies dropped loot?
-        this.assign_task_pick_up(drones, drops);
-
-        // Extensions needs energy?
-        this.assign_task_feed_extension(drones, extensions);
-
-        // Repair stuff?
-        this.assign_task_repair(drones, need_repairs);
-
-        // Build stuff?
-        this.assign_task_build(drones, csites);
-
-        // Containers needs energy?
-        this.assign_task_stockpile(drones, containers);
-
-        // Zealots always upgrade
-        this.assign_task_upgrade(zealots);
-
-        // FINALLY: Any leftover drones? Upgrade
-        this.assign_task_upgrade(drones);
-
-        // Remote miners
-        this.assign_task_remote_mine(miners);
-
-        // Remote fetchers
-        this.assign_task_remote_fetch(fetchers);
-
-
-        // Under attack and we have no towers? Spawn biters and spitters and hope for the best
-        if (this.hostile_creeps.length > 0 && this.towers.length == 0) {
-            // Emergency, spawn biters and spitters
-            if (Math.random() > 0.5) {
-                var result = this.createCreep([MOVE,ATTACK], undefined, { class: 'Biter' });
-            } else {
-                var result = this.createCreep([MOVE,RANGED_ATTACK], undefined, { class: 'Spitter' });
-            }
-            return;
-        };
-
-        if (this.source_flags) {
-            //console.log(this.link()+' has source flags to consider: '+this.source_flags);
-            for (var i in this.source_flags) {
-                var flag = this.source_flags[i];
-                var needs = flag.needs();
-                if (needs == 'Miner') {
-                    console.log(this.link()+' spawning a local miner for '+flag.pos.roomName);
-                    var result = this.createCreep(this.schematic('Miner'), undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } );
-                    if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } ); }
-                    if (result == OK) { flag.spawned('Miner'); }
-                    return;
-                }
-            }
-        }
-        if (Game.time % Math.floor(CREEP_LIFE_TIME / this.want_drones()) == 0) {
-            // Experimental clockwork spawning of drones
-
-            // FIXME! Naive scaling code
-            var result = ERR_NOT_ENOUGH_ENERGY;
-            //if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,MOVE,MOVE,MOVE,CARRY,CARRY,CARRY,CARRY,CARRY,WORK,WORK,WORK,WORK,WORK], undefined, { class: 'Drone' }); }
-            //if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,MOVE,MOVE,CARRY,CARRY,CARRY,CARRY,WORK,WORK,WORK,WORK], undefined, { class: 'Drone' }); }
-            if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Drone'), undefined, { class: 'Drone' }); }
-            if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,CARRY,CARRY,WORK,WORK], undefined, { class: 'Drone' }); }
-            if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Drone' }); }
-            //console.log(this.link()+' spawn result='+result);
-            return;
-        }
-        if (Game.colonize && Game.time % 50 == 0) {
-            console.log(this.link()+' spawning a creep to claim '+Game.colonize);
-            var result = this.createCreep([MOVE,CARRY,WORK,CLAIM], undefined, { class: 'Swarmer', destination: Game.colonize });
-            return;
-        }
-        if (Game.request_drones && Game.time % 50 == 0) {
-            console.log(this.link()+' spawning a creep to build spawn in '+Game.request_drones);
-            var result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Swarmer', destination: Game.request_drones });
-            return;
-        }
-        if (this.controller && this.controller.flag) {
-            var flag = this.controller.flag;
-            var needs = flag.needs();
-            //console.log(this.link()+' flag '+flag+' needs '+needs);
-            if (needs == 'Zealot') {
-                console.log(this.link()+' spawning a zealot for '+flag.pos.roomName);
-                var result = this.createCreep(this.schematic('Zealot'), undefined, { class: 'Zealot', home: this.name, flag: flag.name } );
-                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Zealot', home: this.name, flag: flag.name } ); }
-                if (result == OK) { flag.spawned('Zealot'); }
-                console.log('spawn zealot: '+result);
-                return;
-            }
-        }
-        if (this.harvest_flags) {
-            //console.log(this.link()+' has harvest flags to consider: '+this.harvest_flags);
-            for (var i in this.harvest_flags) {
-                var flag = this.harvest_flags[i];
-                var needs = flag.needs();
-                if (needs == 'Miner') {
-                    console.log(this.link()+' spawning a remote miner for '+flag.pos.roomName);
-                    var result = this.createCreep(this.schematic('Miner'), undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
-                    if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } ); }
-                    if (result == OK) { flag.spawned('Miner'); }
-                    return;
-                }
-                if (needs == 'Fetcher') {
-                    console.log(this.link()+' spawning a remote fetcher for '+flag.pos.roomName);
-                    var result = this.createCreep(this.schematic('Fetcher'), undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
-                    if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } ); }
-                    if (result == OK) { flag.spawned('Fetcher'); }
-                    return;
-                }
-/*                if (flag.memory.ticks > flag.memory.frequency) {
-                    // Time to spawn another Miner to work this flag
-                    console.log(this.link()+' spawning a remote miner for '+flag.pos.roomName);
-                    var result = this.createCreep([MOVE,MOVE,CARRY,CARRY,WORK,WORK], undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
-                    if (result == OK) { flag.memory.ticks = 0; }
-                    return;
-                }*/
-            }
-        }
-
-    },
 
     want_drones: function() {
         // TODO: Calculate the optimal number of drones for this room
