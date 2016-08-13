@@ -1,4 +1,5 @@
 
+module.exports = {}; // Nothing.
 var Routingtable = require('Routingtable');
 
 Room.prototype.initialize = function() {
