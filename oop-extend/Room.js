@@ -248,7 +248,7 @@ module.exports = {
                     var result = this.createCreep(this.schematic('Miner'), undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } );
                     if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } ); }
                     if (result == OK) { flag.spawned('Miner'); }
-                    //return;
+                    return;
                 }
             }
         }
@@ -259,7 +259,7 @@ module.exports = {
             var result = ERR_NOT_ENOUGH_ENERGY;
             //if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,MOVE,MOVE,MOVE,CARRY,CARRY,CARRY,CARRY,CARRY,WORK,WORK,WORK,WORK,WORK], undefined, { class: 'Drone' }); }
             //if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,MOVE,MOVE,CARRY,CARRY,CARRY,CARRY,WORK,WORK,WORK,WORK], undefined, { class: 'Drone' }); }
-            if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([this.schematic('Drone')], undefined, { class: 'Drone' }); }
+            if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Drone'), undefined, { class: 'Drone' }); }
             if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,CARRY,CARRY,WORK,WORK], undefined, { class: 'Drone' }); }
             if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Drone' }); }
             //console.log(this+' spawn result='+result);
