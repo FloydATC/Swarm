@@ -5,7 +5,7 @@ module.exports = {
 
     link: function() {
         return '<A href="https://screeps.com/a/#!/room/'+this.name+'">'+this.name+'</A>';
-    }
+    },
 
     initialize: function() {
         //console.log(this.link()+' initializing');
