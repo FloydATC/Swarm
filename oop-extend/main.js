@@ -17,6 +17,7 @@ module.exports.loop = function() {
     profiler.wrap(function() {
 
 //module.exports.loop = function () {
+    if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' overhead'); }
 
     // Scavenge dead creeps
     if (Game.time % 87 == 0) {
