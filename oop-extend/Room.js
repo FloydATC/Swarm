@@ -86,7 +86,7 @@ Room.prototype.plan = function() {
     var csites = this.construction_sites.slice(0,2); // Max 3 at a time
     var need_repairs = this.need_repairs.slice(0,2); // Max 3 at a time
 
-    var miners = [];        // Mine energy (in remote rooms for now)
+    var miners = [];        // Mine energy (local or remote)
     var fetchers = [];      // Fetch energy from remote mines
     var zealots = [];     // Camp next to controller and upgrade it
     var drones = [];        // Generic workers
@@ -159,8 +159,8 @@ Room.prototype.plan = function() {
     // FINALLY: Any leftover drones? Upgrade
     this.assign_task_upgrade(drones);
 
-    // Remote miners
-    this.assign_task_remote_mine(miners);
+    // Miners mine
+    this.assign_task_mine(miners);
 
     // Remote fetchers
     this.assign_task_remote_fetch(fetchers);
@@ -511,21 +511,10 @@ Room.prototype.assign_task_claim = function(infectors) {
     }
 }
 
-Room.prototype.assign_task_mine = function(miners, sources) {
-    while (miners.length > 0 && sources.length > 0) {
-        var miner = miners.shift();
-        var source = miner.shift_nearest(sources);
-        miner.task = 'mine';
-        miner.target = source.id;
-        //console.log(drone.name+' assigned to '+drone.task+' '+drone.target);
-        if (miners.length < 3) { break; } // Bootstrap/emergency
-    }
-}
-
-Room.prototype.assign_task_remote_mine = function(miners) {
+Room.prototype.assign_task_mine = function(miners) {
     while (miners.length > 0) {
         var miner = miners.shift();
-        miner.task = 'remote mine';
+        miner.task = 'mine';
         miner.target = miner.id; // Dummy because flag doesn't have an id. Duh.
         //console.log(miner.name+' assigned to '+miner.task+' '+miner.target);
     }

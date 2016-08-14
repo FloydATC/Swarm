@@ -49,9 +49,8 @@ Creep.prototype.execute = function() {
     if (this.task == 'ranged attack') { this.task_ranged_attack(); return; }
     if (this.task == 'recycle') { this.task_recycle(); return; }
     if (this.task == 'pick up') { this.task_pick_up(); return; }
-    if (this.task == 'remote mine') { this.task_remote_mine(); return; }
-    if (this.task == 'remote fetch') { this.task_remote_fetch(); return; }
     if (this.task == 'mine') { this.task_mine(); return; }
+    if (this.task == 'remote fetch') { this.task_remote_fetch(); return; }
     if (this.task == 'claim') { this.task_claim(); return; }
     if (this.task == 'travel') { this.task_travel(); return; }
     if (this.task == 'upgrade') { this.task_upgrade(); return; }
@@ -312,7 +311,7 @@ Creep.prototype.task_pick_up = function() {
     return;
 }
 
-Creep.prototype.task_remote_mine = function() {
+Creep.prototype.task_mine = function() {
     var flag = Game.flags[this.memory.flag];
     flag.assign_worker(this); // Check in with flag
     this.memory.tracking = true;
@@ -330,6 +329,28 @@ Creep.prototype.task_remote_mine = function() {
             // Get energy
             this.harvest(source);
             //console.log('Miner '+this+' harvesting source ('+source+' in '+this.memory.mine+')');
+
+            // Link with free space within reach?
+            var links = this.pos.findInRange(STRUCTURE_LINK, 1);
+            var link = null;
+            for (var i=0; i<links.length; i++) {
+                if (links[i].free == 0) { continue; }
+                link = links[i]
+            }
+            if (link != null) { this.transfer(link, RESOURCE_ENERGY); return; }
+
+            // Container with free space within reach?
+            var containers = this.pos.findInRange(STRUCTURE_CONTAINER, 1);
+            var container = null;
+            for (var i=0; i<containers.length; i++) {
+                if (containers[i].free == 0) { continue; }
+                container = containers[i]
+            }
+            if (container != null) { this.transfer(container, RESOURCE_ENERGY); return; }
+
+            // Nope. Just drop the energy on the ground then
+            this.drop(RESOURCE_ENERGY);
+
         }
         return;
     } else {
@@ -426,42 +447,6 @@ Creep.prototype.task_remote_fetch = function() {
             return;
         }
     }
-}
-
-Creep.prototype.task_mine = function() {
-    var target = Game.getObjectById(this.target);
-    if (this.pos.inRangeTo(target, 1)) {
-        this.harvest(target);
-        // Link with free space within reach?
-        var links = this.pos.findInRange(STRUCTURE_LINK, 1);
-        var link = null;
-        for (var i=0; i<links.length; i++) {
-            if (links[i].free == 0) { continue; }
-            link = links[i]
-        }
-        if (link != null) {
-            this.transfer(link, RESOURCE_ENERGY);
-        } else {
-            // Container with free space within reach?
-            var containers = this.pos.findInRange(STRUCTURE_CONTAINER, 1);
-            var container = null;
-            for (var i=0; i<containers.length; i++) {
-                if (containers[i].free == 0) { continue; }
-                container = containers[i]
-            }
-            if (container != null) {
-                this.transfer(container, RESOURCE_ENERGY);
-            } else {
-                // Nope. Just drop the energy on the ground then
-                this.drop(RESOURCE_ENERGY);
-            }
-        }
-        this.memory.tracking = false;
-    } else {
-        this.move_to(target);
-        this.memory.tracking = true;
-    }
-    return;
 }
 
 Creep.prototype.task_claim = function() {
