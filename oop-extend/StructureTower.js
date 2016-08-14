@@ -16,7 +16,8 @@ module.exports = {
             while (redfor.length > 0) {
                 var hostile = this.shift_nearest(redfor);
                 if (hostile.is_harmless()) { continue; }
-                //console.log(this+' attacking threat '+hostile);
+                if (Math.random(1) > 0.25) { continue; }
+                console.log(this+' attacking threat '+hostile);
                 this.attack(hostile);
                 return;
             }

@@ -652,7 +652,7 @@ Creep.prototype.move_to = function(target) {
                 return;
             } else {
                 var nexthop = route[0];
-                console.log(this+' will try to reach '+target.pos.roomName+' via '+nexthop.room);
+                //console.log(this+' will try to reach '+target.pos.roomName+' via '+nexthop.room);
                 this.memory.nexthop = nexthop;
             }
         }
@@ -669,8 +669,8 @@ Creep.prototype.move_to = function(target) {
             }
             if (this.memory.useexit) {
                 target = { pos: new RoomPosition(this.memory.useexit.x, this.memory.useexit.y, this.memory.useexit.roomName) };
-                console.log(this+' dummy target = '+JSON.stringify(target));
-                console.log(this+' in '+this.room.name+' using exit at '+target.pos);
+                //console.log(this+' dummy target = '+JSON.stringify(target));
+                //console.log(this+' in '+this.room.name+' using exit at '+target.pos);
             }
         }
     } else {
