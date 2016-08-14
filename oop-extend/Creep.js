@@ -649,12 +649,13 @@ Creep.prototype.move_to = function(target) {
                 return;
             } else {
                 var nexthop = route[0];
-                //console.log(this+' will try to reach '+target.pos.roomName+' via '+nexthop.room);
+                console.log(this+' will try to reach '+target.pos.roomName+' via '+nexthop.room);
                 this.memory.nexthop = nexthop;
             }
         }
         if (this.memory.nexthop && this.memory.nexthop.exit) {
             if (typeof this.memory.useexit == 'undefined') {
+                console.log(this+' finding closest exit to '+nexthop.room);
                 this.memory.useexit = this.pos.findClosestByPath(this.memory.nexthop.exit);
             }
             target = { pos: this.memory.useexit };
