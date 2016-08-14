@@ -660,6 +660,7 @@ Creep.prototype.move_to = function(target) {
                 this.memory.useexit = this.pos.findClosestByPath(this.memory.nexthop.exit);
             }
             target = { pos: this.memory.useexit };
+            console.log(this+' dummy target = '+JSON.stringify(target));
             console.log(this+' in '+this.room.name+' using exit at '+target.pos);
         }
     } else {
@@ -668,7 +669,7 @@ Creep.prototype.move_to = function(target) {
     }
 
     if (this.pos.roomName == target.pos.roomName) {
-        console.log(this+' getting direction from local router');
+        //console.log(this+' getting direction from local router');
         var direction = this.room.get_direction(this.pos, target.pos);
         if (direction >= 1 && direction <= 8) {
             //console.log('#DEBUG '+this+' ROUTER move('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+')');
@@ -682,13 +683,11 @@ Creep.prototype.move_to = function(target) {
                 this.moveTo(target); // Try to avoid other creeps but do not learn path
             }
             return;
-        } else {
-            console.log(this+' got INVALID direction "'+direction+'" from local router! from='+this.pos+' to='+target.pos);
         }
     }
     if (this.pos.roomName == target.pos.roomName) {
         this.moveTo(target, { ignoreCreeps: true } );
-        console.log('#DEBUG '+this+' moveTo('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+' IGNORING CREEPS) = '+this.memory._move.path);
+        //console.log('#DEBUG '+this+' moveTo('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+' IGNORING CREEPS) = '+this.memory._move.path);
         this.learn_path();
     } else {
         this.moveTo(target, { ignoreCreeps: false } );
