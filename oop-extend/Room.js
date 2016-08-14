@@ -192,7 +192,7 @@ Room.prototype.plan = function() {
         }
     }
     var drone_spawn_interval = CREEP_LIFE_TIME / this.want_drones();
-    var drone_spawn_timer = Game.time - this.memory.last_drone_spawned;
+    var drone_spawn_timer = Game.time - (this.memory.last_drone_spawned || 0);
     console.log(this.link()+' drone spawn timer: '+drone_spawn_timer+' interval: '+drone_spawn_interval);
     if (drone_spawn_timer >= drone_spawn_interval) {
         // Experimental clockwork spawning of drones
