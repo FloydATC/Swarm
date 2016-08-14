@@ -631,8 +631,8 @@ Creep.prototype.move_to = function(target) {
     this.add_stats('move')
     //return;
 
-    delete this.memory.nexthop;
-    delete this.memory.useexit;
+    //delete this.memory.nexthop;
+    //delete this.memory.useexit;
 
     if (this.pos.roomName != target.pos.roomName) {
         // If possible, switch target to an exit leading towards target
@@ -668,9 +668,9 @@ Creep.prototype.move_to = function(target) {
                 }
             }
             if (this.memory.useexit) {
-            target = { pos: new RoomPosition(this.memory.useexit.x, this.memory.useexit.y, this.memory.useexit.roomName) };
-            console.log(this+' dummy target = '+JSON.stringify(target));
-            console.log(this+' in '+this.room.name+' using exit at '+target.pos);
+                target = { pos: new RoomPosition(this.memory.useexit.x, this.memory.useexit.y, this.memory.useexit.roomName) };
+                console.log(this+' dummy target = '+JSON.stringify(target));
+                console.log(this+' in '+this.room.name+' using exit at '+target.pos);
             }
         }
     } else {
