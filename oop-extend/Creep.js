@@ -661,7 +661,11 @@ Creep.prototype.move_to = function(target) {
             if (typeof this.memory.useexit == 'undefined') {
                 console.log(this+' finding closest exit to '+this.memory.nexthop.room);
                 var exit = this.pos.findClosestByPath(this.memory.nexthop.exit);
-                this.memory.useexit = { x: exit.x, y: exit.y, roomName: exit.roomName };
+                if (exit == null) {
+                    console.log(this+' was told to use exit direction '+this.memory.nexthop.exit+' but found no exits');
+                } else {
+                    this.memory.useexit = { x: exit.x, y: exit.y, roomName: exit.roomName };
+                }
             }
             target = { pos: new RoomPosition(this.memory.useexit.x, this.memory.useexit.y, this.memory.useexit.roomName) };
             console.log(this+' dummy target = '+JSON.stringify(target));
