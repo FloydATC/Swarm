@@ -521,9 +521,15 @@ Creep.prototype.task_repair = function() {
 
 Creep.prototype.task_upgrade = function() {
     var target = Game.getObjectById(this.target);
+    var upgrader = Game.rooms[this.room.name].upgrader;
+    var ctrl = Game.rooms[this.room.name].controller;
     var flag = Game.flags[this.memory.flag];
     if (flag != null) { flag.assign_worker(this); } // Check in with flag
-    if (this.pos.inRangeTo(target, 3)) {
+    if (this.memory.class != 'Zealot') { target = upgrader || ctrl; }
+    var range = this.pos.getRangeTo(target);
+    //console.log(this.memory.class+' '+this+' upgrade target ['+(target.structureType)+'] range ['+range+']');
+    if (target.structureType == STRUCTURE_CONTROLLER && range <= 3) {
+        //console.log('  ok, upgrade it');
         delete this.memory._move;
         delete this.memory.moving_to;
         if (this.carry.energy > 0) {
@@ -543,9 +549,22 @@ Creep.prototype.task_upgrade = function() {
             var treasures = this.pos.findInRange(FIND_DROPPED_ENERGY, 1);
             if (treasures.length > 0) { this.pickup(treasures[0]); }
         }
-    } else {
-        this.move_to(target);
+        return;
     }
+    //console.log(this+' target: '+target);
+    if (target.structureType != STRUCTURE_CONTROLLER && range <= 1) {
+        if (target.free > 0) {
+            this.transfer(target, RESOURCE_ENERGY);
+        }
+        if (this.pos.inRangeTo(ctrl, 3)) {
+            this.upgradeController(ctrl);
+            this.add_stats('upgrade');
+        } else {
+            this.move_to(ctrl);
+        }
+        return;
+    }
+    this.move_to(target);
     return;
 }
 
