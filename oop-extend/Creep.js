@@ -633,21 +633,31 @@ Creep.prototype.move_to = function(target) {
 
     if (this.pos.roomName != target.pos.roomName) {
         // Switch target to an exit leading towards target
-        var route = Game.map.findRoute(this.room, target.pos.roomName, {
-        	routeCallback(roomName) {
-                if (Game.rooms[roomName] && Game.rooms[roomName].controller && Game.rooms[roomName].controller.my) { return 1; } // My room
-        		var parsed = /^[WE]([0-9]+)[NS]([0-9]+)$/.exec(roomName);
-        		if ((parsed[1] % 10 === 0) || (parsed[2] % 10 === 0)) { return 1.5; } // Highway
-    			return 2.5;
-        	}
-        });
-        if (route == ERR_NO_PATH) {
-            console.log(this+' is unable to reach '+target.pos.roomName+' (findRoute returned ERR_NO_PATH)');
-            return;
-        } else {
-            var nexthop = route[0];
-            console.log(this+' needs exit to '+target.pos.roomName+': '+nexthop.exit);
+
+        if (this.memory.nexthop && this.memory.nexthop.room == this.pos.roomName) { delete this.memory.nexthop; }
+        if (typeof this.memory.nexthop == 'undefined') {
+            var route = Game.map.findRoute(this.room, target.pos.roomName, {
+            	routeCallback(roomName) {
+                    if (Game.rooms[roomName] && Game.rooms[roomName].controller && Game.rooms[roomName].controller.my) { return 1; } // My room
+            		var parsed = /^[WE]([0-9]+)[NS]([0-9]+)$/.exec(roomName);
+            		if ((parsed[1] % 10 === 0) || (parsed[2] % 10 === 0)) { return 1.5; } // Highway
+        			return 2.5;
+            	}
+            });
+            if (route == ERR_NO_PATH) {
+                console.log(this+' is unable to reach '+target.pos.roomName+' (findRoute returned ERR_NO_PATH)');
+                return;
+            } else {
+                var nexthop = route[0];
+                console.log(this+' needs exit to '+target.pos.roomName+': '+nexthop.exit);
+                this.memory.nexthop = nexthop;
+            }
         }
+        if (this.memory.nexthop && this.memory.nexthop.exit) {
+            var newtarget = creep.pos.findClosestByRange(this.memory.nexthop.exit);
+            console.log(this+' would navigate to '+newtarget);
+        }
+
     }
 
 
