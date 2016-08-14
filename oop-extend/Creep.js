@@ -686,7 +686,7 @@ Creep.prototype.move_to = function(target) {
     }
     if (this.pos.roomName == target.pos.roomName) {
         this.moveTo(target, { ignoreCreeps: true } );
-        //console.log('#DEBUG '+this+' moveTo('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+' IGNORING CREEPS) = '+this.memory._move.path);
+        console.log('#DEBUG '+this+' moveTo('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+' IGNORING CREEPS) = '+this.memory._move.path);
         this.learn_path();
     } else {
         this.moveTo(target, { ignoreCreeps: false } );
