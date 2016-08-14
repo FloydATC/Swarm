@@ -201,8 +201,8 @@ Room.prototype.plan = function() {
 
             // FIXME! Naive scaling code
             var result = ERR_NOT_ENOUGH_ENERGY;
-            //if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,MOVE,MOVE,MOVE,CARRY,CARRY,CARRY,CARRY,CARRY,WORK,WORK,WORK,WORK,WORK], undefined, { class: 'Drone' }); }
-            //if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,MOVE,MOVE,CARRY,CARRY,CARRY,CARRY,WORK,WORK,WORK,WORK], undefined, { class: 'Drone' }); }
+            if (result == ERR_NOT_ENOUGH_ENERGY && this.controller.level >= 6) { result = this.createCreep([MOVE,MOVE,MOVE,MOVE,MOVE,CARRY,CARRY,CARRY,CARRY,CARRY,WORK,WORK,WORK,WORK,WORK], undefined, { class: 'Drone' }); }
+            if (result == ERR_NOT_ENOUGH_ENERGY && this.controller.level >= 5) { result = this.createCreep([MOVE,MOVE,MOVE,MOVE,CARRY,CARRY,CARRY,CARRY,WORK,WORK,WORK,WORK], undefined, { class: 'Drone' }); }
             if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Drone'), undefined, { class: 'Drone' }); }
             if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,CARRY,CARRY,WORK,WORK], undefined, { class: 'Drone' }); }
             if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Drone' }); }
