@@ -332,10 +332,10 @@ Creep.prototype.task_mine = function() {
 
             // Link with free space within reach?
             var links = this.pos.findInRange(FIND_STRUCTURES, 1, { filter: { structureType: STRUCTURE_LINK } });
-            console.log(this+' can reach these links: '+links);
+            //console.log(this+' can reach these links: '+links);
             var link = null;
             for (var i=0; i<links.length; i++) {
-                console.log(this+' consider putting energy in '+links[i]+' ('+links[i].free+' free)');
+                //console.log(this+' consider putting energy in '+links[i]+' ('+links[i].free+' free)');
                 if (links[i].free == 0) { continue; }
                 link = links[i]
             }
@@ -343,10 +343,10 @@ Creep.prototype.task_mine = function() {
 
             // Container with free space within reach?
             var containers = this.pos.findInRange(FIND_STRUCTURES, 1, { filter: { structureType: STRUCTURE_CONTAINER } });
-            console.log(this+' can reach these containers: '+links);
+            //console.log(this+' can reach these containers: '+links);
             var container = null;
             for (var i=0; i<containers.length; i++) {
-                console.log(this+' consider putting energy in '+containers[i]+' ('+containers[i].free+' free)');
+                //console.log(this+' consider putting energy in '+containers[i]+' ('+containers[i].free+' free)');
                 if (containers[i].free == 0) { continue; }
                 container = containers[i]
             }
