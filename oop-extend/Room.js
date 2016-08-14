@@ -347,7 +347,10 @@ Room.prototype.createCreep = function(body, name, memory) {
 Room.prototype.want_drones = function() {
     // TODO: Calculate the optimal number of drones for this room
     //return (this.sources.length * 2) + 4; // Naive calculation
-    return 5;
+    var num = 4; // Minimum
+    if (this.construction_sites.length > 0) { num++; } // One extra for construction
+    if (this.sources.length > 1) { num++; } // One for extra source
+    return num;
 }
 
 
