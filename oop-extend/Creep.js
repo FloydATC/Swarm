@@ -649,7 +649,7 @@ Creep.prototype.move_to = function(target) {
                 return;
             } else {
                 var nexthop = route[0];
-                console.log(this+' needs exit to '+target.pos.roomName+': '+nexthop.exit);
+                console.log(this+' will try to reach '+target.pos.roomName+' via '+nexthop.room);
                 this.memory.nexthop = nexthop;
             }
         }
