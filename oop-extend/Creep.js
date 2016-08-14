@@ -334,6 +334,7 @@ Creep.prototype.task_mine = function() {
             var links = this.pos.findInRange(STRUCTURE_LINK, 1);
             var link = null;
             for (var i=0; i<links.length; i++) {
+                console.log(this+' consider putting energy in '+links[i]+' ('+links[i].free+' free)';
                 if (links[i].free == 0) { continue; }
                 link = links[i]
             }
@@ -343,6 +344,7 @@ Creep.prototype.task_mine = function() {
             var containers = this.pos.findInRange(STRUCTURE_CONTAINER, 1);
             var container = null;
             for (var i=0; i<containers.length; i++) {
+                console.log(this+' consider putting energy in '+containers[i]+' ('+containers[i].free+' free)';
                 if (containers[i].free == 0) { continue; }
                 container = containers[i]
             }
