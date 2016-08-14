@@ -1,8 +1,8 @@
 
 var extend_game = require('Game');
-var extend_creep = require('Creep');
+var extend_creep = require('Creep'); // Extends prototype
 var extend_flag = require('Flag');
-var extend_room = require('Room');
+var extend_room = require('Room'); // Extends prototype
 var extend_source = require('Source');
 var extend_s_container = require('StructureContainer');
 var extend_s_link = require('StructureLink');
@@ -10,7 +10,7 @@ var extend_s_spawn = require('StructureSpawn');
 var extend_s_storage = require('StructureStorage');
 var extend_s_tower = require('StructureTower');
 var profiler = require('Profiler');
-var show_perf = true;
+var show_perf = false;
 
 profiler.enable(); // Game.profiler.profile(100) -or- Game.profiler.email(100)
 module.exports.loop = function() {
