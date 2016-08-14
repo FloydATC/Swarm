@@ -631,6 +631,8 @@ Creep.prototype.move_to = function(target) {
     this.add_stats('move')
     //return;
 
+    delete this.memory.nexthop;
+
     if (this.pos.roomName != target.pos.roomName) {
         // If possible, switch target to an exit leading towards target
         // This will let the creep use local routing instead of pathfinding
