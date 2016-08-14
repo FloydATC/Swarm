@@ -658,6 +658,7 @@ Creep.prototype.move_to = function(target) {
                 console.log(this+' finding closest exit to '+nexthop.room);
                 this.memory.useexit = this.pos.findClosestByPath(this.memory.nexthop.exit);
             }
+            console.log(this+' using exit at '+target.pos);
             target = { pos: this.memory.useexit };
         }
     } else {
