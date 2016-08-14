@@ -656,7 +656,7 @@ Creep.prototype.move_to = function(target) {
                 this.memory.nexthop = nexthop;
             }
         }
-        if (this.memory.nexthop && typeof this.memory.nexthop.exit != 'undefined') {
+        if (this.memory.nexthop && this.memory.nexthop.exit != null) {
             if (this.memory.useexit && this.memory.useexit.roomName != this.room.name) { delete this.memory.useexit; } // Expire
             if (typeof this.memory.useexit == 'undefined') {
                 console.log(this+' finding closest exit to '+this.memory.nexthop.room);
