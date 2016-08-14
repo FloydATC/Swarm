@@ -667,9 +667,11 @@ Creep.prototype.move_to = function(target) {
                     this.memory.useexit = { x: exit.x, y: exit.y, roomName: exit.roomName };
                 }
             }
+            if (this.memory.useexit) {
             target = { pos: new RoomPosition(this.memory.useexit.x, this.memory.useexit.y, this.memory.useexit.roomName) };
             console.log(this+' dummy target = '+JSON.stringify(target));
             console.log(this+' in '+this.room.name+' using exit at '+target.pos);
+            }
         }
     } else {
         delete this.memory.nexthop;
