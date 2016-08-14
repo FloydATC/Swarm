@@ -637,7 +637,7 @@ Creep.prototype.move_to = function(target) {
         	routeCallback(roomName) {
                 if (Game.rooms[roomName] && Game.rooms[roomName].controller && Game.rooms[roomName].controller.my) { return 1; } // My room
         		var parsed = /^[WE]([0-9]+)[NS]([0-9]+)$/.exec(roomName);
-        		if (parsed[1] % 10 === 0) || (parsed[2] % 10 === 0) { return 1.5; } // Highway
+        		if ((parsed[1] % 10 === 0) || (parsed[2] % 10 === 0)) { return 1.5; } // Highway
     			return 2.5;
         	}
         });
