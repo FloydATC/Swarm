@@ -659,6 +659,9 @@ Creep.prototype.move_to = function(target) {
             }
             target = { pos: this.memory.useexit };
         }
+    } else {
+        delete this.memory.nexthop;
+        delete this.memory.useexit;
     }
 
     if (this.pos.roomName == target.pos.roomName) {
