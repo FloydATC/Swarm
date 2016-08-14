@@ -683,7 +683,7 @@ Creep.prototype.move_to = function(target) {
             }
             return;
         } else {
-            console.log(this+' got INVALID direction "'+direction+'" from local router');
+            console.log(this+' got INVALID direction "'+direction+'" from local router! from='+this.pos+' to='+target.pos);
         }
     }
     if (this.pos.roomName == target.pos.roomName) {
