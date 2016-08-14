@@ -632,6 +632,7 @@ Creep.prototype.move_to = function(target) {
     //return;
 
     delete this.memory.nexthop;
+    delete this.memory.useexit;
 
     if (this.pos.roomName != target.pos.roomName) {
         // If possible, switch target to an exit leading towards target
