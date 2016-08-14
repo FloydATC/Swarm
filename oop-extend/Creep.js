@@ -253,7 +253,7 @@ Creep.prototype.is_harmless = function() {
     if (this.getActiveBodyparts(RANGED_ATTACK) > 0) { return false; } // Can shoot
     if (this.getActiveBodyparts(CLAIM) > 0) { return false; } // Can claim/reserve/attack controller
     if (this.getActiveBodyparts(WORK) > 0) { return false; } // Can dismantle
-    if (this.getActiveBodyparts(HEAL) > 0) { return false; } // Can dismantle
+    if (this.getActiveBodyparts(HEAL) > 0) { return false; } // Can tank
     return true;
 }
 
