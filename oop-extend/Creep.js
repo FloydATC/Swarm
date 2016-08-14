@@ -654,7 +654,7 @@ Creep.prototype.move_to = function(target) {
             }
         }
         if (this.memory.nexthop && this.memory.nexthop.exit) {
-            var newtarget = creep.pos.findClosestByRange(this.memory.nexthop.exit);
+            var newtarget = this.pos.findClosestByRange(this.memory.nexthop.exit);
             console.log(this+' would navigate to '+newtarget);
         }
 
