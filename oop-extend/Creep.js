@@ -680,6 +680,8 @@ Creep.prototype.move_to = function(target) {
                 this.moveTo(target); // Try to avoid other creeps but do not learn path
             }
             return;
+        } else {
+            console.log(this+' got INVALID direction "'+direction+'" from local router');
         }
     }
     if (this.pos.roomName == target.pos.roomName) {
