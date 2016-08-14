@@ -193,6 +193,7 @@ Room.prototype.plan = function() {
     }
     if (Game.time % Math.floor(CREEP_LIFE_TIME / this.want_drones()) == 0) {
         // Experimental clockwork spawning of drones
+        console.log(this.link()+' needs to spawn a new Drone');
 
         // FIXME! Naive scaling code
         var result = ERR_NOT_ENOUGH_ENERGY;
@@ -201,7 +202,7 @@ Room.prototype.plan = function() {
         if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Drone'), undefined, { class: 'Drone' }); }
         if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,CARRY,CARRY,WORK,WORK], undefined, { class: 'Drone' }); }
         if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Drone' }); }
-        //console.log(this.link()+' spawn result='+result);
+        console.log(this.link()+' Drone spawn result='+result);
         return;
     }
     if (Game.colonize && Game.time % 50 == 0) {
