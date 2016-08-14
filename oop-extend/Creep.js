@@ -632,8 +632,8 @@ Creep.prototype.move_to = function(target) {
     //return;
 
     if (this.pos.roomName != target.pos.roomName) {
-        // Switch target to an exit leading towards target
-
+        // If possible, switch target to an exit leading towards target
+        // This will let the creep use local routing instead of pathfinding
         if (this.memory.nexthop && this.memory.nexthop.room == this.pos.roomName) { delete this.memory.nexthop; }
         if (typeof this.memory.nexthop == 'undefined') {
             var route = Game.map.findRoute(this.room, target.pos.roomName, {
@@ -654,12 +654,9 @@ Creep.prototype.move_to = function(target) {
             }
         }
         if (this.memory.nexthop && this.memory.nexthop.exit) {
-            var newtarget = this.pos.findClosestByRange(this.memory.nexthop.exit);
-            console.log(this+' would navigate to '+newtarget);
+            target = { pos: this.pos.findClosestByRange(this.memory.nexthop.exit) };
         }
-
     }
-
 
     if (this.pos.roomName == target.pos.roomName) {
         var direction = this.room.get_direction(this.pos, target.pos);
