@@ -530,6 +530,7 @@ Creep.prototype.task_upgrade = function() {
     if (flag != null) { flag.assign_worker(this); } // Check in with flag
     if (this.memory.class != 'Zealot') { target = upgrader || ctrl; }
     var range = this.pos.getRangeTo(target);
+    this.memory.tracking = true;
     //console.log(this.memory.class+' '+this+' upgrade target ['+(target.structureType)+'] range ['+range+']');
     if (target.structureType == STRUCTURE_CONTROLLER && range <= 3) {
         //console.log('  ok, upgrade it');
