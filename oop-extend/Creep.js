@@ -588,6 +588,7 @@ Creep.prototype.learn_path = function() {
     if (typeof this.memory._move.dest == 'undefined') { return; } // No moveTo destination
     if (this.memory._move.room != this.memory._move.dest.room) { return; } // Not a local path
     var p = this.memory._move.path;
+    var learned = 0;
     var offset = 4;
     var direction = p.charAt(offset);
     if (direction == 'u') { return; }
@@ -618,12 +619,17 @@ Creep.prototype.learn_path = function() {
             y2 = this.memory._move.dest.y;
             var dst = ('0'+x2).slice(-2)+('0'+y2).slice(-2); // XXYY
             //console.log('  learning route src='+src+' dst='+dst+' nexthop='+nexthop);
+            console.log('BEFORE '+table.table);
             table.setDirectionTo(dst, nexthop);
+            console.log('CHANGE dst='+dst+' nexthop='+nexthop);
+            console.log('AFTER  '+table.table);
+            learned++;
 //            }
         this.room.save_routing_table(src, table);
         x1 = x1 + vector1[0];
         y1 = y1 + vector1[1];
     }
+    console.log(this.room.name+' learned: '+learned);
 }
 
 Creep.prototype.move_to = function(target) {
@@ -640,6 +646,7 @@ Creep.prototype.move_to = function(target) {
         // This will let the creep use local routing instead of pathfinding
         if (this.memory.nexthop && this.memory.nexthop.room == this.pos.roomName) { delete this.memory.nexthop; }
         if (typeof this.memory.nexthop == 'undefined') {
+            console.log(this+' calculating route from '+this.room.name+' to '+target.pos.roomName+' (EXPENSIVE)');
             var route = Game.map.findRoute(this.room, target.pos.roomName, {
             	routeCallback(roomName) {
                     if (Game.rooms[roomName] && Game.rooms[roomName].controller && Game.rooms[roomName].controller.my) { return 1; } // My room
@@ -660,7 +667,7 @@ Creep.prototype.move_to = function(target) {
         if (this.memory.nexthop && this.memory.nexthop.exit != null) {
             if (this.memory.useexit && this.memory.useexit.roomName != this.room.name) { delete this.memory.useexit; } // Expire
             if (typeof this.memory.useexit == 'undefined') {
-                console.log(this+' finding closest exit to '+this.memory.nexthop.room);
+                console.log(this+' finding closest exit to '+this.memory.nexthop.room+' (EXPENSIVE)');
                 var exit = this.pos.findClosestByPath(this.memory.nexthop.exit);
                 if (exit == null) {
                     console.log(this+' was told to use exit direction '+this.memory.nexthop.exit+' but found no exits');
@@ -697,10 +704,12 @@ Creep.prototype.move_to = function(target) {
         }
     }
     if (this.pos.roomName == target.pos.roomName) {
+        console.log(this.memory.class+' '+this+' ('+this.memory.task.type+') calculating cacheable path from '+this.pos+' to '+target.pos+' (EXPENSIVE)');
         this.moveTo(target, { ignoreCreeps: true } );
         //console.log('#DEBUG '+this+' moveTo('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+' IGNORING CREEPS) = '+this.memory._move.path);
         this.learn_path();
     } else {
+        console.log(this.memory.class+' '+this+' ('+this.memory.task.type+') calculating NON-CACHEABLE path to '+target.pos+' (EXPENSIVE)');
         this.moveTo(target, { ignoreCreeps: false } );
     }
 }
