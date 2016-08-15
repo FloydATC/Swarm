@@ -478,6 +478,7 @@ Creep.prototype.task_feed = function() {
     if (this.pos.inRangeTo(target, 1)) {
         this.transfer(target, RESOURCE_ENERGY);
     } else {
+        this.memory.tracking = true;
         this.move_to(target);
     }
     return;
@@ -489,6 +490,7 @@ Creep.prototype.task_feed_link = function() {
     if (this.pos.inRangeTo(target, 1)) {
         this.transfer(target, RESOURCE_ENERGY);
     } else {
+        this.memory.tracking = true;
         this.move_to(target);
     }
     return;
