@@ -603,7 +603,7 @@ Creep.prototype.learn_path = function() {
     for (var offset1=4; offset1<p.length; offset1++) {
         var x2 = x1;
         var y2 = y1;
-        var src = ('0'+x1).slice(-2)+('0'+y1).slice(-2); // XXYY
+        var src = ('00'+x1).slice(-2)+('00'+y1).slice(-2); // XXYY
         var nexthop = p.charAt(offset1);
         var vector1 = this.direction_vector(nexthop);
         var table = this.room.load_routing_table(src);
@@ -617,7 +617,7 @@ Creep.prototype.learn_path = function() {
 //                var dst = ('0'+x2).slice(-2)+('0'+y2).slice(-2); // XXYY
             x2 = this.memory._move.dest.x;
             y2 = this.memory._move.dest.y;
-            var dst = ('0'+x2).slice(-2)+('0'+y2).slice(-2); // XXYY
+            var dst = ('00'+x2).slice(-2)+('00'+y2).slice(-2); // XXYY
             //console.log('  learning route src='+src+' dst='+dst+' nexthop='+nexthop);
             console.log('BEFORE '+table.asString());
             table.setDirectionTo(dst, nexthop);

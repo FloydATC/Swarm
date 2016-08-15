@@ -72,7 +72,7 @@ Routingtable.prototype.setDirectionTo = function(address, direction) {
                 // Range ('XXYY-XXYY=D')
         	    var a2 = route.substring(5,9) * 1;
                 for (var j=a1; j<=a2; j++) {
-                    this.expanded.push(('0'+j).slice(-4)+'='+route.charAt(10)); // Format j as 'XXYY' with leading 0
+                    this.expanded.push(('00'+j).slice(-4)+'='+route.charAt(10)); // Format j as 'XXYY' with leading 0
                 }
             }
         }
@@ -126,14 +126,14 @@ Routingtable.prototype.compress = function() {
             continue;
         }
         // Finish span and start a new one
-        routes.push(span_a1 == span_a2 ? ('0'+span_a1).slice(-4)+'='+span_dir : ('0'+span_a1).slice(-4)+'-'+('0'+span_a2).slice(-4)+'='+span_dir);
+        routes.push(span_a1 == span_a2 ? ('00'+span_a1).slice(-4)+'='+span_dir : ('00'+span_a1).slice(-4)+'-'+('00'+span_a2).slice(-4)+'='+span_dir);
         span_a1 = addr;
         span_a2 = addr;
         span_dir = dir;
     }
     if (span_a1 != null) {
         // Finish last span
-        routes.push(span_a1 == span_a2 ? ('0'+span_a1).slice(-4)+'='+span_dir : ('0'+span_a1).slice(-4)+'-'+('0'+span_a2).slice(-4)+'='+span_dir);
+        routes.push(span_a1 == span_a2 ? ('00'+span_a1).slice(-4)+'='+span_dir : ('00'+span_a1).slice(-4)+'-'+('00'+span_a2).slice(-4)+'='+span_dir);
     }
     this.table = routes.join(',');
 }
