@@ -259,55 +259,51 @@ Creep.prototype.is_harmless = function() {
 
 Creep.prototype.task_attack = function() {
     var target = Game.getObjectById(this.target);
+    this.memory.tracking = false;
     if (this.pos.inRangeTo(target, 1)) {
         this.attack(target);
         this.add_stats('attack')
-        this.memory.tracking = false;
     } else {
         this.move_to(target);
-        this.memory.tracking = false;
     }
     return;
 }
 
 Creep.prototype.task_ranged_attack = function() {
     var target = Game.getObjectById(this.target);
+    this.memory.tracking = false;
     if (this.pos.inRangeTo(target, 3)) {
         this.rangedAttack(target);
         this.add_stats('ranged attack')
-        this.memory.tracking = false;
     } else {
         this.move_to(target);
-        this.memory.tracking = false;
     }
     return;
 }
 
 Creep.prototype.task_recycle = function() {
     var target = Game.getObjectById(this.target);
+    this.memory.tracking = false;
     if (this.pos.inRangeTo(target, 1)) {
         if (this.carry.energy > 0) {
             this.transfer(target, RESOURCE_ENERGY);
         } else {
             target.recycleCreep(this);
         }
-        this.memory.tracking = false;
     } else {
         this.move_to(target);
-        this.memory.tracking = false;
     }
     return;
 }
 
 Creep.prototype.task_pick_up = function() {
     var target = Game.getObjectById(this.target);
+    this.memory.tracking = false;
     if (this.pos.inRangeTo(target, 1)) {
         this.pickup(target);
-        this.memory.tracking = false;
     } else {
         if (this.carry.energy) { this.drop(RESOURCE_ENERGY); } // Make room for valuables!
         this.move_to(target);
-        this.memory.tracking = false;
     }
     return;
 }
@@ -456,12 +452,11 @@ Creep.prototype.task_remote_fetch = function() {
 
 Creep.prototype.task_claim = function() {
     var target = Game.getObjectById(this.target);
+    this.memory.tracking = false;
     if (this.pos.inRangeTo(target, 1)) {
         this.claimController(target);
-        this.memory.tracking = false;
     } else {
         this.move_to(target);
-        this.memory.tracking = false;
     }
     return;
 }
@@ -475,10 +470,10 @@ Creep.prototype.task_travel = function() {
 
 Creep.prototype.task_feed = function() {
     var target = Game.getObjectById(this.target);
+    this.memory.tracking = true;
     if (this.pos.inRangeTo(target, 1)) {
         this.transfer(target, RESOURCE_ENERGY);
     } else {
-        this.memory.tracking = true;
         this.move_to(target);
     }
     return;
@@ -487,10 +482,10 @@ Creep.prototype.task_feed = function() {
 Creep.prototype.task_feed_link = function() {
     var target = this.shift_nearest(this.room.links.slice()); // Always switch to nearest
     this.target = target.id;
+    this.memory.tracking = true;
     if (this.pos.inRangeTo(target, 1)) {
         this.transfer(target, RESOURCE_ENERGY);
     } else {
-        this.memory.tracking = true;
         this.move_to(target);
     }
     return;
@@ -498,26 +493,24 @@ Creep.prototype.task_feed_link = function() {
 
 Creep.prototype.task_build = function() {
     var target = Game.getObjectById(this.target);
+    this.memory.tracking = false;
     if (this.pos.inRangeTo(target, 3)) {
         this.build(target);
         this.add_stats('build')
-        this.memory.tracking = false;
     } else {
         this.move_to(target);
-        this.memory.tracking = false;
     }
     return;
 }
 
 Creep.prototype.task_repair = function() {
     var target = Game.getObjectById(this.target);
+    this.memory.tracking = false;
     if (this.pos.inRangeTo(target, 3)) {
         this.repair(target)
         this.add_stats('repair')
-        this.memory.tracking = false;
     } else {
         this.move_to(target, { maxRooms: 0 }); // Stay in this room!
-        this.memory.tracking = false;
     }
     return;
 }
