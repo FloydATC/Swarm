@@ -308,6 +308,26 @@ Creep.prototype.task_pick_up = function() {
     return;
 }
 
+Creep.prototype.remember = function(label, objects) {
+    // Put a named list of object ids in memory
+    var index = [];
+    for (var i=0; i<objects.length; i++) { index.push(objects[i].id); }
+    this.memory[label] = index;
+}
+
+Creep.prototype.recall = function(label) {
+    // Get a named list of objects based on ids in memory
+    var objects = [];
+    var index = this.memory[label];
+    //console.log(this+' recalling '+label+': '+index);
+    for (var i=0; i<index.length; i++) {
+        var object = Game.getObjectById(index[i]);
+        //console.log('  id='+index[i]+' object='+object);
+        if (object != null) { objects.push(object); }
+    }
+    return objects;
+}
+
 Creep.prototype.task_mine = function() {
     var flag = Game.flags[this.memory.flag];
     flag.assign_worker(this); // Check in with flag
@@ -317,18 +337,27 @@ Creep.prototype.task_mine = function() {
         // Yes. Locate source at flag
         var found = this.room.lookForAt(LOOK_SOURCES, flag);
         var source = found[0];
+        var arrived = this.memory.arrived || 0;
         if (source == null) { flag.remove(); return; } // User error
-        if (this.pos.getRangeTo(source) > 1) {
+        if (arrived == 0 && this.pos.getRangeTo(source) > 1) {
             // Move closer
             this.move_to(source);
             //console.log('Miner '+this+' approaching source ('+source+' in '+this.memory.mine+')');
         } else {
+            if (arrived == 0) {
+                this.memory.arrived = Game.time;
+                // Search for links and containers within reach and remember them
+                var links = this.pos.findInRange(FIND_STRUCTURES, 1, { filter: { structureType: STRUCTURE_LINK } });
+                this.remember('links', links);
+                var containers = this.pos.findInRange(FIND_STRUCTURES, 1, { filter: { structureType: STRUCTURE_CONTAINER } });
+                this.remember('containers', containers);
+            }
             // Get energy
             this.harvest(source);
             //console.log('Miner '+this+' harvesting source ('+source+' in '+this.memory.mine+')');
 
             // Link with free space within reach?
-            var links = this.pos.findInRange(FIND_STRUCTURES, 1, { filter: { structureType: STRUCTURE_LINK } });
+            var links = this.recall('links');
             //console.log(this+' can reach these links: '+links);
             var link = null;
             for (var i=0; i<links.length; i++) {
@@ -339,8 +368,8 @@ Creep.prototype.task_mine = function() {
             if (link != null) { this.transfer(link, RESOURCE_ENERGY); return; }
 
             // Container with free space within reach?
-            var containers = this.pos.findInRange(FIND_STRUCTURES, 1, { filter: { structureType: STRUCTURE_CONTAINER } });
-            //console.log(this+' can reach these containers: '+links);
+            var containers = this.recall('containers');
+            //console.log(this+' can reach these containers: '+containers);
             var container = null;
             for (var i=0; i<containers.length; i++) {
                 //console.log(this+' consider putting energy in '+containers[i]+' ('+containers[i].free+' free)');

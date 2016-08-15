@@ -338,6 +338,8 @@ Room.prototype.createCreep = function(body, name, memory) {
         if (spawn.busy == true || spawn.spawning) { return ERR_BUSY; }
         var result = spawn.canCreateCreep(body, name);
         if (result == OK) {
+            memory['spawned'] = Game.time;
+            memory['spawn'] = spawn.id;
             result = spawn.createCreep(body, name, memory);
             console.log(this.link()+' '+spawn+' spawn '+body+' result='+result);
             if (_.isString(result)) { result = OK; }
