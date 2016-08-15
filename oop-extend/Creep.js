@@ -619,10 +619,10 @@ Creep.prototype.learn_path = function() {
             y2 = this.memory._move.dest.y;
             var dst = ('0'+x2).slice(-2)+('0'+y2).slice(-2); // XXYY
             //console.log('  learning route src='+src+' dst='+dst+' nexthop='+nexthop);
-            console.log('BEFORE '+table.table);
+            console.log('BEFORE '+table.asString());
             table.setDirectionTo(dst, nexthop);
             console.log('CHANGE dst='+dst+' nexthop='+nexthop);
-            console.log('AFTER  '+table.table);
+            console.log('AFTER  '+table.asString());
             learned++;
 //            }
         this.room.save_routing_table(src, table);
