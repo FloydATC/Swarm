@@ -709,7 +709,7 @@ Creep.prototype.move_to = function(target) {
         this.moveTo(target, { ignoreCreeps: true } );
         //console.log('#DEBUG '+this+' moveTo('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+' IGNORING CREEPS) = '+this.memory._move.path);
         var result = this.learn_path();
-        if (result != OK) { console.log(this.' learn path returned '+result); }
+        if (result != OK) { console.log(this+' learn path returned '+result); }
     } else {
         console.log(this.memory.class+' '+this+' ('+this.memory.task.type+') calculating NON-CACHEABLE path to '+target.pos+' (EXPENSIVE)');
         this.moveTo(target, { ignoreCreeps: false } );
