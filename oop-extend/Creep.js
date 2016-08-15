@@ -581,12 +581,12 @@ Creep.prototype.opposite_vector = function(x,y) {
 }
 
 Creep.prototype.learn_path = function() {
-    if (this.memory.tracking != true) { return; } // Do not track this creep
-    if (typeof this.memory._move == 'undefined') { return; } // No moveTo data
-    if (typeof this.memory._move.path == 'undefined') { return; } // No moveTo path
-    if (this.memory._move.path.charAt(4) == 'u') { return; } // Undefined path
-    if (typeof this.memory._move.dest == 'undefined') { return; } // No moveTo destination
-    if (this.memory._move.room != this.memory._move.dest.room) { return; } // Not a local path
+    if (this.memory.tracking == false) { return 'ERR_DO_NOT_TRACK'; } // Do not track this creep
+    if (typeof this.memory._move == 'undefined') { return 'ERR_UNDEF_MOVE'; } // No moveTo data
+    if (typeof this.memory._move.path == 'undefined') { return 'ERR_UNDEF_MOVE_PATH'; } // No moveTo path
+    if (this.memory._move.path.charAt(4) == 'u') { return 'ERR_U_DIRECTION'; } // Undefined path
+    if (typeof this.memory._move.dest == 'undefined') { return 'ERR_UNDEF_MOVE_DEST'; } // No moveTo destination
+    if (this.memory._move.room != this.memory._move.dest.room) { return 'ERR_NOT_LOCAL'; } // Not a local path
     var p = this.memory._move.path;
     var learned = 0;
     var offset = 4;
@@ -619,10 +619,10 @@ Creep.prototype.learn_path = function() {
             y2 = this.memory._move.dest.y;
             var dst = ('00'+x2).slice(-2)+('00'+y2).slice(-2); // XXYY
             //console.log('  learning route src='+src+' dst='+dst+' nexthop='+nexthop);
-            console.log('BEFORE '+table.asString());
+            //console.log('BEFORE '+table.asString());
             table.setDirectionTo(dst, nexthop);
-            console.log('CHANGE dst='+dst+' nexthop='+nexthop);
-            console.log('AFTER  '+table.asString());
+            //console.log('CHANGE dst='+dst+' nexthop='+nexthop);
+            //console.log('AFTER  '+table.asString());
             learned++;
 //            }
         this.room.save_routing_table(src, table);
@@ -630,6 +630,7 @@ Creep.prototype.learn_path = function() {
         y1 = y1 + vector1[1];
     }
     console.log(this.room.name+' learned: '+learned);
+    return OK;
 }
 
 Creep.prototype.move_to = function(target) {
@@ -707,7 +708,8 @@ Creep.prototype.move_to = function(target) {
         console.log(this.memory.class+' '+this+' ('+this.memory.task.type+') calculating cacheable path from '+this.pos+' to '+target.pos+' (EXPENSIVE)');
         this.moveTo(target, { ignoreCreeps: true } );
         //console.log('#DEBUG '+this+' moveTo('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+' IGNORING CREEPS) = '+this.memory._move.path);
-        this.learn_path();
+        var result = this.learn_path();
+        if (result != OK) { console.log(this.' learn path returned '+result); }
     } else {
         console.log(this.memory.class+' '+this+' ('+this.memory.task.type+') calculating NON-CACHEABLE path to '+target.pos+' (EXPENSIVE)');
         this.moveTo(target, { ignoreCreeps: false } );
