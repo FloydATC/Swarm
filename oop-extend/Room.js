@@ -25,7 +25,7 @@ Room.prototype.initialize = function() {
     this.link_average = 0;
 
     // Record presence of hostiles in case we lose visual
-    this.memory.hostiles = hostile_creeps.length;
+    this.memory.hostiles = this.hostile_creeps.length;
     this.memory.scanned = Game.time;
 
     // Owned room?
