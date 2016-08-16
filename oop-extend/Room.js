@@ -199,13 +199,20 @@ Room.prototype.plan = function() {
             // Experimental clockwork spawning of drones
             //console.log(this.link()+' needs to spawn a new Drone');
 
-            // FIXME! Naive scaling code
-            var result = ERR_NOT_ENOUGH_ENERGY;
-            if (result == ERR_NOT_ENOUGH_ENERGY && this.controller.level >= 6) { result = this.createCreep([MOVE,MOVE,MOVE,MOVE,MOVE,CARRY,CARRY,CARRY,CARRY,CARRY,WORK,WORK,WORK,WORK,WORK], undefined, { class: 'Drone' }); }
-            if (result == ERR_NOT_ENOUGH_ENERGY && this.controller.level >= 5) { result = this.createCreep([MOVE,MOVE,MOVE,MOVE,CARRY,CARRY,CARRY,CARRY,WORK,WORK,WORK,WORK], undefined, { class: 'Drone' }); }
-            if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Drone'), undefined, { class: 'Drone' }); }
-            if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,CARRY,CARRY,WORK,WORK], undefined, { class: 'Drone' }); }
-            if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Drone' }); }
+            // Try to spawn a drone appropriate for this room controller level
+            var result = null;
+            for (var level=this.controller.level; level>0; level--) {
+                result = this.createCreep(this.schematic('Drone.'+level), undefined, { class: 'Drone' });
+                if (result == OK) { break; }
+                if (result == ERR_NOT_ENOUGH_ENERGY) { continue; }
+                console.log(this.link()+' createCreep returned '+result);
+                break;
+            }
+            //if (result == ERR_NOT_ENOUGH_ENERGY && this.controller.level >= 6) { result = this.createCreep(this.schematic('Drone.6'), undefined, { class: 'Drone' }); }
+            //if (result == ERR_NOT_ENOUGH_ENERGY && this.controller.level >= 5) { result = this.createCreep(this.schematic('Drone.5'), undefined, { class: 'Drone' }); }
+            //if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Drone'), undefined, { class: 'Drone' }); }
+            //if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,CARRY,CARRY,WORK,WORK], undefined, { class: 'Drone' }); }
+            //if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Drone' }); }
             //console.log(this.link()+' Drone spawn result='+result);
             if (result == OK) { this.memory.last_drone_spawned = Game.time; }
             return;
@@ -317,6 +324,13 @@ Room.prototype.schematic = function(c) {
         case 'Miner': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
         case 'Fetcher': { hash[WORK] = 1; hash[CARRY] = 5; hash[MOVE] = 3; break; }
         case 'Zealot': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
+        case 'Drone.1': { hash[WORK] = 1; hash[CARRY] = 1; hash[MOVE] = 1; break; }
+        case 'Drone.2': { hash[WORK] = 2; hash[CARRY] = 2; hash[MOVE] = 2; break; }
+        case 'Drone.3': { hash[WORK] = 3; hash[CARRY] = 3; hash[MOVE] = 3; break; }
+        case 'Drone.4': { hash[WORK] = 4; hash[CARRY] = 4; hash[MOVE] = 4; break; }
+        case 'Drone.5': { hash[WORK] = 5; hash[CARRY] = 5; hash[MOVE] = 5; break; }
+        case 'Drone.6': { hash[WORK] = 6; hash[CARRY] = 6; hash[MOVE] = 6; break; }
+        case 'Drone.7': { hash[WORK] = 7; hash[CARRY] = 7; hash[MOVE] = 7; break; }
         default: { hash[WORK] = 3; hash[CARRY] = 3; hash[MOVE] = 3; break; }
     };
     return this.build_schematic(hash);
