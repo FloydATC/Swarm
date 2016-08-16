@@ -24,6 +24,10 @@ Room.prototype.initialize = function() {
     this.link_total = 0;
     this.link_average = 0;
 
+    // Record presence of hostiles in case we lose visual
+    this.memory.hostiles = hostile_creeps.length;
+    this.memory.scanned = Game.time;
+
     // Owned room?
     if (this.controller && this.controller.my) {
         // There should be a flag on the controller to coordinate the upgrading efforts
@@ -92,27 +96,32 @@ Room.prototype.plan = function() {
     var drones = [];        // Generic workers
     var swarmers = [];      // Move to remote room then mutate into Infectors
     var infectors = [];     // Claim controller then mutate into Drone
-    var biters = [];        // Attack unit
-    var spitters = [];      // Ranged attack unit
+    var biters = [];        // Basic attack unit
+    var spitters = [];      // Basic ranged attack unit
+    var hunters = [];       // Medium ranged attack unit
 
     // Sort creeps into classes
     for (var i in my_creeps) {
         var creep = my_creeps[i];
         if (typeof creep == 'object') {
             if (!creep.memory.class) { creep.memory.class = 'Drone'; console.log(this.link()+' AMNESIAC '+creep+' assigned to Drone class'); }
-            if (creep.memory.class == 'Miner') { miners.push(creep); }
-            if (creep.memory.class == 'Fetcher') { fetchers.push(creep); }
-            if (creep.memory.class == 'Upgrader') { creep.memory.class = 'Zealot'; } // TEMP
-            if (creep.memory.class == 'Zealot') { zealots.push(creep); }
-            if (creep.memory.class == 'Drone') { drones.push(creep); }
-            if (creep.memory.class == 'Swarmer') { swarmers.push(creep); }
-            if (creep.memory.class == 'Infector') { infectors.push(creep); }
-            if (creep.memory.class == 'Biter') { biters.push(creep); }
-            if (creep.memory.class == 'Spitter') { spitters.push(creep); }
+            if (creep.memory.class == 'Miner')      { miners.push(creep);       continue; }
+            if (creep.memory.class == 'Fetcher')    { fetchers.push(creep);     continue; }
+            if (creep.memory.class == 'Zealot')     { zealots.push(creep);      continue; }
+            if (creep.memory.class == 'Drone')      { drones.push(creep);       continue; }
+            if (creep.memory.class == 'Swarmer')    { swarmers.push(creep);     continue; }
+            if (creep.memory.class == 'Infector')   { infectors.push(creep);    continue; }
+            if (creep.memory.class == 'Biter')      { biters.push(creep);       continue; }
+            if (creep.memory.class == 'Spitter')    { spitters.push(creep);     continue; }
+            if (creep.memory.class == 'Hunter')     { hunters.push(creep);      continue; }
+            console.log(this.link()+' unhandled creep class '+creep.memory.class);
         } else {
             console.log(this.link()+' POSSIBLE SERVER ERROR: INVALID CREEP type='+(typeof creep)+' creep='+creep);
         }
     }
+
+    // Hunters hunters
+    this.assign_task_hunt(hunters);
 
     // Biters swarm and attack threats. Recycle when no longer needed.
     this.assign_task_attack(biters);
@@ -166,16 +175,31 @@ Room.prototype.plan = function() {
     this.assign_task_remote_fetch(fetchers);
 
 
-    // Under attack and we have no towers? Spawn biters and spitters and hope for the best
-    if (this.hostile_creeps.length > 0 && this.towers.length == 0) {
-        // Emergency, spawn biters and spitters
-        if (Math.random() > 0.5) {
-            var result = this.createCreep([MOVE,ATTACK], undefined, { class: 'Biter' });
-        } else {
-            var result = this.createCreep([MOVE,RANGED_ATTACK], undefined, { class: 'Spitter' });
+    // Under attack? Plan A: Rlease a hunter. Plan B: Spam tiny fighters and hope for the best
+    if (this.hostile_creeps.length > 0) {
+        // Try to spawn a hunter
+        if (hunters.length == 0) {
+            if (this.createCreep(this.schematic('Hunter'), undefined, { class: 'Hunter', destination: this.name }) == OK) { return; }
+            // Emergency, spawn biters and spitters if possible
+            //if (Math.random() > 0.80) { this.createCreep(this.schematic('Healer'), undefined, { class: 'Healer' }); return; }
+            if (Math.random() > 0.50) { this.createCreep(this.schematic('Spitter'), undefined, { class: 'Spitter' }); return; }
+            this.createCreep(this.schematic('Biter'), undefined, { class: 'Biter' });
+            return;
         }
-        return;
-    };
+    } else {
+        // If we are NOT under attack, check for other rooms that may require assistance
+        for (var name in Memory.rooms) {
+            if (Game.manhattanDistance(this.name, name) <= 2) {
+                if (Memory.rooms[name].hostiles > 0 && Memory.rooms[name].scanned > Game.time - 1000) {
+                    if (this.energy_reserves > 1000) {
+                        // Spawn a hunter to assist!
+                        this.createCreep(this.schematic('Hunter'), undefined, { class: 'Hunter', destination: name })
+                        return;
+                    }
+                }
+            }
+        }
+    }
 
     if (this.source_flags) {
         //console.log(this.link()+' has source flags to consider: '+this.source_flags);
@@ -208,11 +232,6 @@ Room.prototype.plan = function() {
                 console.log(this.link()+' createCreep returned '+result);
                 break;
             }
-            //if (result == ERR_NOT_ENOUGH_ENERGY && this.controller.level >= 6) { result = this.createCreep(this.schematic('Drone.6'), undefined, { class: 'Drone' }); }
-            //if (result == ERR_NOT_ENOUGH_ENERGY && this.controller.level >= 5) { result = this.createCreep(this.schematic('Drone.5'), undefined, { class: 'Drone' }); }
-            //if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Drone'), undefined, { class: 'Drone' }); }
-            //if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,MOVE,CARRY,CARRY,WORK,WORK], undefined, { class: 'Drone' }); }
-            //if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Drone' }); }
             //console.log(this.link()+' Drone spawn result='+result);
             if (result == OK) { this.memory.last_drone_spawned = Game.time; }
             return;
@@ -321,6 +340,7 @@ Room.prototype.schematic = function(c) {
     switch (c) {
         case 'Spitter': { hash[RANGED_ATTACK] = 1; hash[MOVE] = 1; break; }
         case 'Biter': { hash[ATTACK] = 1; hash[MOVE] = 1; break; }
+        case 'Hunter': { hash[TOUGH] = 5; hash[RANGED_ATTACK] = 5; hash[MOVE] = 5; hash[HEAL] = 5; break; }
         case 'Miner': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
         case 'Fetcher': { hash[WORK] = 1; hash[CARRY] = 5; hash[MOVE] = 3; break; }
         case 'Zealot': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
@@ -328,9 +348,9 @@ Room.prototype.schematic = function(c) {
         case 'Drone.2': { hash[WORK] = 2; hash[CARRY] = 2; hash[MOVE] = 2; break; }
         case 'Drone.3': { hash[WORK] = 3; hash[CARRY] = 3; hash[MOVE] = 3; break; }
         case 'Drone.4': { hash[WORK] = 4; hash[CARRY] = 4; hash[MOVE] = 4; break; }
-        case 'Drone.5': { hash[WORK] = 5; hash[CARRY] = 5; hash[MOVE] = 5; break; }
-        case 'Drone.6': { hash[WORK] = 6; hash[CARRY] = 6; hash[MOVE] = 6; break; }
-        case 'Drone.7': { hash[WORK] = 7; hash[CARRY] = 7; hash[MOVE] = 7; break; }
+        case 'Drone.5': { hash[WORK] = 6; hash[CARRY] = 6; hash[MOVE] = 6; break; }
+        case 'Drone.6': { hash[WORK] = 8; hash[CARRY] = 8; hash[MOVE] = 8; break; }
+        case 'Drone.7': { hash[WORK] = 10; hash[CARRY] = 10; hash[MOVE] = 10; break; }
         default: { hash[WORK] = 3; hash[CARRY] = 3; hash[MOVE] = 3; break; }
     };
     return this.build_schematic(hash);
@@ -504,6 +524,14 @@ Room.prototype.assign_task_ranged_attack = function(spitters) {
             spitter.target = spawn.id;
         }
 
+    }
+}
+
+Room.prototype.assign_task_hunt = function(hunters) {
+    while (hunters.length > 0) {
+        var hunter = hunters.shift();
+        hunter.task = 'hunt';
+        swarmer.target = hunter.id; // Dummy target
     }
 }
 

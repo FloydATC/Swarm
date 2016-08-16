@@ -45,6 +45,7 @@ Creep.prototype.execute = function() {
     }
 
     // Tasks that do not involve a work/fetch cycle
+    if (this.task == 'hunt') { this.task_hunt(); return; }
     if (this.task == 'attack') { this.task_attack(); return; }
     if (this.task == 'ranged attack') { this.task_ranged_attack(); return; }
     if (this.task == 'recycle') { this.task_recycle(); return; }
@@ -255,6 +256,26 @@ Creep.prototype.is_harmless = function() {
     if (this.getActiveBodyparts(WORK) > 0) { return false; } // Can dismantle
     if (this.getActiveBodyparts(HEAL) > 0) { return false; } // Can tank
     return true;
+}
+
+Creep.prototype.task_hunt = function() {
+    this.memory.tracking = false;
+    if (this.memory.destination == this.room.name) {
+        console.log(this.memory.class+' '+this+' hunting hostiles in '+this.room.name);
+        // Attack!
+        var target = this.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+        if (target != null) {
+            if (this.pos.getRangeTo(target) > 1) {
+                this.move_to(target); // Close on target
+                this.heal(this); // Attempt to heal self
+            } else {
+                this.attack(target);
+            }
+        }
+    } else {
+        console.log(this.memory.class+' '+this+' heading for '+this.memory.destination+' to assist');
+        this.move_to({ pos: new RoomPosition(25, 25, this.memory.destination) });
+    }
 }
 
 Creep.prototype.task_attack = function() {
