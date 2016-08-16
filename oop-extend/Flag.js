@@ -50,6 +50,11 @@ module.exports = {
         for (var i in this.workers) {
             var creep = Game.getObjectById(this.workers[i]);
             if (creep.memory.class == c) { count++; }
+            // Auto-adjust lead time
+            if (creep.memory.spawned && creep.memory.arrived) {
+                this.memory.lead_time = Math.floor((this.memory.lead_time + (creep.memory.arrived - creep.memory.spawned)) / 2);
+                delete creep.memory.spawned;
+            }
         }
         return count;
     },

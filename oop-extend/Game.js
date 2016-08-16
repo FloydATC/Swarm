@@ -40,7 +40,7 @@ module.exports = {
                 lo_room.harvest_flags.push(flag);
 
                 // Calculate and set spawn parameters
-                flag.memory.lead_time = 250; // How many ticks from spawn to arrival? FIXME!!!
+                //flag.memory.lead_time = 250; // How many ticks from spawn to arrival? FIXME!!!
                 flag.memory.cooldown = 300; // How many ticks minimum between spawns? FIXME!!!
                 flag.memory.workforce = { 'Miner': 1, 'Fetcher': 3 };
 
@@ -59,7 +59,7 @@ module.exports = {
                     ctrl.flag = flag;
 
                     // Calculate and set spawn parameters
-                    flag.memory.lead_time = 20; // How many ticks from spawn to arrival? FIXME!!!
+                    //flag.memory.lead_time = 20; // How many ticks from spawn to arrival? FIXME!!!
                     flag.memory.cooldown = 600; // How many ticks minimum between spawns? FIXME!!!
                     flag.memory.workforce = { 'Zealot': 1 };
                 }
@@ -78,7 +78,7 @@ module.exports = {
                     source.room.source_flags.push(flag);
 
                     // Calculate and set spawn parameters
-                    flag.memory.lead_time = 20; // How many ticks from spawn to arrival? FIXME!!!
+                    //flag.memory.lead_time = 20; // How many ticks from spawn to arrival? FIXME!!!
                     flag.memory.cooldown = 200; // How many ticks minimum between spawns? FIXME!!!
                     flag.memory.workforce = { 'Miner': 1 };
                 }
