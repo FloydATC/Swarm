@@ -314,10 +314,13 @@ Room.prototype.optimize = function() {
                 //console.log(this.link()+' creeps '+creep_a+' ('+creep_a.range_to_target+'>'+catb+') and '+creep_b+' ('+creep_b.range_to_target+'>'+cbta+')  swapped targets');
                 var target = creep_a.target;
                 var task = creep_a.task;
+                var range_to_target = creep_a.range_to_target;
                 creep_a.target = creep_b.target;
                 creep_a.task = creep_b.task;
-                creep_b.target = creep_a.target;
-                creep_b.task = creep_a.task;
+                creep_a.range_to_target = creep_b.range_to_target;
+                creep_b.target = target;
+                creep_b.task = task;
+                creep_b.range_to_target = range_to_target;
                 creep_a.say('swap');
                 creep_b.say('swap');
             }
