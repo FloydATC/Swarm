@@ -9,8 +9,8 @@ Creep.prototype.initialize = function() {
     this.free = this.carryCapacity - _.sum(this.carry);
 
     // Get an array of adjacent objects
-    //this.adjacent = this.pos.lookAtArea(this.pos.y-1, this.pos.x-1, this.pos.y+1, this.pos.x+1, true);
-    //if (this.memory.debug) { console.log(this.adjacent); }
+    this.adjacent = this.room.lookAtArea(this.pos.y-1, this.pos.x-1, this.pos.y+1, this.pos.x+1, true);
+    if (this.memory.debug) { console.log(this.adjacent); }
 }
 
 Creep.prototype.speak = function() {
