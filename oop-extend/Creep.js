@@ -619,6 +619,7 @@ Creep.prototype.direction_vector = function(direction) {
     var vec = [[0,0], [0,-1], [1,-1], [1,0], [1,1], [0,1], [-1,1], [-1,0], [-1,-1] ];
     if (direction >= 1 && direction <= 8) { return vec[direction]; }
     console.log(this+' at '+this.pos+' got an INVALID direction_vector('+direction+')');
+    console.log(arguments.callee.trace());
     return vec[0];
 }
 
