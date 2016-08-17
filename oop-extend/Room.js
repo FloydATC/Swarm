@@ -229,7 +229,7 @@ Room.prototype.plan = function() {
                 result = this.createCreep(this.schematic('Drone.'+level), undefined, { class: 'Drone' });
                 if (result == OK) { break; }
                 if (result == ERR_NOT_ENOUGH_ENERGY) { continue; }
-                console.log(this.link()+' createCreep returned '+result);
+                //console.log(this.link()+' createCreep returned '+result);
                 break;
             }
             //console.log(this.link()+' Drone spawn result='+result);
