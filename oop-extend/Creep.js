@@ -8,6 +8,9 @@ Creep.prototype.initialize = function() {
     this.memory.where = this.room.name;
     this.free = this.carryCapacity - _.sum(this.carry);
 
+    // Get an array of adjacent objects
+    this.adjacent = this.pos.lookAtArea(this.pos.y-1, this.pos.x-1, this.pos.y+1, this.pos.x+1, true);
+    if (this.memory.debug) { console.log(this.adjacent); }
 }
 
 Creep.prototype.speak = function() {
@@ -745,9 +748,7 @@ Creep.prototype.move_to = function(target) {
 
     if (this.pos.roomName == target.pos.roomName) {
         //console.log(this+' getting direction from local router');
-        this.room.start_timer('get_direction');
         var direction = this.room.get_direction(this.pos, target.pos);
-        this.room.stop_timer('get_direction');
         if (direction >= 1 && direction <= 8) {
             //console.log('#DEBUG '+this+' ROUTER move('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+')');
             var newpos = this.next_position(direction);
@@ -770,9 +771,7 @@ Creep.prototype.move_to = function(target) {
         this.moveTo(target, { ignoreCreeps: true } );
         this.room.stop_timer('moveTo');
         //console.log('#DEBUG '+this+' moveTo('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+' IGNORING CREEPS) = '+this.memory._move.path);
-        this.room.start_timer('learn_path');
         var result = this.learn_path();
-        this.room.stop_timer('learn_path');
         //if (result != OK) { console.log(this+' learn path returned '+result); }
     } else {
         //console.log(this.memory.class+' '+this+' ('+this.memory.task.type+') calculating NON-CACHEABLE path to '+target.pos+' (EXPENSIVE)');
