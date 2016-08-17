@@ -10,7 +10,7 @@ var extend_s_spawn = require('StructureSpawn');
 var extend_s_storage = require('StructureStorage');
 var extend_s_tower = require('StructureTower');
 var profiler = require('Profiler');
-var stacktrace = require('Stacktrace'); // var trace = arguments.callee.trace();
+//var stacktrace = require('Stacktrace'); // var trace = arguments.callee.trace();
 var show_perf = false;
 
 profiler.enable(); // Game.profiler.profile(100) -or- Game.profiler.email(100)
