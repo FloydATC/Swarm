@@ -481,7 +481,8 @@ Creep.prototype.task_remote_fetch = function() {
                 //console.log('Fetcher '+this+' harvesting source ('+source+' in '+this.memory.mine+')');
             }
             // Dropped energy within reach? Grab it.
-            var treasures = this.pos.findInRange(FIND_DROPPED_ENERGY, 1);
+            //var treasures = this.pos.findInRange(FIND_DROPPED_ENERGY, 1);
+            var treasures = this.energy_within_reach();
             if (treasures.length > 0) {
                 this.pickup(treasures[0]);
             }
@@ -639,7 +640,8 @@ Creep.prototype.task_upgrade = function() {
         }
         if (this.free > 0) {
             //console.log(this+' has free space');
-            var treasures = this.pos.findInRange(FIND_DROPPED_ENERGY, 1);
+            //var treasures = this.pos.findInRange(FIND_DROPPED_ENERGY, 1);
+            var treasures = this.energy_within_reach();
             if (treasures.length > 0) { this.pickup(treasures[0]); }
         }
         return;
