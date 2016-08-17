@@ -411,7 +411,7 @@ Creep.prototype.task_mine = function() {
             // Link with free space within reach?
 //            var links = this.recall('links');
             var links = this.links_within_reach();
-            //console.log(this+' can reach these links: '+links);
+            console.log(this+' can reach these links: '+links);
             var link = null;
             for (var i=0; i<links.length; i++) {
                 //console.log(this+' consider putting energy in '+links[i]+' ('+links[i].free+' free)');
@@ -423,7 +423,7 @@ Creep.prototype.task_mine = function() {
             // Container with free space within reach?
 //            var containers = this.recall('containers');
             var containers = this.containers_within_reach();
-            //console.log(this+' can reach these containers: '+containers);
+            console.log(this+' can reach these containers: '+containers);
             var container = null;
             for (var i=0; i<containers.length; i++) {
                 //console.log(this+' consider putting energy in '+containers[i]+' ('+containers[i].free+' free)');
