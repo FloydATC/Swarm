@@ -20,6 +20,9 @@ Room.prototype.initialize = function() {
     var ambition = this.hp_ambition();
     this.need_repairs = this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits && s.hits < ambition && s.hits < s.hitsMax; } }).sort( function(a,b) { return a.hits - b.hits; } ); // Most urgent first
 
+    this.timer = {};
+    this.total = {};
+
     this.link_count = 0;
     this.link_total = 0;
     this.link_average = 0;
