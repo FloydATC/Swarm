@@ -16,7 +16,7 @@ Creep.prototype.initialize = function() {
         (this.pos.x < 49 ? this.pos.x+1 : this.pos.x),
         true // Result as plain array please
     );
-    if (this.memory.debug) { console.log(JSON.stringify(this.adjacent)); }
+    if (this.memory.debug) { console.log(this.adjacent); }
 }
 
 Creep.prototype.speak = function() {
