@@ -58,33 +58,28 @@ module.exports.loop = function() {
     for (var name in Game.rooms) {
         var room = Game.rooms[name];
 
-        try {
-            room.plan();
-            if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' planned '+room); }
-            room.optimize();
-            if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' optimized '+room); }
-            room.execute();
-            if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' executed '+room); }
+        room.plan();
+        if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' planned '+room); }
+        room.optimize();
+        if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' optimized '+room); }
+        room.execute();
+        if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' executed '+room); }
 
-            room.show_totals();
+        room.show_totals();
 
-            if (Game.time % 100 == 0) {
-                room.expire_routes();
-                if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' expired routes '+room); }
-                if (show_perf) { console.log(room+' routing table: '+roughSizeOfObject(Memory.rooms[room.name].router)+' bytes (est.)'); }
+        if (Game.time % 100 == 0) {
+            room.expire_routes();
+            if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' expired routes '+room); }
+            if (show_perf) { console.log(room+' routing table: '+roughSizeOfObject(Memory.rooms[room.name].router)+' bytes (est.)'); }
 
-
-            }
-
-            if (Game.time % 1000 == 0) {
-                // Reset road votes
-                for (var name in Memory.rooms) { delete Memory.rooms[name].votes; }
-            }
 
         }
-        catch (e) {
-            console.log(this.link()+' exception: '+e);
+
+        if (Game.time % 1000 == 0) {
+            // Reset road votes
+            for (var name in Memory.rooms) { delete Memory.rooms[name].votes; }
         }
+
 
     }
     if (show_perf) { console.log('(finished)'); }
