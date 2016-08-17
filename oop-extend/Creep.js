@@ -621,7 +621,7 @@ Creep.prototype.direction_vector = function(direction) {
     try {
         console.log(this+' at '+this.pos+' got an INVALID direction_vector('+direction+')');
         console.log(arguments.callee.trace());
-    } 
+    }
     catch (e) {
         console.log('Exception: '+e);
     }
@@ -700,6 +700,7 @@ Creep.prototype.move_to = function(target) {
         if (this.memory.nexthop && this.memory.nexthop.room == this.pos.roomName) { delete this.memory.nexthop; }
         if (typeof this.memory.nexthop == 'undefined') {
             //console.log(this+' calculating route from '+this.room.name+' to '+target.pos.roomName+' (EXPENSIVE)');
+            this.room.start_timer('findRoute');
             var route = Game.map.findRoute(this.room, target.pos.roomName, {
             	routeCallback(roomName) {
                     if (Game.rooms[roomName] && Game.rooms[roomName].controller && Game.rooms[roomName].controller.my) { return 1; } // My room
@@ -708,6 +709,7 @@ Creep.prototype.move_to = function(target) {
         			return 2.5;
             	}
             });
+            this.room.stop_timer('findRoute');
             if (route == ERR_NO_PATH) {
                 console.log(this+' is unable to reach '+target.pos.roomName+' (findRoute returned ERR_NO_PATH)');
                 return;
@@ -721,7 +723,9 @@ Creep.prototype.move_to = function(target) {
             if (this.memory.useexit && this.memory.useexit.roomName != this.room.name) { delete this.memory.useexit; } // Expire
             if (typeof this.memory.useexit == 'undefined') {
                 //console.log(this+' finding closest exit to '+this.memory.nexthop.room+' (EXPENSIVE)');
+                this.room.start_timer('findClosestByPath');
                 var exit = this.pos.findClosestByPath(this.memory.nexthop.exit);
+                this.room.stop_timer('findClosestByPath');
                 if (exit == null) {
                     console.log(this+' in '+this.room.name+' was told to use exit direction '+this.memory.nexthop.exit+' to reach '+this.memory.nexthop.room+' but found no exits');
                 } else {
@@ -741,7 +745,9 @@ Creep.prototype.move_to = function(target) {
 
     if (this.pos.roomName == target.pos.roomName) {
         //console.log(this+' getting direction from local router');
+        this.room.start_timer('get_direction');
         var direction = this.room.get_direction(this.pos, target.pos);
+        this.room.stop_timer('get_direction');
         if (direction >= 1 && direction <= 8) {
             //console.log('#DEBUG '+this+' ROUTER move('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+')');
             var newpos = this.next_position(direction);
@@ -751,20 +757,28 @@ Creep.prototype.move_to = function(target) {
                 delete this.memory._move;
             } else {
                 this.say('Traffic');
+                this.room.start_timer('moveTo');
                 this.moveTo(target); // Try to avoid other creeps but do not learn path
+                this.room.stop_timer('moveTo');
             }
             return;
         }
     }
     if (this.pos.roomName == target.pos.roomName) {
         //console.log(this.memory.class+' '+this+' ('+this.memory.task.type+') calculating cacheable path from '+this.pos+' to '+target.pos+' (EXPENSIVE)');
+        this.room.start_timer('moveTo');
         this.moveTo(target, { ignoreCreeps: true } );
+        this.room.stop_timer('moveTo');
         //console.log('#DEBUG '+this+' moveTo('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+' IGNORING CREEPS) = '+this.memory._move.path);
+        this.room.start_timer('learn_path');
         var result = this.learn_path();
+        this.room.stop_timer('learn_path');
         //if (result != OK) { console.log(this+' learn path returned '+result); }
     } else {
         //console.log(this.memory.class+' '+this+' ('+this.memory.task.type+') calculating NON-CACHEABLE path to '+target.pos+' (EXPENSIVE)');
+        this.room.start_timer('moveTo');
         this.moveTo(target, { ignoreCreeps: false } );
+        this.room.stop_timer('moveTo');
     }
 }
 

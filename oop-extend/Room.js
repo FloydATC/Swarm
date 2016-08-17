@@ -827,3 +827,18 @@ Room.prototype.hp_ambition = function() {
         return 0;
     }
 }
+
+Room.prototype.start_timer = function(name) {
+    this.timer[name] = Game.cpu.getUsed();
+}
+
+Room.prototype.stop_timer = function(name) {
+    var delta = Game.cpu.getUsed() - this.timer[name];
+    this.total[name] = (this.total[name] +  delta) || delta;
+}
+
+Room.prototype.show_totals = function() {
+    var report = this.link()+' totals:';
+    for (var name in this.total) { report = report+' '+name+'='+this.total[name].toFixed(3); }
+    console.log(report);
+}
