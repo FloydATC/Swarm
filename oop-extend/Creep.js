@@ -24,7 +24,7 @@ Creep.prototype.containers_within_reach = function() {
     for (var i=0; i<this.adjacent.length; i++) {
         var object = this.adjacent[i];
         if (object.type == LOOK_STRUCTURES && object.structure.structureType == STRUCTURE_CONTAINER) {
-            found.push(object);
+            found.push(object.structure); // Note! Object contains coordinates and more
         }
     }
     return found;
@@ -35,7 +35,7 @@ Creep.prototype.links_within_reach = function() {
     for (var i=0; i<this.adjacent.length; i++) {
         var object = this.adjacent[i];
         if (object.type == LOOK_STRUCTURES && object.structure.structureType == STRUCTURE_LINK) {
-            found.push(object);
+            found.push(object.structure); // Note! Object contains coordinates and more
         }
     }
     return found;
