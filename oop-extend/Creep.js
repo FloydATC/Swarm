@@ -271,20 +271,6 @@ Creep.prototype.task_hunt = function() {
             } else {
                 this.attack(target);
             }
-        } else {
-            // No targets
-            this.memory.idle = (this.memory.idle + 1) || 1;
-            if (this.memory.idle > 50) {
-                // Recycle
-                var spawn = this.pos.findClosestByRange(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_SPAWN; } } );
-                if (spawn) {
-                    if (this.pos.getRangeTo(spawn) > 1) {
-                        this.move_to(spawn);
-                    } else {
-                        spawn.recycleCreep(this);
-                    }
-                }
-            }
         }
     } else {
         console.log(this.memory.class+' '+this+' heading for '+this.memory.destination+' to assist');
@@ -731,7 +717,7 @@ Creep.prototype.move_to = function(target) {
                 //console.log(this+' finding closest exit to '+this.memory.nexthop.room+' (EXPENSIVE)');
                 var exit = this.pos.findClosestByPath(this.memory.nexthop.exit);
                 if (exit == null) {
-                    console.log(this+' was told to use exit direction '+this.memory.nexthop.exit+' but found no exits');
+                    console.log(this+' in '+this.room.name+' was told to use exit direction '+this.memory.nexthop.exit+' to reach '+this.memory.nexthop.room+' but found no exits');
                 } else {
                     this.memory.useexit = { x: exit.x, y: exit.y, roomName: exit.roomName };
                 }
