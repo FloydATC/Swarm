@@ -534,7 +534,7 @@ Room.prototype.assign_task_hunt = function(hunters) {
     while (hunters.length > 0) {
         var hunter = hunters.shift();
         hunter.task = 'hunt';
-        swarmer.target = hunter.id; // Dummy target
+        hunter.target = hunter.id; // Dummy target
     }
 }
 
