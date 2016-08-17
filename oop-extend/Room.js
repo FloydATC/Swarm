@@ -20,14 +20,15 @@ Room.prototype.initialize = function() {
     var ambition = this.hp_ambition();
     this.need_repairs = this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits && s.hits < ambition && s.hits < s.hitsMax; } }).sort( function(a,b) { return a.hits - b.hits; } ); // Most urgent first
 
-    this.timer = {};
-    this.total = {};
+    this.timer = {}; // Used by .start_timer() and .stop_timer()
+    this.total = {}; // Accumulated timers, used by .show_totals()
 
+    // Used to calculate total and average link energy levels
     this.link_count = 0;
     this.link_total = 0;
     this.link_average = 0;
 
-    // Record presence of hostiles in case we lose visual
+    // Record presence of hostiles in case we lose visual - used by other rooms to assist
     this.memory.hostiles = this.hostile_creeps.length;
     this.memory.scanned = Game.time;
 
