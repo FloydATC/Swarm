@@ -118,12 +118,14 @@ Creep.prototype.execute = function() {
     if (this.free > 0) {
         //var treasures = this.pos.findInRange(FIND_DROPPED_ENERGY, 1);
         var treasures = this.energy_within_reach();
-        var reserved = treasures[0].reserved_amount || 0;
-        if (treasures.length > 0 && treasures[0].amount > reserved) {
-            treasures[0].reserved_amount = reserved + this.free;
-            this.pickup(treasures[0]);
-            this.say('Treasure');
-            return;
+        if (treasures.length > 0) {
+            var reserved = treasures[0].reserved_amount || 0;
+            if (treasures[0].amount > reserved) {
+                treasures[0].reserved_amount = reserved + this.free;
+                this.pickup(treasures[0]);
+                this.say('Treasure');
+                return;
+            }
         }
     }
 
