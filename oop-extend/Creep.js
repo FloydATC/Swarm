@@ -271,6 +271,20 @@ Creep.prototype.task_hunt = function() {
             } else {
                 this.attack(target);
             }
+        } else {
+            // No targets
+            this.memory.idle = (this.memory.idle + 1) || 1;
+            if (this.memory.idle > 50) {
+                // Recycle
+                var spawn = this.pos.findClosestByRange(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_SPAWN; } } );
+                if (spawn) {
+                    if (this.pos.getRangeTo(spawn) > 1) {
+                        this.move_to(spawn);
+                    } else {
+                        spawn.recycleCreep(this);
+                    }
+                }
+            }
         }
     } else {
         console.log(this.memory.class+' '+this+' heading for '+this.memory.destination+' to assist');
