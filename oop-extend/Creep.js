@@ -41,6 +41,17 @@ Creep.prototype.links_within_reach = function() {
     return found;
 }
 
+Creep.prototype.energy_within_reach = function() {
+    var found = [];
+    for (var i=0; i<this.adjacent.length; i++) {
+        var object = this.adjacent[i];
+        if (object.type == LOOK_RESOURCES && object.resource.resourceType == RESOURCE_ENERGY) {
+            found.push(Game.getObjectById(object.resource.id)); // Note! Object is just a nested hash
+        }
+    }
+    return found;
+}
+
 Creep.prototype.speak = function() {
     var comments = [ '*bzz*', '*chirp*', '*chirr*', '*chirrup*', '*chitter*', '*click*', '*clitter*', '*cricket*' ];
     this.say(comments[Math.floor(Math.random() * comments.length)], true);
@@ -105,8 +116,15 @@ Creep.prototype.execute = function() {
 
     // Free energy within reach? Try to grab it.
     if (this.free > 0) {
-        var treasures = this.pos.findInRange(FIND_DROPPED_ENERGY, 1);
-        if (treasures.length > 0) { this.pickup(treasures[0]); this.say('Treasure'); return; }
+        //var treasures = this.pos.findInRange(FIND_DROPPED_ENERGY, 1);
+        var treasures = this.energy_within_reach();
+        var reserved = treasures[0].reserved_amount || 0;
+        if (treasures.length > 0 && treasures[0].amount > reserved) {
+            treasures[0].reserved_amount = reserved + this.free;
+            this.pickup(treasures[0]);
+            this.say('Treasure');
+            return;
+        }
     }
 
     // Get energy if needed
@@ -398,18 +416,12 @@ Creep.prototype.task_mine = function() {
         } else {
             if (arrived == 0) {
                 this.memory.arrived = Game.time;
-                // Search for links and containers within reach and remember them
-//                var links = this.pos.findInRange(FIND_STRUCTURES, 1, { filter: { structureType: STRUCTURE_LINK } });
-//                this.remember('links', links);
-//                var containers = this.pos.findInRange(FIND_STRUCTURES, 1, { filter: { structureType: STRUCTURE_CONTAINER } });
-//                this.remember('containers', containers);
             }
             // Get energy
             this.harvest(source);
             //console.log('Miner '+this+' harvesting source ('+source+' in '+this.memory.mine+')');
 
             // Link with free space within reach?
-//            var links = this.recall('links');
             var links = this.links_within_reach();
             console.log(this+' can reach these links: '+links);
             var link = null;
@@ -421,7 +433,6 @@ Creep.prototype.task_mine = function() {
             if (link != null) { this.transfer(link, RESOURCE_ENERGY); return; }
 
             // Container with free space within reach?
-//            var containers = this.recall('containers');
             var containers = this.containers_within_reach();
             console.log(this+' can reach these containers: '+containers);
             var container = null;
