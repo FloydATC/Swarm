@@ -83,7 +83,8 @@ Creep.prototype.execute = function() {
     if (typeof this.memory.task == 'object' && this.memory.task.type == this.task && this.memory.task.target == target.toString()) {
         this.memory.task.ticks = (this.memory.task.ticks + 1) || 1;
     } else {
-        this.memory.task = { type: this.task, target: (target != null ? target.toString() || '(null)'), ticks: 0 };
+        var target_str = (target != null ? target.toString() || '(null)');
+        this.memory.task = { type: this.task, target: target_str, ticks: 0 };
     }
 
     // Tasks that do not involve a work/fetch cycle
