@@ -319,6 +319,8 @@ Creep.prototype.task_hunt = function() {
         var target = this.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
         if (target == null) {
             this.say('Victory!');
+            target = this.shift_nearest(this.room.spawns.slice());
+            if (target) { this.move_to(target); }
             return;
         } else {
             if (this.pos.getRangeTo(target) > 3) {
