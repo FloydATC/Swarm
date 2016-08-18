@@ -777,6 +777,7 @@ Creep.prototype.move_to = function(target) {
             //if (typeof this.memory.useexit == 'undefined') {
                 console.log(this.room.link()+' '+this+' finding closest exit ('+this.memory.nexthop.exit+') to '+this.memory.nexthop.room+' (EXPENSIVE)');
                 var exits = this.room.get_exits();
+                console.log('  candidates: '+JSON.stringify(exits));
                 var exit = null;
                 var nearest_dist = null;
                 for (var i=0; i<exits.length; i++) {
