@@ -200,7 +200,8 @@ Room.prototype.plan = function() {
                     if (this.calc_energy_reserves() > 75) {
                         console.log('  '+this.link()+' spawning assistance!');
                         // Spawn a hunter to assist!
-                        this.createCreep(this.schematic('Hunter'), undefined, { class: 'Hunter', destination: name })
+                        var result = this.createCreep(this.schematic('Hunter'), undefined, { class: 'Hunter', destination: name })
+                        console.log('  result='+result);
                         return;
                     } else {
                         console.log('  '+this.link()+' unable to assist');
