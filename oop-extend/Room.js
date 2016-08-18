@@ -71,6 +71,21 @@ Room.prototype.initialize = function() {
         }
     }
 
+    // Record exits if not already done
+    if (!this.memory.exits) {
+        this.memory.exits = {};
+        var directions = [ FIND_EXIT_TOP, FIND_EXIT_LEFT, FIND_EXIT_BOTTOM, FIND_EXIT_RIGHT ];
+        for (var i in directions) {
+            var direction = directions[i];
+            var exits = this.find(direction);
+            for (var j in exits) {
+                var exit = exits[j];
+                console.log(this.link()+' exit dir '+direction+' no '+j+' = '+JSON.stringify(exit));
+            }
+        }
+    }
+
+
     for (var i=0; i<this.links.length; i++) { this.links[i].initialize(); }
     for (var i=0; i<this.my_creeps.length; i++) { this.my_creeps[i].initialize(); }
     for (var i=0; i<this.towers.length; i++) { this.towers[i].initialize(); }
