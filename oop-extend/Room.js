@@ -251,10 +251,12 @@ Room.prototype.plan = function() {
         var result = this.createCreep([MOVE,CARRY,WORK,CLAIM], undefined, { class: 'Swarmer', destination: Game.colonize });
         return;
     }
-    if (Game.request_drones && Game.time % 50 == 0) {
-        console.log(this.link()+' spawning a creep to build spawn in '+Game.request_drones);
-        var result = this.createCreep([MOVE,CARRY,WORK], undefined, { class: 'Swarmer', destination: Game.request_drones });
-        return;
+    if (Game.request_drones && Game.time % 300 == 0) {
+        if (this.manhattanDistance(this.name, Game.request_drones) <= 2) {
+            console.log(this.link()+' spawning a creep to build spawn in '+Game.request_drones);
+            var result = this.createCreep(this.schematic('Drone'), undefined, { class: 'Swarmer', destination: Game.request_drones });
+            return;
+        }
     }
     if (this.controller && this.controller.flag) {
         var flag = this.controller.flag;
