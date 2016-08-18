@@ -320,9 +320,6 @@ Creep.prototype.task_hunt = function() {
         if (target == null) {
             delete this.memory.destination;
             this.say('Victory!');
-            target = this.shift_nearest(this.room.spawns.slice());
-            if (target) { this.move_to(target); }
-            return;
         } else {
             if (this.pos.getRangeTo(target) > 3) {
                 if (this.hits < this.hitsMax) { this.heal(this); }// Attempt to heal self
@@ -330,12 +327,24 @@ Creep.prototype.task_hunt = function() {
             } else {
                 this.rangedAttack(target);
             }
+            return;
         }
     }
     if (this.memory.destination && this.memory.destination != this.room.name) {
         console.log(this.memory.class+' '+this+' heading for '+this.memory.destination+' to assist');
         this.move_to({ pos: new RoomPosition(25, 25, this.memory.destination) });
+        return;
     }
+    var spawn = this.shift_nearest(this.room.spawns.slice());
+    if (spawn != null) {
+        if (this.pos.getRangeTo(spawn) > 1) {
+            this.move_to(spawn);
+        } else {
+            spawn.recycleCreep(this);
+        }
+    }
+    return;
+
 }
 
 Creep.prototype.task_attack = function() {
