@@ -247,7 +247,7 @@ Room.prototype.plan = function() {
             return;
         }
     }
-    console.log(this.link()+' time='+Game.time+' colonize='+(Game.colonize ? 'yes' : 'no')+' request='+(Game.request_drones ? 'yes' : 'no'));
+    //console.log(this.link()+' time='+Game.time+' colonize='+(Game.colonize ? 'yes' : 'no')+' request='+(Game.request_drones ? 'yes' : 'no'));
     if (Game.colonize && Game.time % 100 == 0) {
         if (Game.manhattanDistance(this.name, Game.colonize) <= 2 && Game.rooms[Game.colonize].my == false) {
             console.log(this.link()+' spawning a creep to claim '+Game.colonize);
