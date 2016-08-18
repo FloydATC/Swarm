@@ -461,6 +461,7 @@ Creep.prototype.task_mine = function() {
 
 Creep.prototype.task_remote_fetch = function() {
     var flag = Game.flags[this.memory.flag];
+    if (flag == null) { this.memory.class = 'Drone'; return; }
     flag.assign_worker(this); // Check in with flag
     this.memory.tracking = true;
     if (this.memory.working == true && this.is_empty()) { this.memory.working = false; }
