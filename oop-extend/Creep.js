@@ -313,12 +313,12 @@ Creep.prototype.is_harmless = function() {
 
 Creep.prototype.task_hunt = function() {
     this.memory.tracking = false;
-    if (this.memory.destination == this.room.name) {
-        delete this.memory.destination;
+    if (this.memory.destination && this.memory.destination == this.room.name) {
         //console.log(this.memory.class+' '+this+' hunting hostiles in '+this.room.name);
         // Attack!
         var target = this.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
         if (target == null) {
+            delete this.memory.destination;
             this.say('Victory!');
             target = this.shift_nearest(this.room.spawns.slice());
             if (target) { this.move_to(target); }
@@ -331,7 +331,8 @@ Creep.prototype.task_hunt = function() {
                 this.rangedAttack(target);
             }
         }
-    } else {
+    }
+    if (this.memory.destination && this.memory.destination != this.room.name) {
         console.log(this.memory.class+' '+this+' heading for '+this.memory.destination+' to assist');
         this.move_to({ pos: new RoomPosition(25, 25, this.memory.destination) });
     }
