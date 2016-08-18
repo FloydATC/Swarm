@@ -797,7 +797,9 @@ Creep.prototype.move_to = function(target) {
             //    }
             //}
             //if (this.memory.useexit) {
-                target = { pos: new RoomPosition(exit.x, exit.y, this.memory.useexit.roomName) };
+                if (exit != null) {
+                    target = { pos: new RoomPosition(exit.x, exit.y, this.memory.useexit.roomName) };
+                }
                 //console.log(this+' dummy target = '+JSON.stringify(target));
                 //console.log(this+' in '+this.room.name+' using exit at '+target.pos);
             //}
