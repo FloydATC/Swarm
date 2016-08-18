@@ -791,6 +791,7 @@ Creep.prototype.move_to = function(target) {
                 //this.room.stop_timer('findClosestByPath');
                 if (exit == null) {
                     console.log(this+' in '+this.room.name+' was told to use exit direction '+this.memory.nexthop.exit+' to reach '+this.memory.nexthop.room+' but found no exits');
+                    this.memory.useexit = null;
                 } else {
                     this.memory.useexit = { x: exit.x, y: exit.y, roomName: exit.roomName };
                 }
