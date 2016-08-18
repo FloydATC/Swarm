@@ -66,7 +66,7 @@ Creep.prototype.execute = function() {
 
     var target = Game.getObjectById(this.target);
     //console.log(this+' target '+target);
-    if (target == null) {
+    if (this.memory.class == 'Drone' && target == null) {
         if (this.room.controller && (this.room.controller.level < 3 || (this.room.energy_reserves() > 25 && this.room.spawn_reserves() > 50))) {
             target = this.room.controller;
             this.task = 'upgrade';
