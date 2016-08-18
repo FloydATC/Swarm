@@ -196,8 +196,8 @@ Room.prototype.plan = function() {
             if (name == this.name) { continue; } // Assist self? Duh.
             if (Game.manhattanDistance(this.name, name) <= 2) {
                 if (Memory.rooms[name].hostiles > 0 && Memory.rooms[name].scanned > Game.time - 1000) {
-                    console.log('  '+name+' is under attack, '+this.link()+' checking energy reserves ('+this.calc_energy_reserves()+')');
-                    if (this.calc_energy_reserves() > 75) {
+                    console.log('  '+name+' is under attack, '+this.link()+' checking energy reserves ('+this.calc_spawn_reserves()+')');
+                    if (this.calc_spawn_reserves() > 75) {
                         console.log('  '+this.link()+' spawning assistance!');
                         // Spawn a hunter to assist!
                         var result = this.createCreep(this.schematic('Hunter'), undefined, { class: 'Hunter', destination: name })
@@ -439,7 +439,7 @@ Room.prototype.calc_energy_reserves = function() {
     }
 }
 
-Room.prototype.spawn_reserves = function() {
+Room.prototype.calc_spawn_reserves = function() {
     if (this.spawn_reserves) { return this.spawn_reserves; }
     var count = this.extensions.length;
     var total = 0;
