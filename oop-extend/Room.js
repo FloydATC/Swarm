@@ -567,6 +567,7 @@ Room.prototype.assign_task_claim = function(infectors) {
         if (this.controller) {
             if (this.controller.my == true) {
                 infector.say('Victory!');
+                infector.memory.class = 'Drone';
             } else {
                 infector.say('I can haz');
                 infector.task = 'claim';
