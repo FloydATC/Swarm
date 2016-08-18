@@ -72,7 +72,7 @@ Room.prototype.initialize = function() {
     }
 
     // Record exits if not already done (Store in encoded format)
-    if (!this.memory.exits) {
+    if (true || typeof this.memory.exits == 'undefined') {
         this.memory.exits = {};
         var directions = [ FIND_EXIT_TOP, FIND_EXIT_LEFT, FIND_EXIT_BOTTOM, FIND_EXIT_RIGHT ];
         for (var i in directions) {
