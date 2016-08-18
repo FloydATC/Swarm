@@ -196,15 +196,15 @@ Room.prototype.plan = function() {
             if (name == this.name) { continue; } // Assist self? Duh.
             if (Game.manhattanDistance(this.name, name) <= 2) {
                 if (Memory.rooms[name].hostiles > 0 && Memory.rooms[name].scanned > Game.time - 1000) {
-                    console.log('  '+name+' is under attack, '+this.link()+' checking energy reserves ('+this.calc_spawn_reserves()+')');
+                    //console.log('  '+name+' is under attack, '+this.link()+' checking energy reserves ('+this.calc_spawn_reserves()+')');
                     if (this.calc_spawn_reserves() > 75) {
-                        console.log('  '+this.link()+' spawning assistance!');
+                        //console.log('  '+this.link()+' spawning assistance!');
                         // Spawn a hunter to assist!
                         var result = this.createCreep(this.schematic('Hunter'), undefined, { class: 'Hunter', destination: name })
-                        console.log('  result='+result);
+                        //console.log('  result='+result);
                         return;
                     } else {
-                        console.log('  '+this.link()+' unable to assist');
+                        //console.log('  '+this.link()+' unable to assist');
                     }
                 }
             }
@@ -259,11 +259,11 @@ Room.prototype.plan = function() {
     }
     if (Game.request_drones && Game.time % 300 == 0) {
         if (Game.manhattanDistance(this.name, Game.request_drones) <= 2 && Game.rooms[Game.request_drones].controller && Game.rooms[Game.request_drones].controller.my == true) {
-            console.log(this.link()+' spawning a creep to build spawn in '+Game.request_drones);
+            //console.log(this.link()+' spawning a creep to build spawn in '+Game.request_drones);
             var result = this.createCreep(this.schematic('Drone'), undefined, { class: 'Swarmer', destination: Game.request_drones });
             return;
         } else {
-            console.log(this.link()+' would like to help build but, gee, '+Game.request_drones+' is awfully far away: '+Game.manhattanDistance(this.name, Game.request_drones));
+            //console.log(this.link()+' would like to help build but, gee, '+Game.request_drones+' is awfully far away: '+Game.manhattanDistance(this.name, Game.request_drones));
         }
     }
     if (this.controller && this.controller.flag) {
@@ -271,11 +271,11 @@ Room.prototype.plan = function() {
         var needs = flag.needs();
         //console.log(this.link()+' flag '+flag+' needs '+needs);
         if (needs == 'Zealot') {
-            console.log(this.link()+' spawning a zealot for '+flag.pos.roomName);
+            //console.log(this.link()+' spawning a zealot for '+flag.pos.roomName);
             var result = this.createCreep(this.schematic('Zealot'), undefined, { class: 'Zealot', home: this.name, flag: flag.name } );
             if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Zealot', home: this.name, flag: flag.name } ); }
             if (result == OK) { flag.spawned('Zealot'); }
-            console.log('spawn zealot: '+result);
+            //console.log('spawn zealot: '+result);
             return;
         }
     }
@@ -285,14 +285,14 @@ Room.prototype.plan = function() {
             var flag = this.harvest_flags[i];
             var needs = flag.needs();
             if (needs == 'Miner') {
-                console.log(this.link()+' spawning a remote miner for '+flag.pos.roomName);
+                //console.log(this.link()+' spawning a remote miner for '+flag.pos.roomName);
                 var result = this.createCreep(this.schematic('Miner'), undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
                 if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } ); }
                 if (result == OK) { flag.spawned('Miner'); }
                 return;
             }
             if (needs == 'Fetcher') {
-                console.log(this.link()+' spawning a remote fetcher for '+flag.pos.roomName);
+                //console.log(this.link()+' spawning a remote fetcher for '+flag.pos.roomName);
                 var result = this.createCreep(this.schematic('Fetcher'), undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
                 if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } ); }
                 if (result == OK) { flag.spawned('Fetcher'); }
