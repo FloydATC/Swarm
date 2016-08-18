@@ -769,6 +769,7 @@ Creep.prototype.move_to = function(target) {
                 var nexthop = route[0];
                 console.log(this+' will try to reach '+target.pos.roomName+' via '+nexthop.room);
                 this.memory.nexthop = nexthop;
+                this.memory.useexit = null;
             }
         }
         if (this.memory.nexthop && this.memory.nexthop.exit != null) {
