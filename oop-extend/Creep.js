@@ -802,7 +802,7 @@ Creep.prototype.move_to = function(target) {
                     console.log('  search failed');
                 } else {
                     console.log(' navigating towards '+exit.x+','+exit.y);
-                    target = { pos: new RoomPosition(exit.x, exit.y, this.memory.useexit.roomName) };
+                    target = { pos: new RoomPosition(exit.x, exit.y, this.room.name) };
                 }
                 //console.log(this+' dummy target = '+JSON.stringify(target));
                 //console.log(this+' in '+this.room.name+' using exit at '+target.pos);
