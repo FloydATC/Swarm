@@ -65,7 +65,7 @@ module.exports.loop = function() {
         room.execute();
         if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' executed '+room); }
 
-        //room.show_totals();
+        sroom.show_totals();
 
         if (Game.time % 100 == 0) {
             room.expire_routes();
