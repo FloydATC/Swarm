@@ -317,7 +317,10 @@ Creep.prototype.task_hunt = function() {
         //console.log(this.memory.class+' '+this+' hunting hostiles in '+this.room.name);
         // Attack!
         var target = this.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-        if (target != null) {
+        if (target == null) {
+            this.say('Victory!');
+            return;
+        } else {
             if (this.pos.getRangeTo(target) > 3) {
                 if (this.hits < this.hitsMax) { this.heal(this); }// Attempt to heal self
                 this.move_to(target); // Close on target
