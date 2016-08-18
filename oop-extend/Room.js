@@ -564,10 +564,14 @@ Room.prototype.assign_task_claim = function(infectors) {
     while (infectors.length > 0) {
         var infector = infectors.shift();
         infector.say('I infect!');
-        if (this.controller && this.controller.my == false) {
-            infector.say('I can haz');
-            infector.task = 'claim';
-            infector.target = this.controller.id;
+        if (this.controller) {
+            if (this.controller.my == true) {
+                infector.say('Victory!');
+            } else {
+                infector.say('I can haz');
+                infector.task = 'claim';
+                infector.target = this.controller.id;
+            }
         }
     }
 }
