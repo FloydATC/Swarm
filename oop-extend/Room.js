@@ -249,7 +249,7 @@ Room.prototype.plan = function() {
     }
     //console.log(this.link()+' time='+Game.time+' colonize='+(Game.colonize ? 'yes' : 'no')+' request='+(Game.request_drones ? 'yes' : 'no'));
     if (Game.colonize && Game.time % 10 == 0) {
-        if (Game.manhattanDistance(this.name, Game.colonize) <= 2 && Game.rooms[Game.colonize].my == false) {
+        if (Game.manhattanDistance(this.name, Game.colonize) <= 2 && Game.rooms[Game.colonize].controller && Game.rooms[Game.colonize].controller.my == false) {
             console.log(this.link()+' spawning a creep to claim '+Game.colonize);
             var result = this.createCreep([MOVE,CARRY,WORK,CLAIM], undefined, { class: 'Swarmer', destination: Game.colonize });
             return;
@@ -258,7 +258,7 @@ Room.prototype.plan = function() {
         }
     }
     if (Game.request_drones && Game.time % 10 == 0) {
-        if (Game.manhattanDistance(this.name, Game.request_drones) <= 2 && Game.rooms[Game.request_drones].my == true) {
+        if (Game.manhattanDistance(this.name, Game.request_drones) <= 2 && Game.rooms[Game.request_drones].controller && Game.rooms[Game.request_drones].controller.my == true) {
             console.log(this.link()+' spawning a creep to build spawn in '+Game.request_drones);
             var result = this.createCreep(this.schematic('Drone'), undefined, { class: 'Swarmer', destination: Game.request_drones });
             return;
