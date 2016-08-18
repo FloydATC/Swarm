@@ -553,7 +553,6 @@ Room.prototype.assign_task_travel = function(swarmers) {
         if (swarmer.memory.destination == this.name) {
             swarmer.memory.class = 'Infector';
             delete swarmer.memory.destination;
-            infectors.push(swarmer);
         } else {
             swarmer.task = 'travel';
             swarmer.target = swarmer.id; // Dummy target
