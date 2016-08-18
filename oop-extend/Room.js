@@ -102,7 +102,7 @@ Room.prototype.initialize = function() {
 Room.prototype.get_exits = function(direction) {
     var encoded = this.memory.exits[direction];
     var decoded = [];
-    if (encoded = null) { return decoded; }
+    if (encoded == null) { return decoded; }
     for (var i=0; i<encoded.length; i++) {
         var value = encoded.charCodeAt(i);
         decoded.push( { x: value % 50, y: Math.floor(value / 50) } );
