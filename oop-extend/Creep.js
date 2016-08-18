@@ -774,7 +774,7 @@ Creep.prototype.move_to = function(target) {
         }
         if (this.memory.nexthop && this.memory.nexthop.exit != null) {
             //if (this.memory.useexit && this.memory.useexit.roomName != this.room.name) { delete this.memory.useexit; } // Expire
-            if (typeof this.memory.useexit == 'undefined') {
+            //if (typeof this.memory.useexit == 'undefined') {
                 console.log(this+' finding closest exit ('+this.memory.nexthop.exit+') to '+this.memory.nexthop.room+' (EXPENSIVE)');
                 var exits = this.room.get_exits();
                 var exit = null;
@@ -789,18 +789,18 @@ Creep.prototype.move_to = function(target) {
                 //this.room.start_timer('findClosestByPath');
                 //var exit = this.pos.findClosestByPath(this.memory.nexthop.exit);
                 //this.room.stop_timer('findClosestByPath');
-                if (exit == null) {
-                    console.log(this+' in '+this.room.name+' was told to use exit direction '+this.memory.nexthop.exit+' to reach '+this.memory.nexthop.room+' but found no exits');
-                    this.memory.useexit = null;
-                } else {
-                    this.memory.useexit = { x: exit.x, y: exit.y, roomName: exit.roomName };
-                }
-            }
-            if (this.memory.useexit) {
-                target = { pos: new RoomPosition(this.memory.useexit.x, this.memory.useexit.y, this.memory.useexit.roomName) };
+            //    if (exit == null) {
+            //        console.log(this+' in '+this.room.name+' was told to use exit direction '+this.memory.nexthop.exit+' to reach '+this.memory.nexthop.room+' but found no exits');
+            //        this.memory.useexit = null;
+            //    } else {
+            //        this.memory.useexit = { x: exit.x, y: exit.y, roomName: exit.roomName };
+            //    }
+            //}
+            //if (this.memory.useexit) {
+                target = { pos: new RoomPosition(exit.x, exit.y, this.memory.useexit.roomName) };
                 //console.log(this+' dummy target = '+JSON.stringify(target));
                 //console.log(this+' in '+this.room.name+' using exit at '+target.pos);
-            }
+            //}
         }
     } else {
         delete this.memory.nexthop;
