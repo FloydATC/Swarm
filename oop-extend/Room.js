@@ -446,7 +446,7 @@ Room.prototype.calc_spawn_reserves = function() {
     var total_capacity = 0;
     for (var i=0; i<count; i++) {
         total += this.extensions[i].energy;
-        total_capacity += this.containers[i].energyCapacity;
+        total_capacity += this.extensions[i].energyCapacity;
     }
     count = this.spawns.length;
     for (var i=0; i<count; i++) {
