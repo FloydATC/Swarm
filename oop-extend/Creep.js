@@ -559,7 +559,7 @@ Creep.prototype.task_claim = function() {
 }
 
 Creep.prototype.task_travel = function() {
-    var result = this.move_to(new RoomPosition(25, 25, this.memory.destination));
+    var result = this.move_to({ pos: new RoomPosition(25, 25, this.memory.destination)});
     this.memory.tracking = true;
     //console.log(this+' moveTo '+this.memory.destination+' result='+result);
     return;
