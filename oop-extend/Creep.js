@@ -767,50 +767,32 @@ Creep.prototype.move_to = function(target) {
                 return;
             } else {
                 var nexthop = route[0];
-                console.log(this+' will try to reach '+target.pos.roomName+' via '+nexthop.room);
+                //console.log(this+' will try to reach '+target.pos.roomName+' via '+nexthop.room);
                 this.memory.nexthop = nexthop;
-                this.memory.useexit = null;
             }
         }
         if (this.memory.nexthop && this.memory.nexthop.exit != null) {
-            //if (this.memory.useexit && this.memory.useexit.roomName != this.room.name) { delete this.memory.useexit; } // Expire
-            //if (typeof this.memory.useexit == 'undefined') {
-                console.log(this.room.link()+' '+this+' finding closest exit ('+this.memory.nexthop.exit+') to '+this.memory.nexthop.room+' (EXPENSIVE)');
-                var exits = this.room.get_exits(this.memory.nexthop.exit);
-                console.log('  candidates: '+JSON.stringify(exits));
-                var exit = null;
-                var nearest_dist = null;
-                for (var i=0; i<exits.length; i++) {
-                    var distance = this.room.manhattanDistance(this.pos, exits[i]);
-                    if (nearest_dist == null || distance < nearest_dist) {
-                        exit = exits[i];
-                        nearest_dist = distance;
-                    }
+            //console.log(this.room.link()+' '+this+' finding closest exit ('+this.memory.nexthop.exit+') to '+this.memory.nexthop.room+' (EXPENSIVE)');
+            var exits = this.room.get_exits(this.memory.nexthop.exit);
+            //console.log('  candidates: '+JSON.stringify(exits));
+            var exit = null;
+            var nearest_dist = null;
+            for (var i=0; i<exits.length; i++) {
+                var distance = this.room.manhattanDistance(this.pos, exits[i]);
+                if (nearest_dist == null || distance < nearest_dist) {
+                    exit = exits[i];
+                    nearest_dist = distance;
                 }
-                //this.room.start_timer('findClosestByPath');
-                //var exit = this.pos.findClosestByPath(this.memory.nexthop.exit);
-                //this.room.stop_timer('findClosestByPath');
-            //    if (exit == null) {
-            //        console.log(this+' in '+this.room.name+' was told to use exit direction '+this.memory.nexthop.exit+' to reach '+this.memory.nexthop.room+' but found no exits');
-            //        this.memory.useexit = null;
-            //    } else {
-            //        this.memory.useexit = { x: exit.x, y: exit.y, roomName: exit.roomName };
-            //    }
-            //}
-            //if (this.memory.useexit) {
-                if (exit == null) {
-                    console.log('  search failed');
-                } else {
-                    console.log(' navigating towards '+exit.x+','+exit.y);
-                    target = { pos: new RoomPosition(exit.x, exit.y, this.room.name) };
-                }
-                //console.log(this+' dummy target = '+JSON.stringify(target));
-                //console.log(this+' in '+this.room.name+' using exit at '+target.pos);
-            //}
+            }
+            if (exit == null) {
+                //console.log('  search failed');
+            } else {
+                //console.log('  navigating towards '+exit.x+','+exit.y);
+                target = { pos: new RoomPosition(exit.x, exit.y, this.room.name) };
+            }
         }
     } else {
         delete this.memory.nexthop;
-        delete this.memory.useexit;
     }
 
     if (this.pos.roomName == target.pos.roomName) {

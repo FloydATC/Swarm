@@ -101,7 +101,7 @@ Room.prototype.initialize = function() {
 
 Room.prototype.get_exits = function(direction) {
     var encoded = this.memory.exits[direction];
-    console.log(this.link()+' direction '+direction+' encoded exits = '+encoded);
+    //console.log(this.link()+' direction '+direction+' encoded exits = '+encoded);
     var decoded = [];
     if (encoded == null) { return decoded; }
     for (var i=0; i<encoded.length; i++) {
