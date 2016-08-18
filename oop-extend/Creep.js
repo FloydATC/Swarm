@@ -840,9 +840,9 @@ Creep.prototype.move_to = function(target) {
         //if (result != OK) { console.log(this+' learn path returned '+result); }
     } else {
         //console.log(this.memory.class+' '+this+' ('+this.memory.task.type+') calculating NON-CACHEABLE path to '+target.pos+' (EXPENSIVE)');
-        this.room.start_timer('moveTo');
+        this.room.start_timer('moveTo(*)');
         this.moveTo(target, { ignoreCreeps: false } );
-        this.room.stop_timer('moveTo');
+        this.room.stop_timer('moveTo(*)');
     }
 }
 
