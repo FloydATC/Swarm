@@ -72,7 +72,7 @@ Room.prototype.initialize = function() {
     }
 
     // Record exits if not already done (Store in encoded format)
-    if (true || typeof this.memory.exits == 'undefined') {
+    if (typeof this.memory.exits == 'undefined') {
         this.memory.exits = {};
         var directions = [ FIND_EXIT_TOP, FIND_EXIT_LEFT, FIND_EXIT_BOTTOM, FIND_EXIT_RIGHT ];
         for (var i in directions) {
@@ -101,6 +101,7 @@ Room.prototype.initialize = function() {
 
 Room.prototype.get_exits = function(direction) {
     var encoded = this.memory.exits[direction];
+    console.log(this.link()+' direction '+direction+' encoded exits = '+encoded);
     var decoded = [];
     if (encoded == null) { return decoded; }
     for (var i=0; i<encoded.length; i++) {
