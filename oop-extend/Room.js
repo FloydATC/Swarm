@@ -562,6 +562,7 @@ Room.prototype.assign_task_travel = function(swarmers) {
 
 Room.prototype.assign_task_claim = function(infectors) {
     while (infectors.length > 0) {
+        this.say('I infect!');
         var infector = infectors.shift();
         if (this.controller && this.controller.my == false) {
             infector.say('I can haz');
