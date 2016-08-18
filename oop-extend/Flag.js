@@ -78,7 +78,7 @@ module.exports = {
             var count = this.worker_count(c);
             //console.log(this+' spawn '+c+' have='+count+' want='+minimum);
             if (count < minimum || (count == minimum && this.worker_lowest_ttl(c) < this.memory.lead_time)) {
-                console.log(this.pos.roomName+' '+this+' needs a '+c);
+                //console.log(this.pos.roomName+' '+this+' needs a '+c);
                 return c;
             }
         }

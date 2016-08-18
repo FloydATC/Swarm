@@ -216,7 +216,7 @@ Room.prototype.plan = function() {
             var flag = this.source_flags[i];
             var needs = flag.needs();
             if (needs == 'Miner') {
-                console.log(this.link()+' spawning a local miner for '+flag.pos.roomName);
+                //console.log(this.link()+' spawning a local miner for '+flag.pos.roomName);
                 var result = this.createCreep(this.schematic('Miner'), undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } );
                 if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } ); }
                 if (result == OK) { flag.spawned('Miner'); }
