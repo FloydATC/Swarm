@@ -254,7 +254,7 @@ Room.prototype.plan = function() {
             var result = this.createCreep([MOVE,CARRY,WORK,CLAIM], undefined, { class: 'Swarmer', destination: Game.colonize });
             return;
         } else {
-            console.log(this.link()+' would like to help but, gee, '+Game.colonize+' is awfully far away'+Game.manhattanDistance(this.name, Game.colonize));
+            console.log(this.link()+' would like to help colonize but, gee, '+Game.colonize+' is awfully far away: '+Game.manhattanDistance(this.name, Game.colonize));
         }
     }
     if (Game.request_drones && Game.time % 10 == 0) {
@@ -263,7 +263,7 @@ Room.prototype.plan = function() {
             var result = this.createCreep(this.schematic('Drone'), undefined, { class: 'Swarmer', destination: Game.request_drones });
             return;
         } else {
-            console.log(this.link()+' would like to help but, gee, '+Game.request_drones+' is awfully far away: '+Game.manhattanDistance(this.name, Game.request_drones));
+            console.log(this.link()+' would like to help build but, gee, '+Game.request_drones+' is awfully far away: '+Game.manhattanDistance(this.name, Game.request_drones));
         }
     }
     if (this.controller && this.controller.flag) {
