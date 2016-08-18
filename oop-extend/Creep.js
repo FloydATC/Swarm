@@ -767,14 +767,15 @@ Creep.prototype.move_to = function(target) {
                 return;
             } else {
                 var nexthop = route[0];
-                //console.log(this+' will try to reach '+target.pos.roomName+' via '+nexthop.room);
+                console.log(this+' will try to reach '+target.pos.roomName+' via '+nexthop.room);
                 this.memory.nexthop = nexthop;
             }
         }
         if (this.memory.nexthop && this.memory.nexthop.exit != null) {
             if (this.memory.useexit && this.memory.useexit.roomName != this.room.name) { delete this.memory.useexit; } // Expire
             if (typeof this.memory.useexit == 'undefined') {
-                //console.log(this+' finding closest exit to '+this.memory.nexthop.room+' (EXPENSIVE)');
+                console.log(this+' finding closest exit to '+this.memory.nexthop.room+' (EXPENSIVE)');
+                console.log('  '+JSON.stringify(this.memory.nexthop.exit));
                 this.room.start_timer('findClosestByPath');
                 var exit = this.pos.findClosestByPath(this.memory.nexthop.exit);
                 this.room.stop_timer('findClosestByPath');
