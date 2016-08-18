@@ -314,6 +314,7 @@ Creep.prototype.is_harmless = function() {
 Creep.prototype.task_hunt = function() {
     this.memory.tracking = false;
     if (this.memory.destination == this.room.name) {
+        delete this.memory.destination;
         //console.log(this.memory.class+' '+this+' hunting hostiles in '+this.room.name);
         // Attack!
         var target = this.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
