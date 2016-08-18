@@ -569,7 +569,6 @@ Room.prototype.assign_task_claim = function(infectors) {
             infector.target = this.controller.id;
         } else {
             infector.memory.class = 'Drone';
-            drones.push(infector);
         }
     }
 }
