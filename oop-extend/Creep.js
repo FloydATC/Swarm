@@ -318,11 +318,11 @@ Creep.prototype.task_hunt = function() {
         // Attack!
         var target = this.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
         if (target != null) {
-            if (this.pos.getRangeTo(target) > 1) {
+            if (this.pos.getRangeTo(target) > 3) {
                 if (this.hits < this.hitsMax) { this.heal(this); }// Attempt to heal self
                 this.move_to(target); // Close on target
             } else {
-                this.attack(target);
+                this.rangedAttack(target);
             }
         }
     } else {
