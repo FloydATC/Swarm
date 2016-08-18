@@ -253,6 +253,8 @@ Room.prototype.plan = function() {
             console.log(this.link()+' spawning a creep to claim '+Game.colonize);
             var result = this.createCreep([MOVE,CARRY,WORK,CLAIM], undefined, { class: 'Swarmer', destination: Game.colonize });
             return;
+        } else {
+            console.log(this.link()+' would like to help but gee '+Game.colonize+' is awfully far away');
         }
     }
     if (Game.request_drones && Game.time % 100 == 0) {
@@ -260,6 +262,8 @@ Room.prototype.plan = function() {
             console.log(this.link()+' spawning a creep to build spawn in '+Game.request_drones);
             var result = this.createCreep(this.schematic('Drone'), undefined, { class: 'Swarmer', destination: Game.request_drones });
             return;
+        } else {
+            console.log(this.link()+' would like to help but gee '+Game.request_drones+' is awfully far away');
         }
     }
     if (this.controller && this.controller.flag) {
