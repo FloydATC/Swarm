@@ -254,14 +254,15 @@ Creep.prototype.get_energy = function() {
         if (source instanceof Source) {
             var used_slots = source.used_slots || 0;
             var free_slots = source.slots.length - used_slots + 1; // Reserve space for one dedicated miner
-            if (free_slots < 1) { continue; } // Not enough left for me
-            source.used_slots = used_slots + 1;
             if (this.pos.inRangeTo(source, 1)) {
                 this.harvest(source);
                 this.memory.tracking = true;
+                source.used_slots = used_slots + 1; // Already AT the source = I have this slot.
             } else {
+                if (free_slots < 1) { continue; } // Not enough left for me anyway
                 this.move_to(source);
                 this.memory.tracking = false;
+                source.used_slots = used_slots + 1;
             }
             return;
         }
