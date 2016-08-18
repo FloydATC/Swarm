@@ -772,12 +772,22 @@ Creep.prototype.move_to = function(target) {
             }
         }
         if (this.memory.nexthop && this.memory.nexthop.exit != null) {
-            if (this.memory.useexit && this.memory.useexit.roomName != this.room.name) { delete this.memory.useexit; } // Expire
+            //if (this.memory.useexit && this.memory.useexit.roomName != this.room.name) { delete this.memory.useexit; } // Expire
             if (typeof this.memory.useexit == 'undefined') {
                 console.log(this+' finding closest exit ('+this.memory.nexthop.exit+') to '+this.memory.nexthop.room+' (EXPENSIVE)');
-                this.room.start_timer('findClosestByPath');
-                var exit = this.pos.findClosestByPath(this.memory.nexthop.exit);
-                this.room.stop_timer('findClosestByPath');
+                var exits = this.room.get_exits();
+                var exit = null;
+                var nearest_dist = null;
+                for (var i=0; i<exits.length; i++) {
+                    var distance = this.room.manhattanDistance(this.pos, exits[i]);
+                    if (nearest_dist == null || distance < nearest_dist) {
+                        exit = exits[i];
+                        nearest_dist = distance;
+                    }
+                }
+                //this.room.start_timer('findClosestByPath');
+                //var exit = this.pos.findClosestByPath(this.memory.nexthop.exit);
+                //this.room.stop_timer('findClosestByPath');
                 if (exit == null) {
                     console.log(this+' in '+this.room.name+' was told to use exit direction '+this.memory.nexthop.exit+' to reach '+this.memory.nexthop.room+' but found no exits');
                 } else {

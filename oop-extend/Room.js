@@ -71,17 +71,20 @@ Room.prototype.initialize = function() {
         }
     }
 
-    // Record exits if not already done
+    // Record exits if not already done (Store in encoded format)
     if (!this.memory.exits) {
         this.memory.exits = {};
         var directions = [ FIND_EXIT_TOP, FIND_EXIT_LEFT, FIND_EXIT_BOTTOM, FIND_EXIT_RIGHT ];
         for (var i in directions) {
             var direction = directions[i];
             var exits = this.find(direction);
+            var encoded = '';
             for (var j in exits) {
                 var exit = exits[j];
-                console.log(this.link()+' exit dir '+direction+' no '+j+' = '+JSON.stringify(exit));
+                //console.log(this.link()+' exit dir '+direction+' no '+j+' = '+JSON.stringify(exit));
+                encoded = encoded + String.fromCharCode(exit.x + (50 * exit.y));
             }
+            this.memory.exits[direction] = encoded;
         }
     }
 
@@ -94,6 +97,20 @@ Room.prototype.initialize = function() {
     for (var i=0; i<this.containers.length; i++) { this.containers[i].initialize(); } // Note: Includes storage
 
     this.containers = this.containers.sort( function(a,b) { return a.free - b.free; } ); // Note: Must initialize before sorting
+}
+
+Room.prototype.get_exits = function(direction) {
+    var encoded = this.memory.exits[direction];
+    var decoded = [];
+    for (var i=0; i<encoded.length; i++) {
+        var value = encoded.charCodeAt(i);
+        decoded.push( { x: value % 50, y: Math.floor(value / 50) } );
+    }
+    return decoded;
+}
+
+Room.prototype.manhattanDistance = function(p1, p2) {
+    return Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
 }
 
 Room.prototype.plan = function() {
