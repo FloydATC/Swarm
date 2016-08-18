@@ -403,6 +403,7 @@ Creep.prototype.recall = function(label) {
 
 Creep.prototype.task_mine = function() {
     var flag = Game.flags[this.memory.flag];
+    if (flag == null) { this.memory.class = 'Drone'; return; }
     flag.assign_worker(this); // Check in with flag
     this.memory.tracking = true;
     // In the right room yet?
