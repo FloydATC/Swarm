@@ -80,10 +80,10 @@ Creep.prototype.execute = function() {
     //this.say(this.task);
     // For debugging, place task+target in memory as human readable strings
     // For sticky targeting we must keep track of how much time has been invested
-    if (typeof this.memory.task == 'object' && this.memory.task.type == this.task && this.memory.task.target == target.toString()) {
+    var target_str = (target != null ? target.toString() : '(null)');
+    if (typeof this.memory.task == 'object' && this.memory.task.type == this.task && this.memory.task.target == target_str) {
         this.memory.task.ticks = (this.memory.task.ticks + 1) || 1;
     } else {
-        var target_str = (target != null ? target.toString() : '(null)');
         this.memory.task = { type: this.task, target: target_str, ticks: 0 };
     }
 
