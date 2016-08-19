@@ -95,12 +95,12 @@ Routingtable.prototype.expand_binary = function() {
                 this.binary_expanded = this.binary_expanded + String.fromCharCode(addr | (code2 && 0xf000));
             }
             //this.binary_expanded = this.binary_expanded.substring(0,addr1)+(String.fromCharCode(dir)).repeat(addr2-addr1)+this.binary_expanded.substring(addr2+1);
-            //this.binary_debug = this.binary_debug + addr1 + '-' + addr2 + '=' + dir + ';';
+            this.binary_debug = this.binary_debug + addr1 + '-' + addr2 + '=' + dir + ';';
         } else {
             // Single address
             this.binary_expanded = this.binary_expanded + code1;
             //this.binary_expanded = this.binary_expanded.substring(0,addr1)+String.fromCharCode(dir)+this.binary_expanded.substring(addr1+1);
-            //this.binary_debug = this.binary_debug + addr1 + '=' + dir + ';';
+            this.binary_debug = this.binary_debug + addr1 + '=' + dir + ';';
         }
 
     }
