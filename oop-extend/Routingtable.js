@@ -4,7 +4,6 @@ function Routingtable(table) {
                                     // Range from(12 bits)+0x1111+to(12 bits)+dir(4 bits)
     //console.log(this+' load as binary string (length='+this.binary_table.length+')');
     this.binary_expanded = null;
-    this.expand_binary(); // FIXME! DEBUG
 }
 
 // Each room tile may have a single routing table
