@@ -64,6 +64,7 @@ Routingtable.prototype.getDirectionTo = function(address) {
         }
         return null; // Address not in table
     }
+    /*
     var a = address * 1;
     if (typeof this.table == 'undefined') { return null; }
     var routes = this.table.split(',');
@@ -84,6 +85,7 @@ Routingtable.prototype.getDirectionTo = function(address) {
             if (a2 > a) { return null; }
         }
     }
+    */
 }
 
 Routingtable.prototype.setDirectionTo = function(address, direction) {
@@ -93,6 +95,7 @@ Routingtable.prototype.setDirectionTo = function(address, direction) {
         this.binary_expanded = this.binary_expanded.substring(0,address)+String.fromCharCode(direction)+this.binary_expanded.substring(address+1);
         return;
     }
+    /*
     var a = address * 1;
     // Expand routing table while maintaining sort order
     if (this.expanded == null) {
@@ -137,7 +140,7 @@ Routingtable.prototype.setDirectionTo = function(address, direction) {
         // Update/insertion point not reached, append new entry
         this.expanded.push(address+'='+direction);
     }
-
+    */
 }
 
 Routingtable.prototype.compress = function() {
@@ -216,6 +219,7 @@ Routingtable.prototype.compress_binary = function() {
 }
 
 Routingtable.prototype.add_span = function(addr1, addr2, dir) {
+    if (dir == 0) { return; } // Do not store 0 (unknown) direction
     if (addr2 == null) {
         // Single address
         var code = dir<<24;
