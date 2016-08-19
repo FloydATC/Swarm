@@ -44,13 +44,13 @@ Routingtable.prototype.getDirectionTo = function(address) {
         var addr1 = code1 & 0x0000111111111111;
         console.log('  found '+addr1);
         if (addr1 > address) { return null; } // Address not in table
-        var dir = code1>>24;
+        var dir = code1>>12;
         if (dir == 0x1111) {
             // Range
             var code2 = table.charCodeAt(i++);
             var addr2 = code2 & 0x0000111111111111;
             console.log('  spans to '+addr2);
-            dir = code2>>24;
+            dir = code2>>12;
             if (addr1 <= address && addr2 >= address) { return dir; } // Range match found
         } else {
             // Single address
@@ -77,13 +77,13 @@ Routingtable.prototype.expand_binary = function() {
     for (var i=0; i<table.length; i++) {
         var code1 = table.charCodeAt(i);
         var addr1 = code1 & 0x0000111111111111;
-        var dir = code1>>24;
+        var dir = code1>>12;
         console.log('code '+code1+' contains direction '+dir);
         if (dir == 0x1111) {
             // Range
             var code2 = table.charCodeAt(i++);
             var addr2 = code2 & 0x0000111111111111;
-            dir = code2>>24;
+            dir = code2>>12;
             this.binary_expanded = this.binary_expanded.substring(0,addr1)+(String.fromCharCode(dir)).repeat(addr2-addr1)+this.binary_expanded.substring(addr2+1);
             this.binary_debug = this.binary_debug + addr1 + '-' + addr2 + '=' + dir + ';';
         } else {
@@ -119,7 +119,7 @@ Routingtable.prototype.add_span = function(addr1, addr2, dir) {
     if (dir == 0) { return; } // Do not store 0 (unknown) direction
     if (addr2 == null) {
         // Single address
-        var code = dir<<24;
+        var code = dir<<12;
         this.binary_table = this.binary_table + String.fromCharCode(addr1 | code);
         this.binary_debug = this.binary_debug + addr1+'='+dir+';';
     } else {
