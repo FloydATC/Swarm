@@ -4,6 +4,7 @@ function Routingtable(table) {
                                     // Range from(12 bits)+0x1111+to(12 bits)+dir(4 bits)
     console.log(this+' load as binary string: '+this.binary_table.toString('hex')+' (length='+this.binary_table.length+')');
     this.binary_expanded = null;
+    this.expand_binary(); // FIXME! DEBUG
 }
 
 // Each room tile may have a single routing table
@@ -46,19 +47,19 @@ Routingtable.prototype.getDirectionTo = function(address) {
     for (var i=0; i<table.length; i++) {
         var code1 = table.charCodeAt(i);
         var addr1 = code1 & 0x0000111111111111;
-        //console.log('  found '+addr1);
+        console.log('  found '+addr1);
         if (addr1 > address) { return null; } // Address not in table
         var dir = code1>>24;
         if (dir == 0x1111) {
             // Range
             var code2 = table.charCodeAt(i++);
             var addr2 = code2 & 0x0000111111111111;
-            //console.log('  spans to '+addr2);
+            console.log('  spans to '+addr2);
             dir = code2>>24;
             if (addr1 <= address && addr2 >= address) { return dir; } // Range match found
         } else {
             // Single address
-            //console.log('  single address');
+            console.log('  single address');
             if (addr1 == address) { return dir; } // Address match found
         }
     }
