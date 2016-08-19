@@ -70,6 +70,7 @@ Routingtable.prototype.setDirectionTo = function(address, direction) {
     for (var i=0; i<this.binary_expanded.length; i++) {
         var code = this.binary_expanded.charCodeAt(i);
         var addr = code & 0x0fff;
+        console.log('offset '+i+' addr='+addr);
         if (addr == address) {
             console.log('overwrite offset '+i);
             this.binary_expanded = this.binary_expanded.substring(0,i) + String.fromCharCode(address | newcode) + this.binary_expanded.substring(i+1);
