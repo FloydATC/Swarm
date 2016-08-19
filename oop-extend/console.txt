@@ -6,10 +6,10 @@
 for (var name in Memory.rooms) { var keys = Object.keys(Memory.rooms[name]); if (keys.length == 0) { delete Memory.rooms[name]; } }
 
 // Clear routing tables for all rooms
-for (var name in Memory.rooms) { delete Memory.rooms[name].router; }
+for (var name in Memory.rooms) { delete Memory.rooms[name].r; }
 
 // Clear routing tables for a single room
-delete Memory.rooms['E27N38'].router;
+delete Memory.rooms['E27N38'].r;
 
 // Clear voting tables for all rooms
 for (var name in Memory.rooms) { delete Memory.rooms[name].votes; }
