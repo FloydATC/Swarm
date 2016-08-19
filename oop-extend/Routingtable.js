@@ -38,6 +38,7 @@ Routingtable.prototype.asString = function() {
 
 Routingtable.prototype.asBinaryString = function() {
     this.compress_binary();
+    console.log(this+' as binary string: '+this.binary_table+' (length='+this.binary_table.length+')');
     return this.binary_table;
 }
 
