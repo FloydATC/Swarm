@@ -40,14 +40,14 @@ Routingtable.prototype.getDirectionTo = function(address) {
     var table = this.binary_table;
     for (var i=0; i<table.length; i++) {
         var code1 = table.charCodeAt(i);
-        var addr1 = code1 & 0x0000111111111111;
+        var addr1 = code1 & 0x0fff;
         console.log('  found '+addr1);
         if (addr1 > address) { return null; } // Address not in table
         var dir = code1>>12;
-        if (dir == 0x1111) {
+        if (dir == 0x0f) {
             // Range
             var code2 = table.charCodeAt(i++);
-            var addr2 = code2 & 0x0000111111111111;
+            var addr2 = code2 & 0x0fff;
             console.log('  spans to '+addr2);
             dir = code2>>12;
             if (addr1 <= address && addr2 >= address) { return dir; } // Range match found
@@ -75,13 +75,13 @@ Routingtable.prototype.expand_binary = function() {
     var table = this.binary_table;
     for (var i=0; i<table.length; i++) {
         var code1 = table.charCodeAt(i);
-        var addr1 = code1 & 0x0000111111111111;
+        var addr1 = code1 & 0x0fff;
         var dir = code1>>12;
         console.log('code '+code1+' contains address '+addr1+' direction '+dir);
-        if (dir == 0x1111) {
+        if (dir == 0x0f) {
             // Range
             var code2 = table.charCodeAt(i++);
-            var addr2 = code2 & 0x0000111111111111;
+            var addr2 = code2 & 0x0fff;
             dir = code2>>12;
             this.binary_expanded = this.binary_expanded.substring(0,addr1)+(String.fromCharCode(dir)).repeat(addr2-addr1)+this.binary_expanded.substring(addr2+1);
             this.binary_debug = this.binary_debug + addr1 + '-' + addr2 + '=' + dir + ';';
@@ -124,7 +124,7 @@ Routingtable.prototype.add_span = function(addr1, addr2, dir) {
         this.binary_debug = this.binary_debug + addr1+'='+dir+';';
     } else {
         // Address range
-        this.binary_table = this.binary_table + String.fromCharCode(addr1 | 0x1111000000000000) + String.fromCharCode(addr2 | code);
+        this.binary_table = this.binary_table + String.fromCharCode(addr1 | 0xf000) + String.fromCharCode(addr2 | code);
         this.binary_debug = this.binary_debug + addr1+'-'+addr2+'='+dir+';';
     }
 }
