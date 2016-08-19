@@ -89,10 +89,11 @@ Routingtable.prototype.setDirectionTo = function(address, direction) {
     if (this.getDirectionTo(address) == direction) { return; } // No change
     if (!_.isString(address)) {
         if (this.binary_expanded == null) { this.expand_binary(); }
-        console.log('PRE= '+this.binary_expanded+' (length='+this.binary_expanded.length+')');
+        console.log('PRE= '+this.binary_expanded.charCodeAt(address));
         console.log(this+' learned address='+address+' direction='+direction);
         this.binary_expanded = this.binary_expanded.substring(0,address)+String.fromCharCode(direction)+this.binary_expanded.substring(address+1);
-        console.log('POST='+this.binary_expanded+' (length='+this.binary_expanded.length+')');
+        console.log('POST='+this.binary_expanded.charCodeAt(address));
+
         return;
     }
     var a = address * 1;
