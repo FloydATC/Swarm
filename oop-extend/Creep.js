@@ -200,7 +200,7 @@ Creep.prototype.get_energy = function() {
 
     // Consider fetching energy from a container
     //console.log(this+' considers fetching energy from a container');
-    if (this.task != 'upgrade' && this.task != 'stockpile') {
+    if (this.task != 'stockpile') {
         var containers = this.room.containers.slice();
         while (containers.length > 0) {
             var container = this.shift_nearest(containers);
