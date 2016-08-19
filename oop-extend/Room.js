@@ -844,12 +844,12 @@ Room.prototype.get_direction = function(src, dst) {
     var pos1 = ('0'+src.x).slice(-2) + ('0'+src.y).slice(-2); // Format as XXYY
     //var pos2 = ('0'+dst.x).slice(-2) + ('0'+dst.y).slice(-2); // Format as XXYY
     //console.log('???:'+pos1+'-'+pos2);
-    if (!this.memory.router) { return null; }
-    if (!this.memory.router[pos1]) { return null; }
+    if (!this.memory.r) { return null; }
+    if (!this.memory.r[pos1]) { return null; }
     //if (!this.memory.router[pos1][pos2]) { return null; }
     //var direction = this.memory.router[pos1][pos2];
-    this.memory.router[pos1]['mru'] = Game.time;
-    var table = new Routingtable(this.memory.router[pos1]['table'], true);
+    this.memory.r[pos1]['mru'] = Game.time;
+    var table = new Routingtable(this.memory.r[pos1]['table']);
     var direction = table.getDirectionTo(src.x + (50 * src.y));
     //console.log('HIT:'+pos1+'-'+pos2+'='+direction);
     return direction;
