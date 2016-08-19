@@ -102,7 +102,7 @@ Routingtable.prototype.expand_binary = function() {
             var addr2 = code2 & 0x0fff;
             dir = code2>>12;
             for (var addr=addr1; addr<=addr2; addr++) {
-                this.binary_expanded = this.binary_expanded + String.fromCharCode(addr | (code2 && 0xf000));
+                this.binary_expanded = this.binary_expanded + String.fromCharCode(addr | (code2 & 0xf000));
             }
             //this.binary_expanded = this.binary_expanded.substring(0,addr1)+(String.fromCharCode(dir)).repeat(addr2-addr1)+this.binary_expanded.substring(addr2+1);
             this.binary_debug = this.binary_debug + addr1 + '-' + addr2 + '=' + dir + ';';
