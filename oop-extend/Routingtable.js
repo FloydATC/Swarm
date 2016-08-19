@@ -82,7 +82,7 @@ Routingtable.prototype.setDirectionTo = function(address, direction) {
             return;
         }
     }
-    console.log('append');
+    console.log('append...');
     this.binary_expanded = this.binary_expanded + String.fromCharCode(address | newcode);
     return;
 }
