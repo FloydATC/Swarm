@@ -32,6 +32,9 @@ Room.prototype.initialize = function() {
     this.memory.hostiles = this.hostile_creeps.length;
     this.memory.scanned = Game.time;
 
+    // Neighbor room route cache
+    if (typeof this.memory.to == 'undefined') { this.memory.to = {}; }
+
     // Owned room?
     if (this.controller && this.controller.my) {
         // There should be a flag on the controller to coordinate the upgrading efforts
@@ -897,7 +900,6 @@ Room.prototype.show_totals = function() {
 }
 
 Room.prototype.direction_to_room = function(name) {
-    if (typeof this.memory.to == 'undefined') { this.memory.to = {}; }
     var entry = this.memory.to[name];
     if (entry != null && entry.at > Game.time - 1000) {
         //console.log(this.link()+' used room route cache entry for '+name);
