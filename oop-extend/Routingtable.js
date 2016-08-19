@@ -89,9 +89,9 @@ Routingtable.prototype.setDirectionTo = function(address, direction) {
     if (this.getDirectionTo(address) == direction) { return; } // No change
     if (!_.isString(address)) {
         if (this.binary_expanded == null) { this.expand_binary(); }
-        console.log('PRE= '+this.binary_expanded);
+        //console.log('PRE= '+this.binary_expanded);
         this.binary_expanded = this.binary_expanded.substring(0,address)+String.fromCharCode(direction)+this.binary_expanded.substring(address+1);
-        console.log('POST='+this.binary_expanded);
+        //console.log('POST='+this.binary_expanded);
         return;
     }
     var a = address * 1;
@@ -179,6 +179,7 @@ Routingtable.prototype.compress = function() {
 
 Routingtable.prototype.expand_binary = function() {
     this.binary_expanded = String.fromCharCode(0).repeat(2500); // Skeleton
+    console.log('Skeleton='+this.binary_expanded);
     var table = this.binary_table;
     for (var i=0; i<table.length; i++) {
         var code1 = table.charCodeAt(i);
