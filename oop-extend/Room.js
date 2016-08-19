@@ -96,7 +96,7 @@ Room.prototype.initialize = function() {
     for (var i=0; i<this.spawns.length; i++) { this.spawns[i].initialize(); }
     for (var i=0; i<this.containers.length; i++) { this.containers[i].initialize(); } // Note: Includes storage
 
-    console.log(this.link()+' containers: '+this.containers);
+    //console.log(this.link()+' containers: '+this.containers);
     this.containers = this.containers.sort( function(a,b) { return a.free - b.free; } ); // Note: Must initialize before sorting
 }
 
@@ -123,7 +123,7 @@ Room.prototype.plan = function() {
     var links = this.links.slice();
     var drops = this.dropped_other.slice();
     var extensions = this.extensions;
-    var containers = this.containers.reverse(); // 3 with least energy
+    var containers = this.containers.slice().reverse(); // 3 with least energy
     var my_creeps = this.my_creeps.slice(); // All classes
     var hostile_creeps = this.hostile_creeps.slice();
     var csites = this.construction_sites.slice(0,2); // Max 3 at a time
