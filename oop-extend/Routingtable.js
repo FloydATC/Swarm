@@ -181,7 +181,7 @@ Routingtable.prototype.expand_binary = function() {
     var zero = String.fromCharCode(0);
     console.log('Zero="'+zero+'" (length='+zero.length+')');
     this.binary_expanded = (String.fromCharCode(0)).repeat(2500); // Skeleton
-    console.log('Skeleton='+this.binary_expanded);
+    console.log('Skeleton='+this.binary_expanded+' (length='+this.binary_expanded.length+')');
     var table = this.binary_table;
     for (var i=0; i<table.length; i++) {
         var code1 = table.charCodeAt(i);
