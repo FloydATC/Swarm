@@ -33,7 +33,7 @@ Room.prototype.initialize = function() {
     this.memory.scanned = Game.time;
 
     // Neighbor room route cache
-    if (true || typeof this.memory.to == 'undefined') { this.memory.to = {}; }
+    if (typeof this.memory.to == 'undefined') { this.memory.to = {}; }
 
     // Owned room?
     if (this.controller && this.controller.my) {
