@@ -18,7 +18,7 @@ Room.prototype.initialize = function() {
     this.containers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_STORAGE; } });
     this.construction_sites = this.find(FIND_CONSTRUCTION_SITES).sort( function(a,b) { return b.progress - a.progress; } ); // Nearest completion first
     var ambition = this.hp_ambition();
-    this.need_repairs = this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits && s.hits < ambition && s.hits < s.hitsMax; } }).sort( function(a,b) { return a.hits - b.hits || a.id.localeCompare(b.id); } ); // Most urgent first
+    this.need_repairs = this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits && s.hits < ambition && s.hits < s.hitsMax; } }).sort( function(a,b) { return (a.hits - b.hits) || (a.ticksToDecay - b.ticksToDecay); } ); // Most urgent first
 
     this.timer = {}; // Used by .start_timer() and .stop_timer()
     this.total = {}; // Accumulated timers, used by .show_totals()
