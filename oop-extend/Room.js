@@ -767,6 +767,7 @@ Room.prototype.assign_task_repair = function(drones, need_repairs){
                 need_repairs = [];
                 break;
             } // Only one
+            console.log('inner loop end');
         }
         if (typeof drone.task == 'undefined') {
             // No structures need repair
@@ -774,6 +775,7 @@ Room.prototype.assign_task_repair = function(drones, need_repairs){
             drones.push(drone);
             break;
         }
+        console.log('outer loop end');
     }
 }
 
