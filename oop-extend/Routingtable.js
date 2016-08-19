@@ -35,6 +35,7 @@ Routingtable.prototype.asString = function() {
 Routingtable.prototype.asBinaryString = function() {
     this.compress_binary();
     console.log(this+' save as binary string: '+this.binary_table.toString('hex')+' (length='+this.binary_table.length+')');
+    console.log('  '+this.binary_debug);
     return this.binary_table;
 }
 
@@ -178,6 +179,7 @@ Routingtable.prototype.expand_binary = function() {
 
 Routingtable.prototype.compress_binary = function() {
     this.binary_table = '';
+    this.binary_debug = '';
     if (this.binary_expanded == null) { return; }
     var span_a1 = null;
     var span_a2 = null;
@@ -200,9 +202,11 @@ Routingtable.prototype.add_span = function(addr1, addr2, dir) {
         // Single address
         var code = dir<<24;
         this.binary_table = this.binary_table + String.fromCharCode(addr1 | code);
+        this.binary_debug = this.binary_debug + addr1+'='+dir+';';
     } else {
         // Address range
         this.binary_table = this.binary_table + String.fromCharCode(addr1 | 0x1111000000000000) + String.fromCharCode(addr2 | code);
+        this.binary_debug = this.binary_debug + addr1+'-'+addr2+'='+dir+';';
     }
 }
 
