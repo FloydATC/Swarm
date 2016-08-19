@@ -30,7 +30,7 @@ function Routingtable(table) {
 
 Routingtable.prototype.asBinaryString = function() {
     this.compress_binary();
-    console.log(this+' save as binary string (length='+this.binary_table.length+')');
+    //console.log(this+' save as binary string (length='+this.binary_table.length+')');
     return this.binary_table;
 }
 
