@@ -108,7 +108,7 @@ Routingtable.prototype.compress_binary = function() {
     for (var addr=0; addr<2500; addr++) {
         var dir = this.binary_expanded[addr];
         if (dir == null) {
-            this.add_span(span_a1, span_a2, span_dir);
+            if (span_dir != null) { this.add_span(span_a1, span_a2, span_dir); }
             span_a1 = null; span_a2 = null; span_dir = null; continue;
         }
         if (span_dir == null) { span_a1 = addr; span_dir = dir; continue; }
