@@ -769,6 +769,7 @@ Room.prototype.assign_task_repair = function(drones, need_repairs){
         }
         if (typeof drone.task == 'undefined') {
             // No structures need repair
+            console.log(this.name+' pushed back on the stack');
             drones.push(drone);
             break;
         }
