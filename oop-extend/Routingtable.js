@@ -2,6 +2,7 @@
 function Routingtable(table) {
 //    if (binary == true) {
         this.binary_table = table || ''; // Unicode packed table. Single address(12 bits)+dir(4 bits) or
+        console.log(this+' load as binary string: '+this.binary_table+' (length='+this.binary_table.length+')');
 //    } else {
 //        this.table = table; // E.g '0703-0708=1,0815=2'. MUST always be in sort order!
 //    }
@@ -38,7 +39,7 @@ Routingtable.prototype.asString = function() {
 
 Routingtable.prototype.asBinaryString = function() {
     this.compress_binary();
-    console.log(this+' as binary string: '+this.binary_table+' (length='+this.binary_table.length+')');
+    console.log(this+' save as binary string: '+this.binary_table+' (length='+this.binary_table.length+')');
     return this.binary_table;
 }
 
