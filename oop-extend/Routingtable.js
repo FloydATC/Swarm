@@ -34,8 +34,8 @@ Routingtable.prototype.asString = function() {
 
 Routingtable.prototype.asBinaryString = function() {
     this.compress_binary();
-    console.log(this+' save as binary string: '+this.binary_table.toString('hex')+' (length='+this.binary_table.length+')');
-    console.log('  '+this.binary_debug);
+    //console.log(this+' save as binary string: '+this.binary_table.toString('hex')+' (length='+this.binary_table.length+')');
+    //console.log('  '+this.binary_debug);
     return this.binary_table;
 }
 
@@ -158,6 +158,7 @@ Routingtable.prototype.compress = function() {
 
 Routingtable.prototype.expand_binary = function() {
     this.binary_expanded = (String.fromCharCode(0)).repeat(2500); // Skeleton
+    this.binary_debug = '';
     var table = this.binary_table;
     for (var i=0; i<table.length; i++) {
         var code1 = table.charCodeAt(i);
@@ -169,12 +170,15 @@ Routingtable.prototype.expand_binary = function() {
             var addr2 = code2 & 0x0000111111111111;
             dir = code2>>24;
             this.binary_expanded = this.binary_expanded.substring(0,addr1)+(String.fromCharCode(dir)).repeat(addr2-addr1)+this.binary_expanded.substring(addr2+1);
+            this.binary_debug = this.binary_debug + addr1 + '-' + addr2 + '=' + dir + ';';
         } else {
             // Single address
             this.binary_expanded = this.binary_expanded.substring(0,addr1)+String.fromCharCode(dir)+this.binary_expanded.substring(addr1+1);
+            this.binary_debug = this.binary_debug + addr1 + '=' + dir + ';';
         }
 
     }
+    console.log('Expanded '+this.binary_debug);
 }
 
 Routingtable.prototype.compress_binary = function() {
