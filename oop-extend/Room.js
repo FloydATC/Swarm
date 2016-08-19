@@ -33,7 +33,7 @@ Room.prototype.initialize = function() {
     this.memory.scanned = Game.time;
 
     // Neighbor room route cache
-    if (typeof this.memory.to == 'undefined') { this.memory.to = {}; }
+    if (true || typeof this.memory.to == 'undefined') { this.memory.to = {}; }
 
     // Owned room?
     if (this.controller && this.controller.my) {
@@ -900,10 +900,10 @@ Room.prototype.show_totals = function() {
 }
 
 Room.prototype.direction_to_room = function(name) {
-    var entry = this.memory.to[name];
-    if (entry != null && entry.at > Game.time - 1000) {
+    var direction = this.memory.to[name];
+    if (direction != null) {
         //console.log(this.link()+' used room route cache entry for '+name);
-        return entry.dir;
+        return direction;
     }
     // Fall back to Map.findRoute()
     console.log(this.link()+' (re)calculating route to '+name);
@@ -917,6 +917,6 @@ Room.prototype.direction_to_room = function(name) {
         }
     });
     this.stop_timer('findRoute');
-    this.memory.to[name] = { at: Game.time, dir: route[0].exit, via: route[0].room, metric: route.length };
+    this.memory.to[name] = route[0].exit;
     return route[0].exit;
 }
