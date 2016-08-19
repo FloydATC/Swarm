@@ -755,47 +755,9 @@ Creep.prototype.learn_path = function() {
 
 Creep.prototype.move_to = function(target) {
     if (this.fatigue > 0) { return; }
-    //this.moveTo(target);
     this.add_stats('move')
-    //return;
-
-    //delete this.memory.nexthop;
-    //delete this.memory.useexit;
 
     if (this.pos.roomName != target.pos.roomName) {
-        // If possible, switch target to an exit leading towards target
-        // This will let the creep use local routing instead of pathfinding
-        if (this.memory.nexthop && this.memory.nexthop.room == this.pos.roomName) { delete this.memory.nexthop; }
-        /*
-        if (typeof this.memory.nexthop == 'undefined') {
-            console.log(this+' calculating route from '+this.room.name+' to '+target.pos.roomName+' (EXPENSIVE)');
-            this.room.start_timer('findRoute');
-            var route = Game.map.findRoute(this.room, target.pos.roomName, {
-            	routeCallback(roomName) {
-                    if (Game.rooms[roomName] && Game.rooms[roomName].controller && Game.rooms[roomName].controller.my) { return 1; } // My room
-            		var parsed = /^[WE]([0-9]+)[NS]([0-9]+)$/.exec(roomName);
-            		if ((parsed[1] % 10 === 0) || (parsed[2] % 10 === 0)) { return 1.5; } // Highway
-        			return 2.5;
-            	}
-            });
-            this.room.stop_timer('findRoute');
-            this.room.start_timer('direction_to_room');
-            this.room.direction_to_room(target.pos.roomName);
-            this.room.stop_timer('direction_to_room');
-
-            if (route == ERR_NO_PATH) {
-                console.log(this+' is unable to reach '+target.pos.roomName+' (findRoute returned ERR_NO_PATH)');
-                return;
-            } else {
-                var nexthop = route[0];
-                //console.log(this+' will try to reach '+target.pos.roomName+' via '+nexthop.room);
-                this.memory.nexthop = nexthop;
-            }
-        }
-        */
-        //if (this.memory.nexthop && this.memory.nexthop.exit != null) {
-            //console.log(this.room.link()+' '+this+' finding closest exit ('+this.memory.nexthop.exit+') to '+this.memory.nexthop.room+' (EXPENSIVE)');
-            //var exits = this.room.get_exits(this.memory.nexthop.exit);
         var direction = this.room.direction_to_room(target.pos.roomName);
         if (direction == null) {
             console.log('  unable to find route from '+this.link()+' to '+target.pos.roomName);
@@ -818,9 +780,6 @@ Creep.prototype.move_to = function(target) {
                 target = { pos: new RoomPosition(exit.x, exit.y, this.room.name) };
             }
         }
-        //}
-//    } else {
-//        delete this.memory.nexthop;
     }
 
     if (this.pos.roomName == target.pos.roomName) {
