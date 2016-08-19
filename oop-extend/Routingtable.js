@@ -79,7 +79,7 @@ Routingtable.prototype.setDirectionTo = function(address, direction) {
 
 Routingtable.prototype.expand_binary = function() {
     this.binary_expanded = '';
-    //this.binary_debug = '';
+    this.binary_debug = '';
     var table = this.binary_table;
     for (var i=0; i<table.length; i++) {
         var code1 = table.charCodeAt(i);
