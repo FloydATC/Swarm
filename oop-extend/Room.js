@@ -866,7 +866,7 @@ Room.prototype.expire_routes = function() {
                 count++;
             }
         }
-        console.log(this.link()+' plain routes expired: '+count);
+        console.log(this.link()+' plain route(s) expired: '+count);
     }
     if (this.memory.r) {
       var count = 0;
@@ -878,7 +878,7 @@ Room.prototype.expire_routes = function() {
                 count++;
             }
         }
-        console.log(this.link()+' binary routes expired: '+count);
+        console.log(this.link()+' binary route(s) expired: '+count);
     }
 }
 
