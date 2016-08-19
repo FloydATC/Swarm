@@ -761,7 +761,7 @@ Room.prototype.assign_task_repair = function(drones, need_repairs){
             if (structure.structureType == STRUCTURE_WALL && structure.hits >= this.hp_ambition()) { continue; }
             drone.task = 'repair';
             drone.target = structure.id;
-            //console.log(drone.name+' assigned to '+drone.task+' '+drone.target);
+            console.log(drone.name+' assigned to '+drone.task+' '+drone.target);
             if (structure.structureType == STRUCTURE_WALL || structure.structureType == STRUCTURE_RAMPART) {
                 need_repairs = [];
                 break;
