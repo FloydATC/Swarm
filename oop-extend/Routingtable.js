@@ -78,6 +78,7 @@ Routingtable.prototype.expand_binary = function() {
         var code1 = table.charCodeAt(i);
         var addr1 = code1 & 0x0000111111111111;
         var dir = code1>>24;
+        console.log('code '+code1+' contains direction '+dir);
         if (dir == 0x1111) {
             // Range
             var code2 = table.charCodeAt(i++);
