@@ -425,19 +425,20 @@ Creep.prototype.task_mine = function() {
     this.memory.tracking = true;
     // In the right room yet?
     if (this.room.name == this.memory.mine) {
-        // Yes. Locate source at flag
-        var found = this.room.lookForAt(LOOK_SOURCES, flag);
-        var source = found[0];
-        var arrived = this.memory.arrived || 0;
+        var source = Game.getObjectById(flag.memory.source);
+        if (source == null) {
+            // Locate source at flag
+            var found = this.room.lookForAt(LOOK_SOURCES, flag);
+            source = found[0];
+        }
         if (source == null) { flag.remove(); return; } // User error
+        var arrived = this.memory.arrived || 0;
         if (arrived == 0 && this.pos.getRangeTo(source) > 1) {
             // Move closer
             this.move_to(source);
             //console.log('Miner '+this+' approaching source ('+source+' in '+this.memory.mine+')');
         } else {
-            if (arrived == 0) {
-                this.memory.arrived = Game.time;
-            }
+            if (arrived == 0) { this.memory.arrived = Game.time; }
             // Get energy
             this.harvest(source);
             //console.log('Miner '+this+' harvesting source ('+source+' in '+this.memory.mine+')');
