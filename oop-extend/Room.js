@@ -134,7 +134,7 @@ Room.prototype.plan = function() {
 
     var miners = [];        // Mine energy (local or remote)
     var fetchers = [];      // Fetch energy from remote mines
-    var zealots = [];     // Camp next to controller and upgrade it
+    var zealots = [];       // Camp next to controller and upgrade it
     var drones = [];        // Generic workers
     var swarmers = [];      // Move to remote room then mutate into Infectors
     var infectors = [];     // Claim controller then mutate into Drone
@@ -257,6 +257,9 @@ Room.prototype.plan = function() {
             if (needs == 'Miner') {
                 //console.log(this.link()+' spawning a local miner for '+flag.pos.roomName);
                 var result = this.createCreep(this.schematic('Miner'), undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } );
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,WORK,WORK,WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } ); }
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,WORK,WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } ); }
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } ); }
                 if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } ); }
                 if (result == OK) { flag.spawned('Miner'); }
                 return;
