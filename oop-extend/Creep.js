@@ -741,7 +741,7 @@ Creep.prototype.learn_path = function() {
 //                var dst = ('0'+x2).slice(-2)+('0'+y2).slice(-2); // XXYY
             x2 = this.memory._move.dest.x;
             y2 = this.memory._move.dest.y;
-            var dst = ('00'+x2).slice(-2)+('00'+y2).slice(-2); // XXYY
+            //var dst = ('00'+x2).slice(-2)+('00'+y2).slice(-2); // XXYY
             //console.log('  learning route src='+src+' dst='+dst+' nexthop='+nexthop);
             //console.log('BEFORE '+table.asString()); // WARNING! PREMATURE CALL TO .asString() = MASSIVE CPU OVERHEAD
             table.setDirectionTo(x2 + (50 * y2), nexthop);

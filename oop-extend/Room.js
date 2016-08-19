@@ -851,7 +851,7 @@ Room.prototype.get_direction = function(src, dst) {
     this.memory.r[pos1]['mru'] = Game.time;
     var table = new Routingtable(this.memory.r[pos1]['table']);
     var direction = table.getDirectionTo(dst.x + (50 * dst.y));
-    //console.log('HIT:'+pos1+'-'+pos2+'='+direction);
+    console.log('HIT:'+pos1+'='+direction);
     return direction;
 }
 
