@@ -31,7 +31,6 @@ function Routingtable(table) {
 Routingtable.prototype.asBinaryString = function() {
     this.compress_binary();
     //console.log(this+' save as binary string: '+this.binary_table.toString('hex')+' (length='+this.binary_table.length+')');
-    console.log('Compressed '+this.binary_debug);
     return this.binary_table;
 }
 
@@ -113,6 +112,7 @@ Routingtable.prototype.compress_binary = function() {
         }
     }
     this.add_span(span_a1, span_a2, span_dir);
+    console.log('Compressed '+this.binary_debug);
 }
 
 Routingtable.prototype.add_span = function(addr1, addr2, dir) {
