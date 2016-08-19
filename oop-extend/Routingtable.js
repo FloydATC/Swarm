@@ -178,7 +178,7 @@ Routingtable.prototype.compress = function() {
 }
 
 Routingtable.prototype.expand_binary = function() {
-    this.binary_expanded = String.fromCharCode(0).repeat(2500); // Skeleton
+    this.binary_expanded = (String.fromCharCode(0)).repeat(2500); // Skeleton
     console.log('Skeleton='+this.binary_expanded);
     var table = this.binary_table;
     for (var i=0; i<table.length; i++) {
