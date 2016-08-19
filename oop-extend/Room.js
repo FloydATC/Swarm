@@ -756,6 +756,7 @@ Room.prototype.assign_task_feed_extension = function(drones, extensions) {
 Room.prototype.assign_task_repair = function(drones, need_repairs){
     while (drones.length > 0 && need_repairs.length > 0) {
         var drone = drones.shift();
+        console.log(this.link()+' shifted '+drone.name+' off the stack');
         while (need_repairs.length > 0) {
             var structure = drone.shift_nearest(need_repairs);
             if (structure.structureType == STRUCTURE_WALL && structure.hits >= this.hp_ambition()) { continue; }
