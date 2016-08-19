@@ -856,18 +856,7 @@ Room.prototype.get_direction = function(src, dst) {
 }
 
 Room.prototype.expire_routes = function() {
-    if (this.memory.router) {
-      var count = 0;
-        var maxage = Game.time - 900; // Drop routing table for tiles not visited in 'maxage' ticks
-        var tiles = Object.keys(this.memory.router);
-        for (var i=0; i<tiles.length; i++) {
-            if (this.memory.router[tiles[i]]['mru'] < maxage) {
-                delete this.memory.router[tiles[i]];
-                count++;
-            }
-        }
-        console.log(this.link()+' plain route(s) expired: '+count);
-    }
+    delete this.memory.router;
     if (this.memory.r) {
       var count = 0;
         var maxage = Game.time - 900; // Drop routing table for tiles not visited in 'maxage' ticks
