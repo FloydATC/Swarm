@@ -46,7 +46,7 @@ Routingtable.prototype.getDirectionTo = function(address) {
         var code1 = table.charCodeAt(i);
         var addr1 = code1 & 0x0000111111111111;
         console.log('  found '+addr1);
-        if (addr1 > address) { return null; } // Address not in table
+        if (addr1 > address) { console.log('  not found'); return null; } // Address not in table
         var dir = code1>>24;
         if (dir == 0x1111) {
             // Range
@@ -61,6 +61,7 @@ Routingtable.prototype.getDirectionTo = function(address) {
             if (addr1 == address) { return dir; } // Address match found
         }
     }
+    console.log('  not found');
     return null; // Address not in table
 }
 
