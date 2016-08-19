@@ -71,9 +71,16 @@ Routingtable.prototype.setDirectionTo = function(address, direction) {
         var code = this.binary_expanded.charCodeAt(i);
         var addr = code & 0x0fff;
         var dir = code>>12;
-        if (addr == address) { this.binary_expanded = this.binary_expanded.substring(0,i) + String.fromCharCode(addr | newcode) + this.binary_expanded.substring(i+2); continue; }
-        if (addr > address) { this.binary_expanded = this.binary_expanded.substring(0,i) + String.fromCharCode(addr | newcode) + this.binary_expanded.substring(i+1); continue; }
+        if (addr == address) {
+            this.binary_expanded = this.binary_expanded.substring(0,i) + String.fromCharCode(addr | newcode) + this.binary_expanded.substring(i+2);
+            return;
+        }
+        if (addr > address) {
+            this.binary_expanded = this.binary_expanded.substring(0,i) + String.fromCharCode(addr | newcode) + this.binary_expanded.substring(i+1);
+            return;
+        }
     }
+    this.binary_expanded = this.binary_expanded + String.fromCharCode(addr | newcode);
     return;
 }
 
