@@ -16,7 +16,7 @@ Creep.prototype.initialize = function() {
         (this.pos.x < 49 ? this.pos.x+1 : this.pos.x),
         true // Result as plain array please
     );
-    if (this.memory.debug) { console.log(this.adjacent); }
+    //if (this.memory.debug) { console.log(this.adjacent); }
 }
 
 Creep.prototype.containers_within_reach = function() {
@@ -209,7 +209,7 @@ Creep.prototype.get_energy = function() {
                 var wanted = this.carryCapacity - _.sum(this.carry);
                 var available = container.store.energy;
                 if (available < reserved + wanted) {
-                    if (debug) { console.log(this+' container '+container+' ignored (available='+available+' , reserved='+reserved+', wanted='+wanted+')'); }                    
+                    if (debug) { console.log(this+' container '+container+' ignored (available='+available+' , reserved='+reserved+', wanted='+wanted+')'); }
                     continue;
                 } // Not enough left for me
                 if (debug) { console.log(this+' decided to fetch from '+container+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')'); }
