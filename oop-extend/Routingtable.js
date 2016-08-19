@@ -65,12 +65,20 @@ Routingtable.prototype.setDirectionTo = function(address, direction) {
     if (this.binary_expanded == null) { this.expand_binary(); }
     //console.log(this+' learn address '+address+' direction '+direction);
     //this.binary_expanded = this.binary_expanded.substring(0,address)+String.fromCharCode(direction)+this.binary_expanded.substring(address+1);
-    this.binary_expanded[address] = direction;
+    //this.binary_expanded[address] = direction;
+    var newcode = direction<<12;
+    for (var i=0; i<this.binary_expanded.length; i++) {
+        var code = this.binary_expanded.charCodeAt(i);
+        var addr = code & 0x0fff;
+        var dir = code>>12;
+        if (addr == address) { this.binary_expanded = this.binary_expanded.substring(0,i) + String.fromCharCode(addr | newcode) + this.binary_expanded.substring(i+2); continue; }
+        if (addr > address) { this.binary_expanded = this.binary_expanded.substring(0,i) + String.fromCharCode(addr | newcode) + this.binary_expanded.substring(i+1); continue; }
+    }
     return;
 }
 
 Routingtable.prototype.expand_binary = function() {
-    this.binary_expanded = [];//String.fromCharCode(0).repeat(2500); // Skeleton
+    this.binary_expanded = '';
     //this.binary_debug = '';
     var table = this.binary_table;
     for (var i=0; i<table.length; i++) {
@@ -83,12 +91,14 @@ Routingtable.prototype.expand_binary = function() {
             var code2 = table.charCodeAt(i++);
             var addr2 = code2 & 0x0fff;
             dir = code2>>12;
-            for (var addr=addr1; addr<=addr2; addr++) { this.binary_expanded[addr] = dir; }
+            for (var addr=addr1; addr<=addr2; addr++) {
+                this.binary_expanded = this.binary_expanded + String.fromCharCode(addr | (code2 && 0xf000));
+            }
             //this.binary_expanded = this.binary_expanded.substring(0,addr1)+(String.fromCharCode(dir)).repeat(addr2-addr1)+this.binary_expanded.substring(addr2+1);
             //this.binary_debug = this.binary_debug + addr1 + '-' + addr2 + '=' + dir + ';';
         } else {
             // Single address
-            this.binary_expanded[addr1] = dir;
+            this.binary_expanded = this.binary_expanded + code1;
             //this.binary_expanded = this.binary_expanded.substring(0,addr1)+String.fromCharCode(dir)+this.binary_expanded.substring(addr1+1);
             //this.binary_debug = this.binary_debug + addr1 + '=' + dir + ';';
         }
@@ -104,13 +114,10 @@ Routingtable.prototype.compress_binary = function() {
     var span_a1 = null;
     var span_a2 = null;
     var span_dir = null;
-    for (var addr=0; addr<2500; addr++) {
-        var dir = this.binary_expanded[addr];
-        if (dir == null) {
-            if (span_dir != null) { this.add_span(span_a1, span_a2, span_dir); }
-            span_a1 = null; span_a2 = null; span_dir = null; continue;
-        }
-        if (span_dir == null) { span_a1 = addr; span_dir = dir; continue; }
+    for (var i=0; i<this.binary_expanded.length; i++) {
+        var code = this.binary_expanded.charCodeAt(i);
+        var addr = code & 0x0fff;
+        var dir = code>>12;
         if (span_dir == dir) { span_a2 = addr; continue; }
         if (span_dir != dir) {
             this.add_span(span_a1, span_a2, span_dir);
