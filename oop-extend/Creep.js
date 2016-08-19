@@ -430,8 +430,10 @@ Creep.prototype.task_mine = function() {
             // Locate source at flag
             var found = this.room.lookForAt(LOOK_SOURCES, flag);
             source = found[0];
+            if (source == null) { flag.remove(); return; } // User error
+            flag.memory.source = source.id;
         }
-        if (source == null) { flag.remove(); return; } // User error
+
         var arrived = this.memory.arrived || 0;
         if (arrived == 0 && this.pos.getRangeTo(source) > 1) {
             // Move closer
