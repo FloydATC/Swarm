@@ -2,7 +2,7 @@
 function Routingtable(table) {
     this.binary_table = table || ''; // Unicode packed table. Single address(12 bits)+dir(4 bits) or
                                     // Range from(12 bits)+0x1111+to(12 bits)+dir(4 bits)
-    console.log(this+' load as binary string: '+JSON.stringify(this.binary_table)+' (length='+this.binary_table.length+')');
+    console.log(this+' load as binary string: '+this.binary_table.toString('hex')+' (length='+this.binary_table.length+')');
     this.binary_expanded = null;
 }
 
@@ -34,7 +34,7 @@ Routingtable.prototype.asString = function() {
 
 Routingtable.prototype.asBinaryString = function() {
     this.compress_binary();
-    console.log(this+' save as binary string: '+JSON.stringify(this.binary_table)+' (length='+this.binary_table.length+')');
+    console.log(this+' save as binary string: '+this.binary_table.toString('hex')+' (length='+this.binary_table.length+')');
     return this.binary_table;
 }
 
