@@ -792,30 +792,30 @@ Room.prototype.assign_task_upgrade = function(drones) {
 }
 
 Room.prototype.load_routing_table = function(tile) {
-    if (!this.memory.router) { this.memory.router = {}; }
-    if (!this.memory.router[tile]) { this.memory.router[tile] = {}; }
-    this.memory.router[tile]['mru'] = Game.time;
-    var table = new Routingtable(this.memory.router[tile]['table']);
+    if (!this.memory.r) { this.memory.r = {}; }
+    if (!this.memory.r[tile]) { this.memory.r[tile] = {}; }
+    this.memory.r[tile]['mru'] = Game.time;
+    var table = new Routingtable(this.memory.r[tile]['table'], true);
     return table;
 }
 
 Room.prototype.save_routing_table = function(tile, table) {
-    if (!this.memory.router) { this.memory.router = {}; }
-    if (!this.memory.router[tile]) { this.memory.router[tile] = {}; }
-    this.memory.router[tile]['table'] = table.asString();
+    if (!this.memory.r) { this.memory.r = {}; }
+    if (!this.memory.r[tile]) { this.memory.r[tile] = {}; }
+    this.memory.r[tile]['table'] = table.asBinaryString();
 }
 
 Room.prototype.get_direction = function(src, dst) {
     var pos1 = ('0'+src.x).slice(-2) + ('0'+src.y).slice(-2); // Format as XXYY
-    var pos2 = ('0'+dst.x).slice(-2) + ('0'+dst.y).slice(-2); // Format as XXYY
+    //var pos2 = ('0'+dst.x).slice(-2) + ('0'+dst.y).slice(-2); // Format as XXYY
     //console.log('???:'+pos1+'-'+pos2);
     if (!this.memory.router) { return null; }
     if (!this.memory.router[pos1]) { return null; }
     //if (!this.memory.router[pos1][pos2]) { return null; }
     //var direction = this.memory.router[pos1][pos2];
     this.memory.router[pos1]['mru'] = Game.time;
-    var table = new Routingtable(this.memory.router[pos1]['table']);
-    var direction = table.getDirectionTo(pos2);
+    var table = new Routingtable(this.memory.router[pos1]['table'], true);
+    var direction = table.getDirectionTo(src.x + (50 * src.y));
     //console.log('HIT:'+pos1+'-'+pos2+'='+direction);
     return direction;
 }
@@ -831,7 +831,19 @@ Room.prototype.expire_routes = function() {
                 count++;
             }
         }
-        console.log(this.link()+' routes expired: '+count);
+        console.log(this.link()+' plain routes expired: '+count);
+    }
+    if (this.memory.r) {
+      var count = 0;
+        var maxage = Game.time - 900; // Drop routing table for tiles not visited in 'maxage' ticks
+        var tiles = Object.keys(this.memory.r);
+        for (var i=0; i<tiles.length; i++) {
+            if (this.memory.r[tiles[i]]['mru'] < maxage) {
+                delete this.memory.r[tiles[i]];
+                count++;
+            }
+        }
+        console.log(this.link()+' binary routes expired: '+count);
     }
 }
 
