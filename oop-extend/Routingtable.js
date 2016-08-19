@@ -1,12 +1,12 @@
 
-function Routingtable(table, binary) {
-    if (binary == true) {
+function Routingtable(table) {
+//    if (binary == true) {
         this.binary_table = table || ''; // Unicode packed table. Single address(12 bits)+dir(4 bits) or
-    } else {
-        this.table = table; // E.g '0703-0708=1,0815=2'. MUST always be in sort order!
-    }
+//    } else {
+//        this.table = table; // E.g '0703-0708=1,0815=2'. MUST always be in sort order!
+//    }
                                // Range from(12 bits)+0x1111+to(12 bits)+dir(4 bits)
-    this.expanded = null;
+//    this.expanded = null;
     this.binary_expanded = null;
 }
 
