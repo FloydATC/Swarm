@@ -200,7 +200,7 @@ Creep.prototype.get_energy = function() {
 
     // Consider fetching energy from a container
     if (debug) { console.log(this+' considers fetching energy from a container'); }
-    if (this.task != 'upgrade' && this.task != 'stockpile') {
+    if ((this.task == 'upgrade' && this.room.controller && this.room.controller.ticksToDowngrade < 5000 ) || (this.task != 'upgrade' && this.task != 'stockpile')) {
         var containers = this.room.containers.slice();
         if (debug) { console.log(this+' candidates: '+containers); }
         while (containers.length > 0) {
