@@ -77,7 +77,7 @@ Routingtable.prototype.expand_binary = function() {
         var code1 = table.charCodeAt(i);
         var addr1 = code1 & 0x0fff;
         var dir = code1>>12;
-        console.log('code '+code1+' contains address '+addr1+' direction '+dir);
+        //console.log('code '+code1+' contains address '+addr1+' direction '+dir);
         if (dir == 0x0f) {
             // Range
             var code2 = table.charCodeAt(i++);
