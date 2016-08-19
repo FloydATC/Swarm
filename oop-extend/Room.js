@@ -757,24 +757,19 @@ Room.prototype.assign_task_repair = function(drones, need_repairs){
     while (drones.length > 0 && need_repairs.length > 0) {
         var drone = drones.shift();
         console.log(this.link()+' shifted '+drone.name+' off the stack');
-        while (need_repairs.length > 0) {
-            var structure = drone.shift_nearest(need_repairs);
-            if (structure.structureType == STRUCTURE_WALL && structure.hits >= this.hp_ambition()) { continue; }
-            drone.task = 'repair';
-            drone.target = structure.id;
-            console.log(this.link()+' '+drone.name+' assigned to '+drone.task+' '+drone.target);
-            if (structure.structureType == STRUCTURE_WALL || structure.structureType == STRUCTURE_RAMPART) {
-                need_repairs = [];
-                break;
-            } // Only one
-            console.log('inner loop end');
-        }
-        if (typeof drone.task == 'undefined') {
-            // No structures need repair
+        var structure = drone.shift_nearest(need_repairs);
+        if (structure.structureType == STRUCTURE_WALL && structure.hits >= this.hp_ambition()) {
             console.log(this.name+' pushed back on the stack');
             drones.push(drone);
-            break;
+            continue;
         }
+        drone.task = 'repair';
+        drone.target = structure.id;
+        console.log(this.link()+' '+drone.name+' assigned to '+drone.task+' '+drone.target);
+        if (structure.structureType == STRUCTURE_WALL || structure.structureType == STRUCTURE_RAMPART) {
+            need_repairs = [];
+            return;
+        } // Only one
         console.log('outer loop end');
     }
 }
