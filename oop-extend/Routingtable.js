@@ -70,19 +70,19 @@ Routingtable.prototype.setDirectionTo = function(address, direction) {
     for (var i=0; i<this.binary_expanded.length; i++) {
         var code = this.binary_expanded.charCodeAt(i);
         var addr = code & 0x0fff;
-        console.log('offset '+i+' addr='+addr);
+        //console.log('offset '+i+' addr='+addr);
         if (addr == address) {
-            console.log('overwrite offset '+i);
+            //console.log('overwrite offset '+i);
             this.binary_expanded = this.binary_expanded.substring(0,i) + String.fromCharCode(address | newcode) + this.binary_expanded.substring(i+1);
             return;
         }
         if (addr > address) {
-            console.log('insert at offset '+i);
+            //console.log('insert at offset '+i);
             this.binary_expanded = this.binary_expanded.substring(0,i) + String.fromCharCode(address | newcode) + this.binary_expanded.substring(i);
             return;
         }
     }
-    console.log('append...');
+    //console.log('append...');
     this.binary_expanded = this.binary_expanded + String.fromCharCode(address | newcode);
     return;
 }
@@ -108,7 +108,7 @@ Routingtable.prototype.expand_binary = function() {
             this.binary_debug = this.binary_debug + addr1 + '-' + addr2 + '=' + dir + ';';
         } else {
             // Single address
-            console.log('expanding single addr='+addr1+' dir='+dir+' code='+code1);
+            //console.log('expanding single addr='+addr1+' dir='+dir+' code='+code1);
             this.binary_expanded = this.binary_expanded + String.fromCharCode(code1);
             //this.binary_expanded = this.binary_expanded.substring(0,addr1)+String.fromCharCode(dir)+this.binary_expanded.substring(addr1+1);
             this.binary_debug = this.binary_debug + addr1 + '=' + dir + ';';
