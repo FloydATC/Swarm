@@ -109,7 +109,7 @@ Routingtable.prototype.expand_binary = function() {
         } else {
             // Single address
             console.log('expanding single addr='+addr1+' dir='+dir+' code='+code1);
-            this.binary_expanded = this.binary_expanded + code1;
+            this.binary_expanded = this.binary_expanded + String.fromCharCode(code1);
             //this.binary_expanded = this.binary_expanded.substring(0,addr1)+String.fromCharCode(dir)+this.binary_expanded.substring(addr1+1);
             this.binary_debug = this.binary_debug + addr1 + '=' + dir + ';';
         }
