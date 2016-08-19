@@ -179,7 +179,7 @@ Routingtable.prototype.compress = function() {
 
 Routingtable.prototype.expand_binary = function() {
     var zero = String.fromCharCode(0);
-    console.log('Zero='+zero);
+    console.log('Zero="'+zero+'" (length='+zero.length+')');
     this.binary_expanded = (String.fromCharCode(0)).repeat(2500); // Skeleton
     console.log('Skeleton='+this.binary_expanded);
     var table = this.binary_table;
