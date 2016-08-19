@@ -96,6 +96,7 @@ Room.prototype.initialize = function() {
     for (var i=0; i<this.spawns.length; i++) { this.spawns[i].initialize(); }
     for (var i=0; i<this.containers.length; i++) { this.containers[i].initialize(); } // Note: Includes storage
 
+    console.log(this.link()+' containers: '+this.containers);
     this.containers = this.containers.sort( function(a,b) { return a.free - b.free; } ); // Note: Must initialize before sorting
 }
 
