@@ -123,7 +123,7 @@ Routingtable.prototype.compress_binary = function() {
 }
 
 Routingtable.prototype.add_span = function(addr1, addr2, dir) {
-    if (dir == 0) { return; } // Do not store 0 (unknown) direction
+    if (dir == 0 || dir == null) { return; } // Do not store 0 (unknown) direction
     if (addr2 == null) {
         // Single address
         var code = dir<<12;
