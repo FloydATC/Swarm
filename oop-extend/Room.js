@@ -396,7 +396,7 @@ Room.prototype.schematic = function(c) {
     switch (c) {
         case 'Spitter': { hash[RANGED_ATTACK] = 1; hash[MOVE] = 1; break; }
         case 'Biter': { hash[ATTACK] = 1; hash[MOVE] = 1; break; }
-        case 'Hunter': { hash[TOUGH] = 2; hash[RANGED_ATTACK] = 4; hash[MOVE] = 5; hash[HEAL] = 4; break; }
+        case 'Hunter': { hash[TOUGH] = 2; hash[MOVE] = 5; hash[RANGED_ATTACK] = 4; hash[HEAL] = 4; break; }
         case 'Miner': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
         case 'Fetcher': { hash[WORK] = 1; hash[CARRY] = 5; hash[MOVE] = 3; break; }
         case 'Zealot': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
