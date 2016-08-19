@@ -756,21 +756,21 @@ Room.prototype.assign_task_feed_extension = function(drones, extensions) {
 Room.prototype.assign_task_repair = function(drones, need_repairs){
     while (drones.length > 0 && need_repairs.length > 0) {
         var drone = drones.shift();
-        console.log(this.link()+' shifted '+drone.name+' off the stack');
+        //console.log(this.link()+' shifted '+drone.name+' off the stack');
         var structure = drone.shift_nearest(need_repairs);
         if (structure.structureType == STRUCTURE_WALL && structure.hits >= this.hp_ambition()) {
-            console.log(this.name+' pushed back on the stack');
+            //console.log(this.name+' pushed back on the stack');
             drones.push(drone);
             continue;
         }
         drone.task = 'repair';
         drone.target = structure.id;
-        console.log(this.link()+' '+drone.name+' assigned to '+drone.task+' '+drone.target);
+        //console.log(this.link()+' '+drone.name+' assigned to '+drone.task+' '+drone.target);
         if (structure.structureType == STRUCTURE_WALL || structure.structureType == STRUCTURE_RAMPART) {
             need_repairs = [];
             return;
         } // Only one
-        console.log('outer loop end');
+        //console.log('outer loop end');
     }
 }
 
