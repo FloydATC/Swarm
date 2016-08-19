@@ -208,7 +208,10 @@ Creep.prototype.get_energy = function() {
                 var reserved = container.reserved_amount || 0;
                 var wanted = this.carryCapacity - _.sum(this.carry);
                 var available = container.store.energy;
-                if (available < reserved + wanted) { continue; } // Not enough left for me
+                if (available < reserved + wanted) {
+                    if (debug) { console.log(this+' container '+container+' ignored (available='+available+' , reserved='+reserved+', wanted='+wanted+')'); }                    
+                    continue;
+                } // Not enough left for me
                 if (debug) { console.log(this+' decided to fetch from '+container+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')'); }
                 container.reserved_amount = reserved + wanted;
                 if (this.pos.inRangeTo(container, 1)) {
