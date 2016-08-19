@@ -495,7 +495,7 @@ Room.prototype.calc_spawn_reserves = function() {
     if (total_capacity > 0) {
         var percent = total * 100 / total_capacity;
         this.spawn_reserves = percent;
-        console.log(this.link()+' spawn reserves at '+percent.toFixed(1)+'%');
+        //console.log(this.link()+' spawn reserves at '+percent.toFixed(1)+'%');
         return percent;
     } else {
         return 0;
