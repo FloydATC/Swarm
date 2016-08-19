@@ -1,13 +1,8 @@
 
 function Routingtable(table) {
-//    if (binary == true) {
-        this.binary_table = table || ''; // Unicode packed table. Single address(12 bits)+dir(4 bits) or
-        console.log(this+' load as binary string: '+this.binary_table+' (length='+this.binary_table.length+')');
-//    } else {
-//        this.table = table; // E.g '0703-0708=1,0815=2'. MUST always be in sort order!
-//    }
-                               // Range from(12 bits)+0x1111+to(12 bits)+dir(4 bits)
-//    this.expanded = null;
+    this.binary_table = table || ''; // Unicode packed table. Single address(12 bits)+dir(4 bits) or
+                                    // Range from(12 bits)+0x1111+to(12 bits)+dir(4 bits)
+    console.log(this+' load as binary string: '+this.binary_table+' (length='+this.binary_table.length+')');
     this.binary_expanded = null;
 }
 
@@ -44,49 +39,29 @@ Routingtable.prototype.asBinaryString = function() {
 }
 
 Routingtable.prototype.getDirectionTo = function(address) {
-    if (!_.isString(address)) {
-        // Use binary format
-        var table = this.binary_table;
-        for (var i=0; i<table.length; i++) {
-            var code1 = table.charCodeAt(i);
-            var addr1 = code1 & 0x0000111111111111;
-            if (addr1 > address) { return null; } // Address not in table
-            var dir = code1>>24;
-            if (dir == 0x1111) {
-                // Range
-                var code2 = table.charCodeAt(i++);
-                var addr2 = code2 & 0x0000111111111111;
-                dir = code2>>24;
-                if (addr1 <= address && addr2 >= address) { return dir; } // Range match found
-            } else {
-                // Single address
-                if (addr1 == address) { return dir; } // Address match found
-            }
-        }
-        return null; // Address not in table
-    }
-    /*
-    var a = address * 1;
-    if (typeof this.table == 'undefined') { return null; }
-    var routes = this.table.split(',');
-    for (var i=0; i<routes.length; i++) {
-        var route = routes[i];
-        var a1 = route.substring(0,4) * 1;
-        if (route.charAt(4) == '=') {
-    	    // Position ('XXYY=D')
-            if (a1 < a) { continue; } // Keep searching
-            if (a1 == a) { return route.charAt(5); }
-            if (a1 > a) { return null; }
-        }
-        if (route.charAt(4) == '-') {
-            // Range ('XXYY-XXYY=D')
-    	    var a2 = route.substring(5,9) * 1;
-            if (a2 < a) { continue; } // Keep searching
-            if (a1 <= a && a <= a2) { return route.charAt(10); }
-            if (a2 > a) { return null; }
+    // Use binary format
+    console.log(this+' lookup address '+address);
+    var table = this.binary_table;
+    for (var i=0; i<table.length; i++) {
+        var code1 = table.charCodeAt(i);
+        var addr1 = code1 & 0x0000111111111111;
+        console.log('  found '+addr1);
+        if (addr1 > address) { return null; } // Address not in table
+        var dir = code1>>24;
+        if (dir == 0x1111) {
+            // Range
+            var code2 = table.charCodeAt(i++);
+            var addr2 = code2 & 0x0000111111111111;
+            console.log('  spans to '+addr2);
+            dir = code2>>24;
+            if (addr1 <= address && addr2 >= address) { return dir; } // Range match found
+        } else {
+            // Single address
+            console.log('  single address');
+            if (addr1 == address) { return dir; } // Address match found
         }
     }
-    */
+    return null; // Address not in table
 }
 
 Routingtable.prototype.setDirectionTo = function(address, direction) {
