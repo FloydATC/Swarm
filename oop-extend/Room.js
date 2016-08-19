@@ -901,7 +901,7 @@ Room.prototype.direction_to_room = function(name) {
     var entry = this.memory.to[name];
     if (entry != null && entry.at > Game.time - 1000) { return entry.dir; }
     // Fall back to Map.findRoute()
-    this.room.start_timer('findRoute');
+    this.start_timer('findRoute');
     var route = Game.map.findRoute(this.name, name, {
         routeCallback(rname) {
             if (Game.rooms[rname] && Game.rooms[rname].controller && Game.rooms[rname].controller.my) { return 1; } // My room
@@ -910,7 +910,7 @@ Room.prototype.direction_to_room = function(name) {
             return 2.5;
         }
     });
-    this.room.stop_timer('findRoute');
+    this.stop_timer('findRoute');
     this.memory.to[name] = { at: Game.time, dir: route[0].exit, via: route[0].room, metric: route.length };
     return route[0].exit;
 }
