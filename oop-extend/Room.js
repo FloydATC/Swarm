@@ -895,3 +895,21 @@ Room.prototype.show_totals = function() {
     for (var name in this.total) { report = report+' '+name+'='+this.total[name].toFixed(3); }
     console.log(report);
 }
+
+Room.prototype.direction_to_room = function(name) {
+    var entry = this.memory.to[name];
+    if (entry != null && entry.at > Game.time - 1000) { return entry.dir; }
+    // Fall back to Map.findRoute()
+    this.room.start_timer('findRoute');
+    var route = Game.map.findRoute(this.name, name, {
+        routeCallback(rname) {
+            if (Game.rooms[rname] && Game.rooms[rname].controller && Game.rooms[rname].controller.my) { return 1; } // My room
+            var parsed = /^[WE]([0-9]+)[NS]([0-9]+)$/.exec(rname);
+            if ((parsed[1] % 10 === 0) || (parsed[2] % 10 === 0)) { return 1.5; } // Highway
+            return 2.5;
+        }
+    });
+    this.room.stop_timer('findRoute');
+    this.memory.to[name] = { at: Game.time, dir: route[0].exit, via: route[0].room, metric: route.length };
+    return route[0].exit;
+}
