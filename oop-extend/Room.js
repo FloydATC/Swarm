@@ -899,8 +899,12 @@ Room.prototype.show_totals = function() {
 Room.prototype.direction_to_room = function(name) {
     if (typeof this.memory.to == 'undefined') { this.memory.to = {}; }
     var entry = this.memory.to[name];
-    if (entry != null && entry.at > Game.time - 1000) { return entry.dir; }
+    if (entry != null && entry.at > Game.time - 1000) {
+        console.log(this.link()+' used room route cache entry for '+name);
+        return entry.dir;
+    }
     // Fall back to Map.findRoute()
+    console.log(this.link()+' calculating route to '+name);
     this.start_timer('findRoute');
     var route = Game.map.findRoute(this.name, name, {
         routeCallback(rname) {
