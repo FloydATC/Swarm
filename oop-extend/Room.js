@@ -830,7 +830,7 @@ Room.prototype.load_routing_table = function(tile) {
     if (!this.memory.r) { this.memory.r = {}; }
     if (!this.memory.r[tile]) { this.memory.r[tile] = {}; }
     this.memory.r[tile]['mru'] = Game.time;
-    var table = new Routingtable(this.memory.r[tile]['table'], true);
+    var table = new Routingtable(this.memory.r[tile]['table']);
     return table;
 }
 

@@ -2,7 +2,7 @@
 function Routingtable(table) {
     this.binary_table = table || ''; // Unicode packed table. Single address(12 bits)+dir(4 bits) or
                                     // Range from(12 bits)+0x1111+to(12 bits)+dir(4 bits)
-    console.log(this+' load as binary string: '+this.binary_table.toString('hex')+' (length='+this.binary_table.length+')');
+    //console.log(this+' load as binary string: '+this.binary_table.toString('hex')+' (length='+this.binary_table.length+')');
     this.binary_expanded = null;
     this.expand_binary(); // FIXME! DEBUG
 }
@@ -27,11 +27,6 @@ function Routingtable(table) {
 // When saving the Routingtable, the caller is expected to access its contents
 // via the .asString() method which (if needed) will compress the contents by
 // aggregating consecutive tiles back into XXY1-XXY2 format.
-
-Routingtable.prototype.asString = function() {
-    this.compress();
-    return this.table;
-}
 
 Routingtable.prototype.asBinaryString = function() {
     this.compress_binary();
@@ -73,88 +68,6 @@ Routingtable.prototype.setDirectionTo = function(address, direction) {
     console.log(this+' learn address '+address+' direction '+direction);
     this.binary_expanded = this.binary_expanded.substring(0,address)+String.fromCharCode(direction)+this.binary_expanded.substring(address+1);
     return;
-    /*
-    var a = address * 1;
-    // Expand routing table while maintaining sort order
-    if (this.expanded == null) {
-        this.expanded = [];
-        var routes = [];
-        if (!(typeof this.table == 'undefined')) { routes = this.table.split(','); }
-        for (var i=0; i<routes.length; i++) {
-            var route = routes[i];
-            var a1 = route.substring(0,4) * 1;
-            if (route.charAt(4) == '=') {
-        	    // Position ('XXYY=D')
-                this.expanded.push(route);
-            }
-            if (route.charAt(4) == '-') {
-                // Range ('XXYY-XXYY=D')
-        	    var a2 = route.substring(5,9) * 1;
-                for (var j=a1; j<=a2; j++) {
-                    this.expanded.push(('00'+j).slice(-4)+'='+route.charAt(10)); // Format j as 'XXYY' with leading 0
-                }
-            }
-        }
-    }
-
-    // Update/insert new entry
-    var found = false;
-    for (var i=0; i<this.expanded.length; i++) {
-        var route = this.expanded[i];
-        var a1 = route.substring(0,4) * 1;
-        if (a1 < a) { continue; }
-        if (a1 == a) {
-            this.expanded[i] = address+'='+direction; // Update existing
-            found = true;
-            break;
-        }
-        if (a1 > a) {
-            this.expanded.splice(i, 0, address+'='+direction); // Found insertion point
-            found = true;
-            break;
-        }
-    }
-    if (found == false) {
-        // Update/insertion point not reached, append new entry
-        this.expanded.push(address+'='+direction);
-    }
-    */
-}
-
-Routingtable.prototype.compress = function() {
-    if (this.expanded == null) { return; }
-    // Compress routing table
-    var routes = [];
-    var span_a1 = null;
-    var span_a2 = null;
-    var span_dir = null;
-    for (var i=0; i<this.expanded.length; i++) {
-        var route = this.expanded[i];
-        var addr = route.substring(0,4) * 1;
-        var dir = route.charAt(5);
-        if (span_a1 == null) {
-            // Start new span
-            span_a1 = addr;
-            span_a2 = addr;
-            span_dir = dir;
-            continue;
-        }
-        if (span_dir == dir && span_a2*1 + 1 == addr*1) {
-            // Continue span
-            span_a2 = addr;
-            continue;
-        }
-        // Finish span and start a new one
-        routes.push(span_a1 == span_a2 ? ('00'+span_a1).slice(-4)+'='+span_dir : ('00'+span_a1).slice(-4)+'-'+('00'+span_a2).slice(-4)+'='+span_dir);
-        span_a1 = addr;
-        span_a2 = addr;
-        span_dir = dir;
-    }
-    if (span_a1 != null) {
-        // Finish last span
-        routes.push(span_a1 == span_a2 ? ('00'+span_a1).slice(-4)+'='+span_dir : ('00'+span_a1).slice(-4)+'-'+('00'+span_a2).slice(-4)+'='+span_dir);
-    }
-    this.table = routes.join(',');
 }
 
 Routingtable.prototype.expand_binary = function() {
