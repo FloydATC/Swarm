@@ -626,11 +626,12 @@ Creep.prototype.task_build = function() {
 Creep.prototype.task_repair = function() {
     var target = Game.getObjectById(this.target);
     this.memory.tracking = false;
+    this.say('*fizz*');
     if (this.pos.inRangeTo(target, 3)) {
         this.repair(target)
         this.add_stats('repair')
     } else {
-        this.move_to(target, { maxRooms: 0 }); // Stay in this room!
+        this.move_to(target); // Stay in this room!
     }
     return;
 }
