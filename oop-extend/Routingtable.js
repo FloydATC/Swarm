@@ -41,7 +41,7 @@ Routingtable.prototype.asBinaryString = function() {
 
 Routingtable.prototype.getDirectionTo = function(address) {
     // Use binary format
-    //console.log(this+' lookup address '+address);
+    console.log(this+' lookup address '+address);
     var table = this.binary_table;
     for (var i=0; i<table.length; i++) {
         var code1 = table.charCodeAt(i);
