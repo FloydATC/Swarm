@@ -128,11 +128,9 @@ Routingtable.prototype.compress_binary = function() {
         var addr = code & 0x0fff;
         var dir = code>>12;
         //console.log('must compress code='+code+' addr='+addr+' dir='+dir);
-        if (span_dir == dir) { span_a2 = addr; continue; }
-        if (span_dir != dir) {
-            this.add_span(span_a1, span_a2, span_dir);
-            span_a1 = addr; span_a2 = null; span_dir = dir; continue;
-        }
+        if (span_dir == dir && span == span_a2 + 1) { span_a2 = addr; continue; }
+        this.add_span(span_a1, span_a2, span_dir);
+        span_a1 = addr; span_a2 = addr; span_dir = dir; continue;
     }
     this.add_span(span_a1, span_a2, span_dir);
     console.log('Compressed '+this.binary_debug);
@@ -140,7 +138,7 @@ Routingtable.prototype.compress_binary = function() {
 
 Routingtable.prototype.add_span = function(addr1, addr2, dir) {
     if (dir == 0 || dir == null) { return; } // Do not store 0 (unknown) direction
-    if (addr2 == null) {
+    if (addr1 == addr2) {
         // Single address
         var code = dir<<12;
         this.binary_table = this.binary_table + String.fromCharCode(addr1 | code);
