@@ -810,7 +810,9 @@ Creep.prototype.move_to = function(target) {
         this.moveTo(target, { ignoreCreeps: true } );
         this.room.stop_timer('moveTo');
         //console.log('#DEBUG '+this+' moveTo('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+' IGNORING CREEPS) = '+this.memory._move.path);
+        this.room.start_timer('learn_path');
         var result = this.learn_path();
+        this.room.stop_timer('learn_path');
         //if (result != OK) { console.log(this+' learn path returned '+result); }
     } else {
         //console.log(this.memory.class+' '+this+' ('+this.memory.task.type+') calculating NON-CACHEABLE path to '+target.pos+' (EXPENSIVE)');
