@@ -72,12 +72,12 @@ Routingtable.prototype.setDirectionTo = function(address, direction) {
         var addr = code & 0x0fff;
         if (addr == address) {
             console.log('overwrite offset '+i);
-            this.binary_expanded = this.binary_expanded.substring(0,i) + String.fromCharCode(address | newcode) + this.binary_expanded.substring(i+2);
+            this.binary_expanded = this.binary_expanded.substring(0,i) + String.fromCharCode(address | newcode) + this.binary_expanded.substring(i+1);
             return;
         }
         if (addr > address) {
             console.log('insert at offset '+i);
-            this.binary_expanded = this.binary_expanded.substring(0,i) + String.fromCharCode(address | newcode) + this.binary_expanded.substring(i+1);
+            this.binary_expanded = this.binary_expanded.substring(0,i) + String.fromCharCode(address | newcode) + this.binary_expanded.substring(i);
             return;
         }
     }
