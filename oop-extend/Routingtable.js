@@ -128,7 +128,7 @@ Routingtable.prototype.compress_binary = function() {
         var addr = code & 0x0fff;
         var dir = code>>12;
         //console.log('must compress code='+code+' addr='+addr+' dir='+dir);
-        if (span_dir == dir && span == span_a2 + 1) { span_a2 = addr; continue; }
+        if (span_dir == dir && addr == span_a2 + 1) { span_a2 = addr; continue; }
         this.add_span(span_a1, span_a2, span_dir);
         span_a1 = addr; span_a2 = addr; span_dir = dir; continue;
     }
