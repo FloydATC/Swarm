@@ -812,7 +812,7 @@ Creep.prototype.move_to = function(target) {
                 }
             }
             if (exit == null) {
-                console.log('  no exits found from '+this.link()+' in direction '+direction|);
+                console.log('  no exits found from '+this.link()+' in direction '+direction);
             } else {
                 //console.log('  navigating towards '+exit.x+','+exit.y);
                 target = { pos: new RoomPosition(exit.x, exit.y, this.room.name) };
