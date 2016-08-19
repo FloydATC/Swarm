@@ -19,3 +19,6 @@ delete Memory.rooms['E27N38'].votes;
 
 // Get number of active creeps
 Object.keys(Game.creeps).length
+
+// Enable debugging for a specific creep
+Memory.creeps['James'].debug = true;

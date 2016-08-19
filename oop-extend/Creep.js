@@ -16,7 +16,7 @@ Creep.prototype.initialize = function() {
         (this.pos.x < 49 ? this.pos.x+1 : this.pos.x),
         true // Result as plain array please
     );
-    if (this.memory.debug) { console.log(this.adjacent); }
+    //if (this.memory.debug) { console.log(this.adjacent); }
 }
 
 Creep.prototype.containers_within_reach = function() {
@@ -148,9 +148,9 @@ Creep.prototype.execute = function() {
 }
 
 Creep.prototype.get_energy = function() {
-
+    var debug = this.memory.debug;
     // Consider energy dropped on the ground
-    //console.log(this+' looking for energy on the ground');
+    if (debug) { console.log(this+' looking for energy on the ground'); }
     var all_dropped_energy = this.room.dropped_energy.slice();
     while (all_dropped_energy.length > 0) {
         var energy = this.shift_nearest(all_dropped_energy);
@@ -159,7 +159,7 @@ Creep.prototype.get_energy = function() {
             var wanted = this.carryCapacity - _.sum(this.carry);
             var available = energy.amount;
             if (available < reserved + wanted) { continue; } // Not enough left for me
-            //console.log(this+' decided to pick up '+energy+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')');
+            if (debug) { console.log(this+' decided to pick up '+energy+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')'); }
             energy.reserved_amount = reserved + wanted;
             if (this.pos.inRangeTo(energy, 1)) {
                 this.pickup(energy);
@@ -174,7 +174,7 @@ Creep.prototype.get_energy = function() {
     }
 
     // Consider fetching energy from a link
-    //console.log(this+' considers fetching energy from a link');
+    if (debug) { console.log(this+' considers fetching energy from a link'); }
     if (this.task == 'feed tower' || this.task == 'feed spawn' || this.task == 'feed extension') {
         var links = this.room.links.slice();
         while (links.length > 0) {
@@ -184,7 +184,7 @@ Creep.prototype.get_energy = function() {
                 var wanted = this.carryCapacity - _.sum(this.carry);
                 var available = link.energy;
                 if (available < reserved + wanted) { continue; } // Not enough left for me
-                //console.log(this+' decided to fetch from '+link+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')');
+                if (debug) { console.log(this+' decided to fetch from '+link+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')'); }
                 link.reserved_amount = reserved + this.carryCapacity - _.sum(this.carry);
                 if (this.pos.inRangeTo(link, 1)) {
                     this.withdraw(link, RESOURCE_ENERGY);
@@ -199,17 +199,21 @@ Creep.prototype.get_energy = function() {
     }
 
     // Consider fetching energy from a container
-    //console.log(this+' considers fetching energy from a container');
+    if (debug) { console.log(this+' considers fetching energy from a container'); }
     if (this.task != 'upgrade' && this.task != 'stockpile') {
         var containers = this.room.containers.slice();
+        if (debug) { console.log(this+' candidates: '+containers); }
         while (containers.length > 0) {
             var container = this.shift_nearest(containers);
             if (container instanceof StructureContainer) {
                 var reserved = container.reserved_amount || 0;
                 var wanted = this.carryCapacity - _.sum(this.carry);
                 var available = container.store.energy;
-                if (available < reserved + wanted) { continue; } // Not enough left for me
-                //console.log(this+' decided to fetch from '+container+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')');
+                if (available < reserved + wanted) {
+                    if (debug) { console.log(this+' container '+container+' ignored (available='+available+' , reserved='+reserved+', wanted='+wanted+')'); }
+                    continue;
+                } // Not enough left for me
+                if (debug) { console.log(this+' decided to fetch from '+container+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')'); }
                 container.reserved_amount = reserved + wanted;
                 if (this.pos.inRangeTo(container, 1)) {
                     this.withdraw(container, RESOURCE_ENERGY);
@@ -224,7 +228,7 @@ Creep.prototype.get_energy = function() {
     }
 
     // Consider fetching energy from storage
-    //console.log(this+' considers fetching energy from storage');
+    if (debug) { console.log(this+' considers fetching energy from storage'); }
     if (this.task != 'upgrade' && this.task != 'stockpile') {
         var storage = this.room.storage;
         if (storage instanceof StructureStorage) {
@@ -232,7 +236,7 @@ Creep.prototype.get_energy = function() {
             var wanted = this.carryCapacity - _.sum(this.carry);
             var available = storage.store.energy;
             if (available >= reserved + wanted) {
-                //console.log(this+' decided to fetch from '+storage+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')');
+                if (debug) { console.log(this+' decided to fetch from '+storage+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')'); }
                 storage.reserved_amount = reserved + this.carryCapacity - _.sum(this.carry);
                 if (this.pos.inRangeTo(storage, 1)) {
                     this.withdraw(storage, RESOURCE_ENERGY);
@@ -247,7 +251,7 @@ Creep.prototype.get_energy = function() {
     }
 
     // Consider mining
-    //console.log(this+' considers mining for energy');
+    if (debug) { console.log(this+' considers mining for energy'); }
     var sources = this.room.sources.slice();
     while (sources.length > 0) {
         var source = this.shift_nearest(sources);
@@ -313,22 +317,38 @@ Creep.prototype.is_harmless = function() {
 
 Creep.prototype.task_hunt = function() {
     this.memory.tracking = false;
-    if (this.memory.destination == this.room.name) {
+    if (this.memory.destination && this.memory.destination == this.room.name) {
         //console.log(this.memory.class+' '+this+' hunting hostiles in '+this.room.name);
         // Attack!
         var target = this.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-        if (target != null) {
+        if (target == null) {
+            delete this.memory.destination;
+            this.say('Victory!');
+        } else {
             if (this.pos.getRangeTo(target) > 3) {
                 if (this.hits < this.hitsMax) { this.heal(this); }// Attempt to heal self
                 this.move_to(target); // Close on target
             } else {
                 this.rangedAttack(target);
             }
+            return;
         }
-    } else {
+    }
+    if (this.memory.destination && this.memory.destination != this.room.name) {
         console.log(this.memory.class+' '+this+' heading for '+this.memory.destination+' to assist');
         this.move_to({ pos: new RoomPosition(25, 25, this.memory.destination) });
+        return;
     }
+    var spawn = this.shift_nearest(this.room.spawns.slice());
+    if (spawn != null) {
+        if (this.pos.getRangeTo(spawn) > 1) {
+            this.move_to(spawn);
+        } else {
+            spawn.recycleCreep(this);
+        }
+    }
+    return;
+
 }
 
 Creep.prototype.task_attack = function() {
@@ -772,27 +792,27 @@ Creep.prototype.move_to = function(target) {
             }
         }
         if (this.memory.nexthop && this.memory.nexthop.exit != null) {
-            if (this.memory.useexit && this.memory.useexit.roomName != this.room.name) { delete this.memory.useexit; } // Expire
-            if (typeof this.memory.useexit == 'undefined') {
-                //console.log(this+' finding closest exit to '+this.memory.nexthop.room+' (EXPENSIVE)');
-                this.room.start_timer('findClosestByPath');
-                var exit = this.pos.findClosestByPath(this.memory.nexthop.exit);
-                this.room.stop_timer('findClosestByPath');
-                if (exit == null) {
-                    console.log(this+' in '+this.room.name+' was told to use exit direction '+this.memory.nexthop.exit+' to reach '+this.memory.nexthop.room+' but found no exits');
-                } else {
-                    this.memory.useexit = { x: exit.x, y: exit.y, roomName: exit.roomName };
+            //console.log(this.room.link()+' '+this+' finding closest exit ('+this.memory.nexthop.exit+') to '+this.memory.nexthop.room+' (EXPENSIVE)');
+            var exits = this.room.get_exits(this.memory.nexthop.exit);
+            //console.log('  candidates: '+JSON.stringify(exits));
+            var exit = null;
+            var nearest_dist = null;
+            for (var i=0; i<exits.length; i++) {
+                var distance = this.room.manhattanDistance(this.pos, exits[i]);
+                if (nearest_dist == null || distance < nearest_dist) {
+                    exit = exits[i];
+                    nearest_dist = distance;
                 }
             }
-            if (this.memory.useexit) {
-                target = { pos: new RoomPosition(this.memory.useexit.x, this.memory.useexit.y, this.memory.useexit.roomName) };
-                //console.log(this+' dummy target = '+JSON.stringify(target));
-                //console.log(this+' in '+this.room.name+' using exit at '+target.pos);
+            if (exit == null) {
+                //console.log('  search failed');
+            } else {
+                //console.log('  navigating towards '+exit.x+','+exit.y);
+                target = { pos: new RoomPosition(exit.x, exit.y, this.room.name) };
             }
         }
     } else {
         delete this.memory.nexthop;
-        delete this.memory.useexit;
     }
 
     if (this.pos.roomName == target.pos.roomName) {
@@ -824,9 +844,9 @@ Creep.prototype.move_to = function(target) {
         //if (result != OK) { console.log(this+' learn path returned '+result); }
     } else {
         //console.log(this.memory.class+' '+this+' ('+this.memory.task.type+') calculating NON-CACHEABLE path to '+target.pos+' (EXPENSIVE)');
-        this.room.start_timer('moveTo');
+        this.room.start_timer('moveTo(*)');
         this.moveTo(target, { ignoreCreeps: false } );
-        this.room.stop_timer('moveTo');
+        this.room.stop_timer('moveTo(*)');
     }
 }
 

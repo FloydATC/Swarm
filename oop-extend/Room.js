@@ -71,6 +71,24 @@ Room.prototype.initialize = function() {
         }
     }
 
+    // Record exits if not already done (Store in encoded format)
+    if (typeof this.memory.exits == 'undefined') {
+        this.memory.exits = {};
+        var directions = [ FIND_EXIT_TOP, FIND_EXIT_LEFT, FIND_EXIT_BOTTOM, FIND_EXIT_RIGHT ];
+        for (var i in directions) {
+            var direction = directions[i];
+            var exits = this.find(direction);
+            var encoded = '';
+            for (var j in exits) {
+                var exit = exits[j];
+                //console.log(this.link()+' exit dir '+direction+' no '+j+' = '+JSON.stringify(exit));
+                encoded = encoded + String.fromCharCode(exit.x + (50 * exit.y));
+            }
+            this.memory.exits[direction] = encoded;
+        }
+    }
+
+
     for (var i=0; i<this.links.length; i++) { this.links[i].initialize(); }
     for (var i=0; i<this.my_creeps.length; i++) { this.my_creeps[i].initialize(); }
     for (var i=0; i<this.towers.length; i++) { this.towers[i].initialize(); }
@@ -78,7 +96,24 @@ Room.prototype.initialize = function() {
     for (var i=0; i<this.spawns.length; i++) { this.spawns[i].initialize(); }
     for (var i=0; i<this.containers.length; i++) { this.containers[i].initialize(); } // Note: Includes storage
 
+    //console.log(this.link()+' containers: '+this.containers);
     this.containers = this.containers.sort( function(a,b) { return a.free - b.free; } ); // Note: Must initialize before sorting
+}
+
+Room.prototype.get_exits = function(direction) {
+    var encoded = this.memory.exits[direction];
+    //console.log(this.link()+' direction '+direction+' encoded exits = '+encoded);
+    var decoded = [];
+    if (encoded == null) { return decoded; }
+    for (var i=0; i<encoded.length; i++) {
+        var value = encoded.charCodeAt(i);
+        decoded.push( { x: value % 50, y: Math.floor(value / 50) } );
+    }
+    return decoded;
+}
+
+Room.prototype.manhattanDistance = function(p1, p2) {
+    return Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
 }
 
 Room.prototype.plan = function() {
@@ -88,7 +123,7 @@ Room.prototype.plan = function() {
     var links = this.links.slice();
     var drops = this.dropped_other.slice();
     var extensions = this.extensions;
-    var containers = this.containers.reverse(); // 3 with least energy
+    var containers = this.containers.slice().reverse(); // 3 with least energy
     var my_creeps = this.my_creeps.slice(); // All classes
     var hostile_creeps = this.hostile_creeps.slice();
     var csites = this.construction_sites.slice(0,2); // Max 3 at a time
@@ -196,15 +231,15 @@ Room.prototype.plan = function() {
             if (name == this.name) { continue; } // Assist self? Duh.
             if (Game.manhattanDistance(this.name, name) <= 2) {
                 if (Memory.rooms[name].hostiles > 0 && Memory.rooms[name].scanned > Game.time - 1000) {
-                    console.log('  '+name+' is under attack, '+this.link()+' checking energy reserves ('+this.calc_spawn_reserves()+')');
+                    //console.log('  '+name+' is under attack, '+this.link()+' checking energy reserves ('+this.calc_spawn_reserves()+')');
                     if (this.calc_spawn_reserves() > 75) {
-                        console.log('  '+this.link()+' spawning assistance!');
+                        //console.log('  '+this.link()+' spawning assistance!');
                         // Spawn a hunter to assist!
                         var result = this.createCreep(this.schematic('Hunter'), undefined, { class: 'Hunter', destination: name })
-                        console.log('  result='+result);
+                        //console.log('  result='+result);
                         return;
                     } else {
-                        console.log('  '+this.link()+' unable to assist');
+                        //console.log('  '+this.link()+' unable to assist');
                     }
                 }
             }
@@ -259,11 +294,11 @@ Room.prototype.plan = function() {
     }
     if (Game.request_drones && Game.time % 300 == 0) {
         if (Game.manhattanDistance(this.name, Game.request_drones) <= 2 && Game.rooms[Game.request_drones].controller && Game.rooms[Game.request_drones].controller.my == true) {
-            console.log(this.link()+' spawning a creep to build spawn in '+Game.request_drones);
+            //console.log(this.link()+' spawning a creep to build spawn in '+Game.request_drones);
             var result = this.createCreep(this.schematic('Drone'), undefined, { class: 'Swarmer', destination: Game.request_drones });
             return;
         } else {
-            console.log(this.link()+' would like to help build but, gee, '+Game.request_drones+' is awfully far away: '+Game.manhattanDistance(this.name, Game.request_drones));
+            //console.log(this.link()+' would like to help build but, gee, '+Game.request_drones+' is awfully far away: '+Game.manhattanDistance(this.name, Game.request_drones));
         }
     }
     if (this.controller && this.controller.flag) {
@@ -271,11 +306,11 @@ Room.prototype.plan = function() {
         var needs = flag.needs();
         //console.log(this.link()+' flag '+flag+' needs '+needs);
         if (needs == 'Zealot') {
-            console.log(this.link()+' spawning a zealot for '+flag.pos.roomName);
+            //console.log(this.link()+' spawning a zealot for '+flag.pos.roomName);
             var result = this.createCreep(this.schematic('Zealot'), undefined, { class: 'Zealot', home: this.name, flag: flag.name } );
             if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Zealot', home: this.name, flag: flag.name } ); }
             if (result == OK) { flag.spawned('Zealot'); }
-            console.log('spawn zealot: '+result);
+            //console.log('spawn zealot: '+result);
             return;
         }
     }
@@ -285,14 +320,14 @@ Room.prototype.plan = function() {
             var flag = this.harvest_flags[i];
             var needs = flag.needs();
             if (needs == 'Miner') {
-                console.log(this.link()+' spawning a remote miner for '+flag.pos.roomName);
+                //console.log(this.link()+' spawning a remote miner for '+flag.pos.roomName);
                 var result = this.createCreep(this.schematic('Miner'), undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
                 if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } ); }
                 if (result == OK) { flag.spawned('Miner'); }
                 return;
             }
             if (needs == 'Fetcher') {
-                console.log(this.link()+' spawning a remote fetcher for '+flag.pos.roomName);
+                //console.log(this.link()+' spawning a remote fetcher for '+flag.pos.roomName);
                 var result = this.createCreep(this.schematic('Fetcher'), undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
                 if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } ); }
                 if (result == OK) { flag.spawned('Fetcher'); }
@@ -362,7 +397,7 @@ Room.prototype.schematic = function(c) {
     switch (c) {
         case 'Spitter': { hash[RANGED_ATTACK] = 1; hash[MOVE] = 1; break; }
         case 'Biter': { hash[ATTACK] = 1; hash[MOVE] = 1; break; }
-        case 'Hunter': { hash[TOUGH] = 2; hash[RANGED_ATTACK] = 4; hash[MOVE] = 5; hash[HEAL] = 4; break; }
+        case 'Hunter': { hash[TOUGH] = 2; hash[MOVE] = 5; hash[RANGED_ATTACK] = 4; hash[HEAL] = 4; break; }
         case 'Miner': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
         case 'Fetcher': { hash[WORK] = 1; hash[CARRY] = 5; hash[MOVE] = 3; break; }
         case 'Zealot': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
@@ -461,7 +496,7 @@ Room.prototype.calc_spawn_reserves = function() {
     if (total_capacity > 0) {
         var percent = total * 100 / total_capacity;
         this.spawn_reserves = percent;
-        console.log(this.link()+' spawn reserves at '+percent.toFixed(1)+'%');
+        //console.log(this.link()+' spawn reserves at '+percent.toFixed(1)+'%');
         return percent;
     } else {
         return 0;
