@@ -325,6 +325,7 @@ Creep.prototype.task_hunt = function() {
                 if (this.hits < this.hitsMax) { this.heal(this); }// Attempt to heal self
                 this.move_to(target); // Close on target
             } else {
+                this.stop();
                 this.rangedAttack(target);
             }
             return;
@@ -351,6 +352,7 @@ Creep.prototype.task_attack = function() {
     var target = Game.getObjectById(this.target);
     this.memory.tracking = false;
     if (this.pos.inRangeTo(target, 1)) {
+        this.stop();
         this.attack(target);
         this.add_stats('attack')
     } else {
@@ -363,6 +365,7 @@ Creep.prototype.task_ranged_attack = function() {
     var target = Game.getObjectById(this.target);
     this.memory.tracking = false;
     if (this.pos.inRangeTo(target, 3)) {
+        this.stop();
         this.rangedAttack(target);
         this.add_stats('ranged attack')
     } else {
@@ -375,6 +378,7 @@ Creep.prototype.task_recycle = function() {
     var target = Game.getObjectById(this.target);
     this.memory.tracking = false;
     if (this.pos.inRangeTo(target, 1)) {
+        this.stop();
         if (this.carry.energy > 0) {
             this.transfer(target, RESOURCE_ENERGY);
         } else {
@@ -390,6 +394,7 @@ Creep.prototype.task_pick_up = function() {
     var target = Game.getObjectById(this.target);
     this.memory.tracking = false;
     if (this.pos.inRangeTo(target, 1)) {
+        this.stop();
         this.pickup(target);
     } else {
         if (this.carry.energy) { this.drop(RESOURCE_ENERGY); } // Make room for valuables!
@@ -442,6 +447,7 @@ Creep.prototype.task_mine = function() {
         } else {
             if (arrived == 0) { this.memory.arrived = Game.time; }
             // Get energy
+            this.stop();
             this.harvest(source);
             //console.log('Miner '+this+' harvesting source ('+source+' in '+this.memory.mine+')');
 
@@ -467,7 +473,7 @@ Creep.prototype.task_mine = function() {
             }
             if (container != null) {
                 if (container.hits < container.hitsMax) {
-                    this.repair(container); return; 
+                    this.repair(container); return;
                 } else {
                     this.transfer(container, RESOURCE_ENERGY); return;
                 }
@@ -506,6 +512,7 @@ Creep.prototype.task_remote_fetch = function() {
                 //console.log('Fetcher '+this+' approaching source ('+source+' in '+this.memory.mine+')');
             } else {
                 // Get energy -- dedicated miner missing or behind schedule?
+                this.stop();
                 this.harvest(source);
                 //console.log('Fetcher '+this+' harvesting source ('+source+' in '+this.memory.mine+')');
             }
@@ -580,6 +587,7 @@ Creep.prototype.task_claim = function() {
     var target = Game.getObjectById(this.target);
     this.memory.tracking = false;
     if (this.pos.inRangeTo(target, 1)) {
+        this.stop();
         this.claimController(target);
     } else {
         this.move_to(target);
@@ -598,6 +606,7 @@ Creep.prototype.task_feed = function() {
     var target = Game.getObjectById(this.target);
     this.memory.tracking = true;
     if (this.pos.inRangeTo(target, 1)) {
+        this.stop();
         this.transfer(target, RESOURCE_ENERGY);
     } else {
         this.move_to(target);
@@ -610,6 +619,7 @@ Creep.prototype.task_feed_link = function() {
     this.target = target.id;
     this.memory.tracking = true;
     if (this.pos.inRangeTo(target, 1)) {
+        this.stop();
         this.transfer(target, RESOURCE_ENERGY);
     } else {
         this.move_to(target);
@@ -621,6 +631,7 @@ Creep.prototype.task_build = function() {
     var target = Game.getObjectById(this.target);
     this.memory.tracking = false;
     if (this.pos.inRangeTo(target, 3)) {
+        this.stop();
         this.build(target);
         this.add_stats('build')
     } else {
@@ -634,6 +645,7 @@ Creep.prototype.task_repair = function() {
     this.memory.tracking = false;
     //this.say(target.pos.x+','+target.pos.y);
     if (this.pos.inRangeTo(target, 3)) {
+        this.stop();
         this.repair(target)
         this.add_stats('repair')
     } else {
@@ -654,8 +666,7 @@ Creep.prototype.task_upgrade = function() {
     //console.log(this.memory.class+' '+this+' upgrade target ['+(target.structureType)+'] range ['+range+']');
     if (target.structureType == STRUCTURE_CONTROLLER && range <= 3) {
         //console.log('  ok, upgrade it');
-        delete this.memory._move;
-        delete this.memory.moving_to;
+        this.stop();
         if (this.carry.energy > 0) {
             //console.log(this+' has energy and should upgrade '+target);
             this.upgradeController(target);
@@ -863,4 +874,10 @@ Creep.prototype.reserve_position = function(pos) {
 Creep.prototype.add_stats = function(label) {
     if (!this.memory.stats) { this.memory.stats = {}; }
     this.memory.stats[label] = (this.memory.stats[label] + 1) || 1;
+}
+
+Creep.prototype.stop = function() {
+    // Signal to other creeps that this creep will not be moving
+    delete this.memory._move;
+    delete this.memory.moving_to;
 }
