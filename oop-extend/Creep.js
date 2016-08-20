@@ -466,7 +466,13 @@ Creep.prototype.task_mine = function() {
                 if (containers[i].free == 0) { continue; }
                 container = containers[i]
             }
-            if (container != null) { this.transfer(container, RESOURCE_ENERGY); return; }
+            if (container != null) {
+                if (container.hits < container.hitsMax) {
+                    this.repair(container); return; 
+                } else {
+                    this.transfer(container, RESOURCE_ENERGY); return;
+                }
+            }
 
             // Nope. Just drop the energy on the ground then
             this.drop(RESOURCE_ENERGY);
