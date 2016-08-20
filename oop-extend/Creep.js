@@ -439,13 +439,17 @@ Creep.prototype.task_mine = function() {
             flag.memory.source = source.id;
         }
 
+        // Register as arrived if we are within 3 tiles. Old creep may be in the way.
         var arrived = this.memory.arrived || 0;
-        if (arrived == 0 && this.pos.getRangeTo(source) > 1) {
+        if (arrived == 0 && this.pos.getRangeTo(source) <= 3) {
+            this.memory.arrived = Game.time;
+        }
+
+        if (this.pos.getRangeTo(source) > 1) {
             // Move closer
             this.move_to(source);
             //console.log('Miner '+this+' approaching source ('+source+' in '+this.memory.mine+')');
         } else {
-            if (arrived == 0) { this.memory.arrived = Game.time; }
             // Get energy
             this.stop();
             this.harvest(source);
