@@ -18,7 +18,7 @@ Room.prototype.initialize = function() {
     this.containers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_STORAGE; } });
     this.construction_sites = this.find(FIND_CONSTRUCTION_SITES).sort( function(a,b) { return b.progress - a.progress; } ); // Nearest completion first
     var ambition = this.hp_ambition();
-    this.need_repairs = this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits && s.hits < ambition && s.hits < s.hitsMax; } }).sort( function(a,b) { return a.hits - b.hits; } ); // Most urgent first
+    this.need_repairs = this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits && s.hits < ambition && s.hits < s.hitsMax; } }).sort( function(a,b) { return (a.hits - b.hits) || (a.ticksToDecay - b.ticksToDecay); } ); // Most urgent first
 
     this.timer = {}; // Used by .start_timer() and .stop_timer()
     this.total = {}; // Accumulated timers, used by .show_totals()
@@ -31,6 +31,9 @@ Room.prototype.initialize = function() {
     // Record presence of hostiles in case we lose visual - used by other rooms to assist
     this.memory.hostiles = this.hostile_creeps.length;
     this.memory.scanned = Game.time;
+
+    // Neighbor room route cache
+    if (typeof this.memory.to == 'undefined') { this.memory.to = {}; }
 
     // Owned room?
     if (this.controller && this.controller.my) {
@@ -131,7 +134,7 @@ Room.prototype.plan = function() {
 
     var miners = [];        // Mine energy (local or remote)
     var fetchers = [];      // Fetch energy from remote mines
-    var zealots = [];     // Camp next to controller and upgrade it
+    var zealots = [];       // Camp next to controller and upgrade it
     var drones = [];        // Generic workers
     var swarmers = [];      // Move to remote room then mutate into Infectors
     var infectors = [];     // Claim controller then mutate into Drone
@@ -254,6 +257,9 @@ Room.prototype.plan = function() {
             if (needs == 'Miner') {
                 //console.log(this.link()+' spawning a local miner for '+flag.pos.roomName);
                 var result = this.createCreep(this.schematic('Miner'), undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } );
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,WORK,WORK,WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } ); }
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,WORK,WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } ); }
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } ); }
                 if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } ); }
                 if (result == OK) { flag.spawned('Miner'); }
                 return;
@@ -750,22 +756,21 @@ Room.prototype.assign_task_feed_extension = function(drones, extensions) {
 Room.prototype.assign_task_repair = function(drones, need_repairs){
     while (drones.length > 0 && need_repairs.length > 0) {
         var drone = drones.shift();
-        while (need_repairs.length > 0) {
-            var structure = drone.shift_nearest(need_repairs);
-            if (structure.structureType == STRUCTURE_WALL && structure.hits >= this.hp_ambition()) { continue; }
-            drone.task = 'repair';
-            drone.target = structure.id;
-            //console.log(drone.name+' assigned to '+drone.task+' '+drone.target);
-            if (structure.structureType == STRUCTURE_WALL || structure.structureType == STRUCTURE_RAMPART) {
-                need_repairs = [];
-                break;
-            } // Only one
-        }
-        if (typeof drone.task == 'undefined') {
-            // No structures need repair
+        //console.log(this.link()+' shifted '+drone.name+' off the stack');
+        var structure = drone.shift_nearest(need_repairs);
+        if (structure.structureType == STRUCTURE_WALL && structure.hits >= this.hp_ambition()) {
+            //console.log(this.name+' pushed back on the stack');
             drones.push(drone);
-            break;
+            continue;
         }
+        drone.task = 'repair';
+        drone.target = structure.id;
+        //console.log(this.link()+' '+drone.name+' assigned to '+drone.task+' '+drone.target);
+        if (structure.structureType == STRUCTURE_WALL || structure.structureType == STRUCTURE_RAMPART) {
+            need_repairs = [];
+            return;
+        } // Only one
+        //console.log('outer loop end');
     }
 }
 
@@ -827,46 +832,47 @@ Room.prototype.assign_task_upgrade = function(drones) {
 }
 
 Room.prototype.load_routing_table = function(tile) {
-    if (!this.memory.router) { this.memory.router = {}; }
-    if (!this.memory.router[tile]) { this.memory.router[tile] = {}; }
-    this.memory.router[tile]['mru'] = Game.time;
-    var table = new Routingtable(this.memory.router[tile]['table']);
+    if (!this.memory.r) { this.memory.r = {}; }
+    if (!this.memory.r[tile]) { this.memory.r[tile] = {}; }
+    this.memory.r[tile]['mru'] = Game.time;
+    var table = new Routingtable(this.memory.r[tile]['table']);
     return table;
 }
 
 Room.prototype.save_routing_table = function(tile, table) {
-    if (!this.memory.router) { this.memory.router = {}; }
-    if (!this.memory.router[tile]) { this.memory.router[tile] = {}; }
-    this.memory.router[tile]['table'] = table.asString();
+    if (!this.memory.r) { this.memory.r = {}; }
+    if (!this.memory.r[tile]) { this.memory.r[tile] = {}; }
+    this.memory.r[tile]['table'] = table.asBinaryString();
 }
 
 Room.prototype.get_direction = function(src, dst) {
     var pos1 = ('0'+src.x).slice(-2) + ('0'+src.y).slice(-2); // Format as XXYY
-    var pos2 = ('0'+dst.x).slice(-2) + ('0'+dst.y).slice(-2); // Format as XXYY
+    //var pos2 = ('0'+dst.x).slice(-2) + ('0'+dst.y).slice(-2); // Format as XXYY
     //console.log('???:'+pos1+'-'+pos2);
-    if (!this.memory.router) { return null; }
-    if (!this.memory.router[pos1]) { return null; }
+    if (!this.memory.r) { return null; }
+    if (!this.memory.r[pos1]) { return null; }
     //if (!this.memory.router[pos1][pos2]) { return null; }
     //var direction = this.memory.router[pos1][pos2];
-    this.memory.router[pos1]['mru'] = Game.time;
-    var table = new Routingtable(this.memory.router[pos1]['table']);
-    var direction = table.getDirectionTo(pos2);
-    //console.log('HIT:'+pos1+'-'+pos2+'='+direction);
+    this.memory.r[pos1]['mru'] = Game.time;
+    var table = new Routingtable(this.memory.r[pos1]['table']);
+    var direction = table.getDirectionTo(dst.x + (50 * dst.y));
+    //console.log('HIT:'+pos1+'='+direction);
     return direction;
 }
 
 Room.prototype.expire_routes = function() {
-    if (this.memory.router) {
+    delete this.memory.router;
+    if (this.memory.r) {
       var count = 0;
         var maxage = Game.time - 900; // Drop routing table for tiles not visited in 'maxage' ticks
-        var tiles = Object.keys(this.memory.router);
+        var tiles = Object.keys(this.memory.r);
         for (var i=0; i<tiles.length; i++) {
-            if (this.memory.router[tiles[i]]['mru'] < maxage) {
-                delete this.memory.router[tiles[i]];
+            if (this.memory.r[tiles[i]]['mru'] < maxage) {
+                delete this.memory.r[tiles[i]];
                 count++;
             }
         }
-        console.log(this.link()+' routes expired: '+count);
+        console.log(this.link()+' binary route(s) expired: '+count);
     }
 }
 
@@ -893,4 +899,26 @@ Room.prototype.show_totals = function() {
     var report = this.link()+' totals:';
     for (var name in this.total) { report = report+' '+name+'='+this.total[name].toFixed(3); }
     console.log(report);
+}
+
+Room.prototype.direction_to_room = function(name) {
+    var direction = this.memory.to[name];
+    if (direction != null) {
+        //console.log(this.link()+' used room route cache entry for '+name);
+        return direction;
+    }
+    // Fall back to Map.findRoute()
+    console.log(this.link()+' (re)calculating route to '+name);
+    this.start_timer('findRoute');
+    var route = Game.map.findRoute(this.name, name, {
+        routeCallback(rname) {
+            if (Game.rooms[rname] && Game.rooms[rname].controller && Game.rooms[rname].controller.my) { return 1; } // My room
+            var parsed = /^[WE]([0-9]+)[NS]([0-9]+)$/.exec(rname);
+            if ((parsed[1] % 10 === 0) || (parsed[2] % 10 === 0)) { return 1.5; } // Highway
+            return 2.5;
+        }
+    });
+    this.stop_timer('findRoute');
+    this.memory.to[name] = route[0].exit;
+    return route[0].exit;
 }
