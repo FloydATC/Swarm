@@ -936,7 +936,7 @@ Room.prototype.find_roads = function() {
     console.log(this.link()+' store '+Game.cpu.getUsed()-start);
 
     start = Game.cpu.getUsed();
-    roads = this.retrieve_structure_from_coords('w', STRUCTURE_ROAD);
+    roads = this.retrieve_structures_from_coords('w', STRUCTURE_ROAD);
     console.log(this.link()+' retrieve '+Game.cpu.getUsed()-start);
 
     return roads;
@@ -950,7 +950,7 @@ Room.prototype.store_coords = function(label, objects) {
     this.memory[label] = string;
 }
 
-Room.prototype.retrieve_structure_from_coors = function(label, type) {
+Room.prototype.retrieve_structures_from_coords = function(label, type) {
     var objects = [];
     var string = this.memory[label];
     for (var i=0; i<string.length; i++) {
