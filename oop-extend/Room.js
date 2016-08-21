@@ -972,6 +972,7 @@ Room.prototype.recall = function(label) {
     var string = this.memory[label];
     if (string == null) { return objects; }
     var list = string.split();
+    console.log('list='+list);
     for (var i=0; i<list.length; i++) {
         var object = Game.getObjectById(list[i]);
         if (object != null) { objects.push(object); }
