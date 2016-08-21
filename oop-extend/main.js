@@ -13,11 +13,11 @@ var profiler = require('Profiler');
 //var stacktrace = require('Stacktrace'); // var trace = arguments.callee.trace();
 var show_perf = false;
 
-profiler.enable(); // Game.profiler.profile(100) -or- Game.profiler.email(100)
-module.exports.loop = function() {
-    profiler.wrap(function() {
+//profiler.enable(); // Game.profiler.profile(100) -or- Game.profiler.email(100)
+//module.exports.loop = function() {
+//    profiler.wrap(function() {
 
-//module.exports.loop = function () {
+module.exports.loop = function () {
     if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' overhead'); }
 
     // Scavenge dead creeps
@@ -85,10 +85,10 @@ module.exports.loop = function() {
     if (show_perf) { console.log('(finished)'); }
 
 
-    }); // Profiler
-}
-
+//    }); // Profiler
 //}
+
+}
 
 function roughSizeOfObject( object ) {
 
