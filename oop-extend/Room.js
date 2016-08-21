@@ -928,7 +928,7 @@ Room.prototype.direction_to_room = function(name) {
 Room.prototype.find_roads = function() {
     var start = null;
     var objects = this.recall('roads');
-    if (roads.length == 0 || Math.random() < 0.05) {
+    if (objects.length == 0 || Math.random() < 0.05) {
         // If empty, do a manual scan. Also, 5% chance to discard cache and do a rescan.
         objects = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_ROAD; } });
         this.remember(objects, 'roads');
@@ -939,7 +939,7 @@ Room.prototype.find_roads = function() {
 Room.prototype.find_walls = function() {
     var start = null;
     var objects = this.recall('walls');
-    if (roads.length == 0 || Math.random() < 0.05) {
+    if (objects.length == 0 || Math.random() < 0.05) {
         // If empty, do a manual scan. Also, 5% chance to discard cache and do a rescan.
         objects = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_WALL; } });
         this.remember(objects, 'walls');
@@ -950,7 +950,7 @@ Room.prototype.find_walls = function() {
 Room.prototype.find_extensions = function() {
     var start = null;
     var objects = this.recall('extensions');
-    if (roads.length == 0 || Math.random() < 0.05) {
+    if (objects.length == 0 || Math.random() < 0.05) {
         // If empty, do a manual scan. Also, 5% chance to discard cache and do a rescan.
         objects = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTENSION; } });
         this.remember(objects, 'extensions');
