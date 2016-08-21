@@ -968,9 +968,10 @@ Room.prototype.remember = function(objects, label) {
 }
 
 Room.prototype.recall = function(label) {
-    var string = this.memory[label] || '';
-    var list = string.split();
     var objects = [];
+    var string = this.memory[label];
+    if (string == null) { return objects; }
+    var list = string.split();
     for (var i=0; i<list.length; i++) {
         var object = Game.getObjectById(list[i]);
         if (object != null) { objects.push(object); }
