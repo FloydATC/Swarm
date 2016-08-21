@@ -961,7 +961,7 @@ Room.prototype.find_extensions = function() {
     return objects;
 }
 
-Room.prototype.remember = function(label, objects) {
+Room.prototype.remember = function(objects, label) {
     var list = [];
     for (var i=0; i<objects.length; i++) { list.push(objects[i].id); }
     this.memory[label] = list.join();
