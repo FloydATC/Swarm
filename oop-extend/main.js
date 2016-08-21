@@ -1,14 +1,15 @@
 
+require('Creep');               // Extends prototype
+require('Flag');                // Extends prototype
+require('Room');                // Extends prototype
+require('Source');              // Extends prototype
+require('StructureContainer');  // Extends prototype
+require('StructureLink');       // Extends prototype
+require('StructureSpawn');      // Extends prototype
+require('StructureStorage');    // Extends prototype
+require('StructureTower');      // Extends prototype
+
 var extend_game = require('Game');
-var extend_creep = require('Creep'); // Extends prototype
-var extend_flag = require('Flag');
-var extend_room = require('Room'); // Extends prototype
-var extend_source = require('Source');
-var extend_s_container = require('StructureContainer');
-var extend_s_link = require('StructureLink');
-var extend_s_spawn = require('StructureSpawn');
-var extend_s_storage = require('StructureStorage');
-var extend_s_tower = require('StructureTower');
 var profiler = require('Profiler');
 //var stacktrace = require('Stacktrace'); // var trace = arguments.callee.trace();
 var show_perf = false;
