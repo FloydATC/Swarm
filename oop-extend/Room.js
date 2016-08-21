@@ -929,15 +929,15 @@ Room.prototype.find_roads = function() {
 
     start = Game.cpu.getUsed();
     var roads = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_ROAD; } });
-    console.log(this.link()+' find '+Game.cpu.getUsed()-start);
+    console.log(this.link()+' find '+(Game.cpu.getUsed()-start));
 
     start = Game.cpu.getUsed();
     this.store_coords('w', roads);
-    console.log(this.link()+' store '+Game.cpu.getUsed()-start);
+    console.log(this.link()+' store '+(Game.cpu.getUsed()-start));
 
     start = Game.cpu.getUsed();
     roads = this.retrieve_structures_from_coords('w', STRUCTURE_ROAD);
-    console.log(this.link()+' retrieve '+Game.cpu.getUsed()-start);
+    console.log(this.link()+' retrieve '+(Game.cpu.getUsed()-start));
 
     return roads;
 }
