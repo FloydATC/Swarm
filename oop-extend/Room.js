@@ -12,9 +12,11 @@ Room.prototype.initialize = function() {
     this.sources = this.find(FIND_SOURCES);
     this.spawns = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_SPAWN; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
     this.towers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_TOWER; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
-    this.roads = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_ROAD; } });
+    //this.roads = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_ROAD; } });
+    this.roads = this.find_roads();
     this.links = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_LINK; } });
-    this.extensions = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTENSION; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
+    //this.extensions = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTENSION; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
+    this.extensions = this.find_extensions();
     this.containers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_STORAGE; } });
     this.construction_sites = this.find(FIND_CONSTRUCTION_SITES).sort( function(a,b) { return b.progress - a.progress; } ); // Nearest completion first
     var ambition = this.hp_ambition();
@@ -343,12 +345,19 @@ Room.prototype.plan = function() {
     }
 }
 
+Room.prototype.rangeFromTo = function(pos1, pos2) {
+    if (pos1.roomName != pos2.roomName) { return Infinity; }
+    return Math.max(Math.abs(pos1.x - pos2.x), Math.abs(pos1.y - pos2.y));
+}
+
 Room.prototype.optimize = function() {
     // Swap tasks where it makes sense
 
     // Calculate each creep's range to target
     for (var i=0; i<this.my_creeps.length; i++) {
-        this.my_creeps[i].range_to_target = this.my_creeps[i].pos.getRangeTo(Game.getObjectById(this.my_creeps[i].target));
+        //this.my_creeps[i].range_to_target = this.my_creeps[i].pos.getRangeTo(Game.getObjectById(this.my_creeps[i].target));
+        var target = Game.getObjectById(this.my_creeps[i].target);
+        this.my_creeps[i].range_to_target = this.rangeFromTo(this.my_creeps[i].pos, target.pos);
     }
 
     // For each creep, if both are same class, would they benefit from swapping targets?
@@ -367,8 +376,8 @@ Room.prototype.optimize = function() {
             var target_b = Game.getObjectById(creep_b.target);
             if (target_b == null) { continue; } // Target no longer valid
             if (target_a.id == target_b.id) { continue; } // Same target
-            var catb = creep_a.pos.getRangeTo(target_b)
-            var cbta = creep_b.pos.getRangeTo(target_a)
+            var catb = this.rangeFromTo(creep_a.pos, target_b.pos);// creep_a.pos.getRangeTo(target_b)
+            var cbta = this.rangeFromTo(creep_b.pos, target_a.pos);// creep_b.pos.getRangeTo(target_a)
             if (cbta+1 < creep_b.range_to_target && catb+1 < creep_a.range_to_target) {
                 // Both would benefit
                 //console.log(this.link()+' creeps '+creep_a+' ('+creep_a.range_to_target+'>'+catb+') and '+creep_b+' ('+creep_b.range_to_target+'>'+cbta+')  swapped targets');
@@ -921,4 +930,62 @@ Room.prototype.direction_to_room = function(name) {
     this.stop_timer('findRoute');
     this.memory.to[name] = route[0].exit;
     return route[0].exit;
+}
+
+Room.prototype.find_roads = function() {
+    var start = null;
+    var objects = this.recall('roads');
+    if (objects == null || Math.random() < 0.05) {
+        // If empty, do a manual scan. Also, 5% chance to discard cache and do a rescan.
+        objects = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_ROAD; } });
+        this.remember(objects, 'roads');
+        //console.log(this.link()+' roads scanned');
+    }
+    return objects;
+}
+
+Room.prototype.find_walls = function() {
+    var start = null;
+    var objects = this.recall('walls');
+    if (objects == null || Math.random() < 0.05) {
+        // If empty, do a manual scan. Also, 5% chance to discard cache and do a rescan.
+        objects = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_WALL; } });
+        this.remember(objects, 'walls');
+        //console.log(this.link()+' walls scanned');
+    }
+    return objects;
+}
+
+Room.prototype.find_extensions = function() {
+    var start = null;
+    var objects = this.recall('extensions');
+    if (objects == null || Math.random() < 0.05) {
+        // If empty, do a manual scan. Also, 5% chance to discard cache and do a rescan.
+        objects = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTENSION; } });
+        this.remember(objects, 'extensions');
+        //console.log(this.link()+' extensions scanned');
+    }
+    return objects;
+}
+
+Room.prototype.remember = function(objects, label) {
+    var list = [];
+    for (var i=0; i<objects.length; i++) { list.push(objects[i].id); }
+    this.memory[label] = list.join(',');
+}
+
+Room.prototype.recall = function(label) {
+    var objects = [];
+    var string = this.memory[label];
+    if (string == null) { return null; }
+    //console.log('string='+string);
+    var list = string.split(',');
+    //console.log('list='+list.join(';'));
+    for (var i=0; i<list.length; i++) {
+        var object = Game.getObjectById(list[i]);
+        if (object != null) { objects.push(object); }
+        //console.log('  i='+i+' object='+object);
+    }
+    //console.log(this.link()+' recalled '+label+':'+objects.length);
+    return objects;
 }

@@ -1,23 +1,19 @@
 
 
-module.exports = {
+module.exports = {}; // Nothing
 
-    initialize: function() {
-        //console.log(this+' initializing');
+Source.prototype.initialize = function() {
+    this.slots = this.find_slots();
+}
 
-        this.slots = this.find_slots();
-    },
-
-    find_slots: function() {
-        // A free space around a Source (where a creep might mine from) counts as a "slot".
-        // Count them to see how many creeps may mine this source simultaneously
-        var slots = [];
-        var tiles = this.room.lookForAtArea(LOOK_TERRAIN, this.pos.y-1, this.pos.x-1, this.pos.y+1, this.pos.x+1, true); // Note: YX not XY
-        var count = tiles.length;
-        for (var i=0; i<count; i++) {
-            if (tiles[i].terrain != 'wall') { slots.push(tiles[i]); }
-        }
-        return slots; // Array of tiles with .terrain, .x and .y
-    },
-
-};
+Source.prototype.find_slots = function() {
+    // A free space around a Source (where a creep might mine from) counts as a "slot".
+    // Count them to see how many creeps may mine this source simultaneously
+    var slots = [];
+    var tiles = this.room.lookForAtArea(LOOK_TERRAIN, this.pos.y-1, this.pos.x-1, this.pos.y+1, this.pos.x+1, true); // Note: YX not XY
+    var count = tiles.length;
+    for (var i=0; i<count; i++) {
+        if (tiles[i].terrain != 'wall') { slots.push(tiles[i]); }
+    }
+    return slots; // Array of tiles with .terrain, .x and .y
+}

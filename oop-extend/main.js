@@ -1,14 +1,15 @@
 
+require('Creep');               // Extends prototype
+require('Flag');                // Extends prototype
+require('Room');                // Extends prototype
+require('Source');              // Extends prototype
+require('StructureContainer');  // Extends prototype
+require('StructureLink');       // Extends prototype
+require('StructureSpawn');      // Extends prototype
+require('StructureStorage');    // Extends prototype
+require('StructureTower');      // Extends prototype
+
 var extend_game = require('Game');
-var extend_creep = require('Creep'); // Extends prototype
-var extend_flag = require('Flag');
-var extend_room = require('Room'); // Extends prototype
-var extend_source = require('Source');
-var extend_s_container = require('StructureContainer');
-var extend_s_link = require('StructureLink');
-var extend_s_spawn = require('StructureSpawn');
-var extend_s_storage = require('StructureStorage');
-var extend_s_tower = require('StructureTower');
 var profiler = require('Profiler');
 //var stacktrace = require('Stacktrace'); // var trace = arguments.callee.trace();
 var show_perf = false;
@@ -36,20 +37,7 @@ module.exports.loop = function() {
 
     // Extend game object instance (can't extend class?)
     for (var key in extend_game) { Game[key] = extend_game[key]; }
-
-
-    // Extend game classes with custom methods
-    //for (var key in extend_creep) { Creep.prototype[key] = extend_creep[key]; }
-    for (var key in extend_flag) { Flag.prototype[key] = extend_flag[key]; }
-    //for (var key in extend_room) { Room.prototype[key] = extend_room[key]; }
-    for (var key in extend_source) { Source.prototype[key] = extend_source[key]; }
-    for (var key in extend_s_container) { StructureContainer.prototype[key] = extend_s_container[key]; }
-    for (var key in extend_s_link) { StructureLink.prototype[key] = extend_s_link[key]; }
-    for (var key in extend_s_spawn) { StructureSpawn.prototype[key] = extend_s_spawn[key]; }
-    for (var key in extend_s_storage) { StructureStorage.prototype[key] = extend_s_storage[key]; }
-    for (var key in extend_s_tower) { StructureTower.prototype[key] = extend_s_tower[key]; }
-
-    if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' extended game classes'); }
+    if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' extended game object'); }
 
     Game.initialize(); // Model current game state
     if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' initialized game model'); }
@@ -65,7 +53,7 @@ module.exports.loop = function() {
         room.execute();
         if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' executed '+room); }
 
-        room.show_totals();
+        //room.show_totals();
 
         if (Game.time % 100 == 0) {
             room.expire_routes();

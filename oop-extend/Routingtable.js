@@ -9,23 +9,24 @@ function Routingtable(table) {
 // Each room tile may have a single routing table
 
 // A routing table is stored as a single string containing one or more
-// comma separated KEY=VALUE pairs, where each pair indicates the
-// next movement needed to reach one (XXYY) or more (XXY1-XXY2) consecutive
-// tiles. The KEY order always sorted, this must not be tampered with.
+// UTF8 characters. Each character encodes a position (12 bits) and a direction (4 bits)
+// If the direction is 0, it means the position marks the beginning of a range
+// ending at the position marked by the next character.
 
 // Typical use for lookups:
 // var table = room.load_routing_table(X1Y1);
-// var direction = table.getDirectionTo(X2Y2);
+// var direction = table.getDirectionTo(x+50y);
 
 // Typical use for learning:
 // var table = room.load_routing_table(X1Y1);
-// table.setDirectionTo(X2Y2, direction); // Repeat for each destination
+// table.setDirectionTo(x+50y, direction); // Repeat for each destination
 // room.save_routing_table(X1Y1, table);
 
-// When making changes with setDirectionTo(), the routing table is expanded
+// When making changes with setDirectionTo(), the routing table is expanded.
 // When saving the Routingtable, the caller is expected to access its contents
-// via the .asString() method which (if needed) will compress the contents by
-// aggregating consecutive tiles back into XXY1-XXY2 format.
+// via the .asBinaryString() method which (if needed) will compress the contents by
+// aggregating consecutive tiles back into compressed format with ranges.
+// NOTE! this.binary_table holds the UNMODIFIED string until .asBinaryString() has been called!
 
 Routingtable.prototype.asBinaryString = function() {
     this.compress_binary();

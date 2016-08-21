@@ -1,10 +1,7 @@
 
 
-module.exports = {
+module.exports = {}; // Nothing
 
-    initialize: function() {
+StructureSpawn.prototype.initialize = function() {
         //console.log(this+' initializing');
-
-    },
-
-};
+}
