@@ -964,21 +964,21 @@ Room.prototype.find_extensions = function() {
 Room.prototype.remember = function(objects, label) {
     var list = [];
     for (var i=0; i<objects.length; i++) { list.push(objects[i].id); }
-    this.memory[label] = list.join();
+    this.memory[label] = list.join(',');
 }
 
 Room.prototype.recall = function(label) {
     var objects = [];
     var string = this.memory[label];
     if (string == null) { return objects; }
-    console.log('string='+string);
+    //console.log('string='+string);
     var list = string.split(',');
-    console.log('list='+list.join(';'));
+    //console.log('list='+list.join(';'));
     for (var i=0; i<list.length; i++) {
         var object = Game.getObjectById(list[i]);
         if (object != null) { objects.push(object); }
-        console.log('  i='+i+' object='+object);
+        //console.log('  i='+i+' object='+object);
     }
-    console.log(this.link()+' recalled '+label+':'+objects.length);
+    //console.log(this.link()+' recalled '+label+':'+objects.length);
     return objects;
 }
