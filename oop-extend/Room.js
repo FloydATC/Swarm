@@ -944,7 +944,7 @@ Room.prototype.find_roads = function() {
 
 Room.prototype.store_coords = function(label, objects) {
     var string = '';
-    for (var i=0; i<objects.length, i++) {
+    for (var i=0; i<objects.length; i++) {
         string = string + String.fromCharCode(objects[i].pos.x + (50 * objects[i].pos.y));
     }
     this.memory[label] = string;
@@ -956,8 +956,8 @@ Room.prototype.retrieve_structure_from_coors = function(label, type) {
     for (var i=0; i<string.length; i++) {
         var code = string.charCodeAt(i);
         var list = this.lookAt(code % 50, Math.floor(code / 50));
-        for (var j=0; i<list.length; j++) {
-            var found = list[i];
+        for (var j=0; j<list.length; j++) {
+            var found = list[j];
             if (found.type == 'structure' && found.structure.structureType == type) {
                 objects.push(found);
             }
