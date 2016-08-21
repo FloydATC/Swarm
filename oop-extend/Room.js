@@ -963,7 +963,7 @@ Room.prototype.find_extensions = function() {
 
 Room.prototype.remember = function(label, objects) {
     var list = [];
-    for (var i=0; i<objects.length; i++) { list.push(objects.id); }
+    for (var i=0; i<objects.length; i++) { list.push(objects[i].id); }
     this.memory[label] = list.join();
 }
 
