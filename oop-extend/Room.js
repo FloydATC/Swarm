@@ -975,5 +975,6 @@ Room.prototype.recall = function(label) {
         var object = Game.getObjectById(list[i]);
         if (object != null) { objects.push(object); }
     }
+    console.log(this.link()+' recalled '+label+':'+objects.length);
     return objects;
 }
