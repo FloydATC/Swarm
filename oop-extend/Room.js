@@ -12,7 +12,8 @@ Room.prototype.initialize = function() {
     this.sources = this.find(FIND_SOURCES);
     this.spawns = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_SPAWN; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
     this.towers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_TOWER; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
-    this.roads = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_ROAD; } });
+    //this.roads = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_ROAD; } });
+    this.roads = this.find_roads();
     this.links = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_LINK; } });
     this.extensions = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTENSION; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
     this.containers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_STORAGE; } });
@@ -921,4 +922,46 @@ Room.prototype.direction_to_room = function(name) {
     this.stop_timer('findRoute');
     this.memory.to[name] = route[0].exit;
     return route[0].exit;
+}
+
+Room.prototype.find_roads = function() {
+    var start = null;
+
+    start = Game.cpu.getUsed();
+    var roads = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_ROAD; } });
+    console.log(this.link()+' find '+Game.cpu.getUsed()-start);
+
+    start = Game.cpu.getUsed();
+    this.store_coords('w', roads);
+    console.log(this.link()+' store '+Game.cpu.getUsed()-start);
+
+    start = Game.cpu.getUsed();
+    roads = this.retrieve_structure_from_coords('w', STRUCTURE_ROAD);
+    console.log(this.link()+' retrieve '+Game.cpu.getUsed()-start);
+
+    return roads;
+}
+
+Room.prototype.store_coords = function(label, objects) {
+    var string = '';
+    for (var i=0; i<objects.length, i++) {
+        string = string + String.fromCharCode(objects[i].pos.x + (50 * objects[i].pos.y));
+    }
+    this.memory[label] = string;
+}
+
+Room.prototype.retrieve_structure_from_coors = function(label, type) {
+    var objects = [];
+    var string = this.memory[label];
+    for (var i=0; i<string.length; i++) {
+        var code = string.charCodeAt(i);
+        var list = this.lookAt(code % 50, Math.floor(code / 50));
+        for (var j=0; i<list.length; j++) {
+            var found = list[i];
+            if (found.type == 'structure' && found.structure.structureType == type) {
+                objects.push(found);
+            }
+        }
+    }
+    return objects;
 }
