@@ -36,20 +36,7 @@ module.exports.loop = function () {
 
     // Extend game object instance (can't extend class?)
     for (var key in extend_game) { Game[key] = extend_game[key]; }
-
-
-    // Extend game classes with custom methods
-    //for (var key in extend_creep) { Creep.prototype[key] = extend_creep[key]; }
-    for (var key in extend_flag) { Flag.prototype[key] = extend_flag[key]; }
-    //for (var key in extend_room) { Room.prototype[key] = extend_room[key]; }
-    for (var key in extend_source) { Source.prototype[key] = extend_source[key]; }
-    for (var key in extend_s_container) { StructureContainer.prototype[key] = extend_s_container[key]; }
-    for (var key in extend_s_link) { StructureLink.prototype[key] = extend_s_link[key]; }
-    for (var key in extend_s_spawn) { StructureSpawn.prototype[key] = extend_s_spawn[key]; }
-    for (var key in extend_s_storage) { StructureStorage.prototype[key] = extend_s_storage[key]; }
-    for (var key in extend_s_tower) { StructureTower.prototype[key] = extend_s_tower[key]; }
-
-    if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' extended game classes'); }
+    if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' extended game object'); }
 
     Game.initialize(); // Model current game state
     if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' initialized game model'); }
