@@ -15,7 +15,8 @@ Room.prototype.initialize = function() {
     //this.roads = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_ROAD; } });
     this.roads = this.find_roads();
     this.links = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_LINK; } });
-    this.extensions = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTENSION; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
+    //this.extensions = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTENSION; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
+    this.extensions = this.find_extensions();
     this.containers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_STORAGE; } });
     this.construction_sites = this.find(FIND_CONSTRUCTION_SITES).sort( function(a,b) { return b.progress - a.progress; } ); // Nearest completion first
     var ambition = this.hp_ambition();
@@ -926,20 +927,35 @@ Room.prototype.direction_to_room = function(name) {
 
 Room.prototype.find_roads = function() {
     var start = null;
+    var objects = this.recall('roads');
+    if (roads.length == 0 || Math.random() < 0.05) {
+        // If empty, do a manual scan. Also, 5% chance to discard cache and do a rescan.
+        objects = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_ROAD; } });
+        this.remember(objects, 'roads');
+    }
+    return objects;
+}
 
-    start = Game.cpu.getUsed();
-    var roads = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_ROAD; } });
-    console.log(this.link()+' find '+(Game.cpu.getUsed()-start));
+Room.prototype.find_walls = function() {
+    var start = null;
+    var objects = this.recall('walls');
+    if (roads.length == 0 || Math.random() < 0.05) {
+        // If empty, do a manual scan. Also, 5% chance to discard cache and do a rescan.
+        objects = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_WALL; } });
+        this.remember(objects, 'walls');
+    }
+    return objects;
+}
 
-    start = Game.cpu.getUsed();
-    this.remember('w', roads);
-    console.log(this.link()+' store '+(Game.cpu.getUsed()-start));
-
-    start = Game.cpu.getUsed();
-    roads = this.recall('w');
-    console.log(this.link()+' retrieve '+(Game.cpu.getUsed()-start));
-
-    return roads;
+Room.prototype.find_extensions = function() {
+    var start = null;
+    var objects = this.recall('extensions');
+    if (roads.length == 0 || Math.random() < 0.05) {
+        // If empty, do a manual scan. Also, 5% chance to discard cache and do a rescan.
+        objects = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTENSION; } });
+        this.remember(objects, 'extensions');
+    }
+    return objects;
 }
 
 Room.prototype.remember = function(label, objects) {
