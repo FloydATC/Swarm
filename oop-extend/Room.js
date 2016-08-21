@@ -345,12 +345,19 @@ Room.prototype.plan = function() {
     }
 }
 
+Room.prototype.rangeFromTo = function(pos1, pos2) {
+    if (pos1.roomName != pos2.roomName) { return Infinity; }
+    return Math.max(Math.abs(pos1.x - pos2.x), Math.abs(pos1.y - pos2.y));
+}
+
 Room.prototype.optimize = function() {
     // Swap tasks where it makes sense
 
     // Calculate each creep's range to target
     for (var i=0; i<this.my_creeps.length; i++) {
-        this.my_creeps[i].range_to_target = this.my_creeps[i].pos.getRangeTo(Game.getObjectById(this.my_creeps[i].target));
+        //this.my_creeps[i].range_to_target = this.my_creeps[i].pos.getRangeTo(Game.getObjectById(this.my_creeps[i].target));
+        var target = Game.getObjectById(this.my_creeps[i].target);
+        this.my_creeps[i].range_to_target = this.rangeFromTo(this.my_creeps[i].pos, target.pos);
     }
 
     // For each creep, if both are same class, would they benefit from swapping targets?
