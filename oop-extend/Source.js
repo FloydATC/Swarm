@@ -6,7 +6,7 @@ Source.prototype.initialize = function() {
     this.slots = this.find_slots();
 }
 
-Flag.prototype.find_slots = function() {
+Source.prototype.find_slots = function() {
     // A free space around a Source (where a creep might mine from) counts as a "slot".
     // Count them to see how many creeps may mine this source simultaneously
     var slots = [];
