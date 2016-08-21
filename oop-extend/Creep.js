@@ -270,13 +270,11 @@ Creep.prototype.get_energy = function() {
 }
 
 Creep.prototype.shift_nearest = function(targets) {
-    var x = this.pos.x;
-    var y = this.pos.y;
     //var targets_by_range = targets.sort( function(a,b) { return a.pos.getRangeTo(x,y) - b.pos.getRangeTo(x,y); } );
     var lo_range = null;
     var lo_index = null;
     for (var i=0; i<targets.length; i++) {
-        var range = targets[i].pos.getRangeTo(x, y);
+        var range = this.room.rangeFromTo(this.pos, targets[i].pos);
         if (lo_range == null || range < lo_range) {
             lo_range = range;
             lo_index = i;
@@ -321,7 +319,7 @@ Creep.prototype.task_hunt = function() {
             delete this.memory.destination;
             this.say('Victory!');
         } else {
-            if (this.pos.getRangeTo(target) > 3) {
+            if (this.room.rangeFromTo(this.pos, target.pos) > 3) {
                 if (this.hits < this.hitsMax) { this.heal(this); }// Attempt to heal self
                 this.move_to(target); // Close on target
             } else {
@@ -338,7 +336,7 @@ Creep.prototype.task_hunt = function() {
     }
     var spawn = this.shift_nearest(this.room.spawns.slice());
     if (spawn != null) {
-        if (this.pos.getRangeTo(spawn) > 1) {
+        if (this.room.rangeFromTo(this.pos, spawn.pos) > 1) {
             this.move_to(spawn);
         } else {
             spawn.recycleCreep(this);
@@ -441,11 +439,12 @@ Creep.prototype.task_mine = function() {
 
         // Register as arrived if we are within 3 tiles. Old creep may be in the way.
         var arrived = this.memory.arrived || 0;
-        if (arrived == 0 && this.pos.getRangeTo(source) <= 3) {
+        var range = this.room.rangeFromTo(this.pos, source.pos);
+        if (arrived == 0 && range <= 3) {
             this.memory.arrived = Game.time;
         }
 
-        if (this.pos.getRangeTo(source) > 1) {
+        if (range > 1) {
             // Move closer
             this.move_to(source);
             //console.log('Miner '+this+' approaching source ('+source+' in '+this.memory.mine+')');
@@ -510,7 +509,7 @@ Creep.prototype.task_remote_fetch = function() {
             var found = this.room.lookForAt(LOOK_SOURCES, flag);
             var source = found[0];
             if (source == null) { flag.remove(); return; } // User error
-            if (this.pos.getRangeTo(source) > 1) {
+            if (this.room.rangeFromTo(this.pos, source.pos) > 1) {
                 // Move closer
                 this.move_to(source);
                 //console.log('Fetcher '+this+' approaching source ('+source+' in '+this.memory.mine+')');
@@ -542,17 +541,18 @@ Creep.prototype.task_remote_fetch = function() {
         // In the right room yet?
         if (this.room.name == this.memory.home) {
             // Yes, approach upgrader (or controller if no upgrader is present)
-            if (upgrader && this.pos.getRangeTo(target) <= 1) {
+            var range = this.room.rangeFromTo(this.pos, target.pos);
+            if (upgrader && range <= 1) {
                 this.drop(RESOURCE_ENERGY);
                 //console.log('Fetcher '+this+' assisting ('+upgrader+' in '+this.memory.home+')');
                 return;
             }
-            if (this.pos.getRangeTo(target) > 1) {
+            if (range > 1) {
                 this.move_to(target);
                 //console.log('Fetcher '+this+' approaching target ('+target+' in '+this.memory.home+')');
                 //return;
             };
-            if (ctrl && this.pos.getRangeTo(target) <= 3) {
+            if (ctrl && range <= 3) {
                 this.upgradeController(ctrl);
                 //console.log('Fetcher '+this+' upgrading controller ('+ctrl+' in '+this.memory.home+')');
                 return;
@@ -665,7 +665,7 @@ Creep.prototype.task_upgrade = function() {
     var flag = Game.flags[this.memory.flag];
     if (flag != null) { flag.assign_worker(this); } // Check in with flag
     if (this.memory.class != 'Zealot') { target = upgrader || ctrl; }
-    var range = this.pos.getRangeTo(target);
+    var range = this.room.rangeFromTo(this.pos, target.pos);
     this.memory.tracking = true;
     //console.log(this.memory.class+' '+this+' upgrade target ['+(target.structureType)+'] range ['+range+']');
     if (target.structureType == STRUCTURE_CONTROLLER && range <= 3) {

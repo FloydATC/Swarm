@@ -376,8 +376,8 @@ Room.prototype.optimize = function() {
             var target_b = Game.getObjectById(creep_b.target);
             if (target_b == null) { continue; } // Target no longer valid
             if (target_a.id == target_b.id) { continue; } // Same target
-            var catb = creep_a.pos.getRangeTo(target_b)
-            var cbta = creep_b.pos.getRangeTo(target_a)
+            var catb = this.rangeFromTo(creep_a.pos, target_b.pos);// creep_a.pos.getRangeTo(target_b)
+            var cbta = this.rangeFromTo(creep_b.pos, target_a.pos);// creep_b.pos.getRangeTo(target_a)
             if (cbta+1 < creep_b.range_to_target && catb+1 < creep_a.range_to_target) {
                 // Both would benefit
                 //console.log(this.link()+' creeps '+creep_a+' ('+creep_a.range_to_target+'>'+catb+') and '+creep_b+' ('+creep_b.range_to_target+'>'+cbta+')  swapped targets');
