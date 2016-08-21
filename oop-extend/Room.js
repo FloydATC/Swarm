@@ -932,7 +932,7 @@ Room.prototype.find_roads = function() {
         // If empty, do a manual scan. Also, 5% chance to discard cache and do a rescan.
         objects = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_ROAD; } });
         this.remember(objects, 'roads');
-        console.log(this.link()+' roads scanned');
+        //console.log(this.link()+' roads scanned');
     }
     return objects;
 }
@@ -944,7 +944,7 @@ Room.prototype.find_walls = function() {
         // If empty, do a manual scan. Also, 5% chance to discard cache and do a rescan.
         objects = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_WALL; } });
         this.remember(objects, 'walls');
-        console.log(this.link()+' walls scanned');
+        //console.log(this.link()+' walls scanned');
     }
     return objects;
 }
@@ -956,7 +956,7 @@ Room.prototype.find_extensions = function() {
         // If empty, do a manual scan. Also, 5% chance to discard cache and do a rescan.
         objects = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTENSION; } });
         this.remember(objects, 'extensions');
-        console.log(this.link()+' extensions scanned');
+        //console.log(this.link()+' extensions scanned');
     }
     return objects;
 }
