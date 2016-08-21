@@ -357,6 +357,7 @@ Room.prototype.optimize = function() {
     for (var i=0; i<this.my_creeps.length; i++) {
         //this.my_creeps[i].range_to_target = this.my_creeps[i].pos.getRangeTo(Game.getObjectById(this.my_creeps[i].target));
         var target = Game.getObjectById(this.my_creeps[i].target);
+        if (target == null) { this.my_creeps[i].range_to_target = 0; continue; } 
         this.my_creeps[i].range_to_target = this.rangeFromTo(this.my_creeps[i].pos, target.pos);
     }
 
