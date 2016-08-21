@@ -932,36 +932,29 @@ Room.prototype.find_roads = function() {
     console.log(this.link()+' find '+(Game.cpu.getUsed()-start));
 
     start = Game.cpu.getUsed();
-    this.store_coords('w', roads);
+    this.remember('w', roads);
     console.log(this.link()+' store '+(Game.cpu.getUsed()-start));
 
     start = Game.cpu.getUsed();
-    roads = this.retrieve_structures_from_coords('w', STRUCTURE_ROAD);
+    roads = this.recall('w');
     console.log(this.link()+' retrieve '+(Game.cpu.getUsed()-start));
 
     return roads;
 }
 
-Room.prototype.store_coords = function(label, objects) {
-    var string = '';
-    for (var i=0; i<objects.length; i++) {
-        string = string + String.fromCharCode(objects[i].pos.x + (50 * objects[i].pos.y));
-    }
-    this.memory[label] = string;
+Room.prototype.remember = function(label, objects) {
+    var list = [];
+    for (var i=0; i<objects.length; i++) { list.push(objects.id); }
+    this.memory[label] = list.join();
 }
 
-Room.prototype.retrieve_structures_from_coords = function(label, type) {
+Room.prototype.recall = function(label) {
+    var string = this.memory[label] || '';
+    var list = string.split();
     var objects = [];
-    var string = this.memory[label];
-    for (var i=0; i<string.length; i++) {
-        var code = string.charCodeAt(i);
-        var list = this.lookAt(code % 50, Math.floor(code / 50));
-        for (var j=0; j<list.length; j++) {
-            var found = list[j];
-            if (found.type == 'structure' && found.structure.structureType == type) {
-                objects.push(found);
-            }
-        }
+    for (var i=0; i<list.length; i++) {
+        var object = Game.getObjectById(list[i]);
+        if (object != null) { objects.push(object); }
     }
     return objects;
 }
