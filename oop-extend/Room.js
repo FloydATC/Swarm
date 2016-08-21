@@ -18,6 +18,7 @@ Room.prototype.initialize = function() {
     //this.extensions = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTENSION; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
     this.extensions = this.find_extensions();
     this.containers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_STORAGE; } });
+    this.storage = this.find(FIND_STRUCTURES, { filter: function(s) { s.structureType == STRUCTURE_STORAGE; } });
     this.construction_sites = this.find(FIND_CONSTRUCTION_SITES).sort( function(a,b) { return b.progress - a.progress; } ); // Nearest completion first
     var ambition = this.hp_ambition();
     this.need_repairs = this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits && s.hits < ambition && s.hits < s.hitsMax; } }).sort( function(a,b) { return (a.hits - b.hits) || (a.ticksToDecay - b.ticksToDecay); } ); // Most urgent first
@@ -129,6 +130,7 @@ Room.prototype.plan = function() {
     var drops = this.dropped_other.slice();
     var extensions = this.extensions;
     var containers = this.containers.slice().reverse(); // 3 with least energy
+    var storage = this.storage.slice().reverse(); // 3 with least energy
     var my_creeps = this.my_creeps.slice(); // All classes
     var hostile_creeps = this.hostile_creeps.slice();
     var csites = this.construction_sites.slice(0,2); // Max 3 at a time
@@ -204,7 +206,7 @@ Room.prototype.plan = function() {
     this.assign_task_build(drones, csites);
 
     // Containers needs energy?
-    this.assign_task_stockpile(drones, containers);
+    this.assign_task_stockpile(drones, storage);
 
     // Zealots always upgrade
     this.assign_task_upgrade(zealots);
@@ -357,7 +359,7 @@ Room.prototype.optimize = function() {
     for (var i=0; i<this.my_creeps.length; i++) {
         //this.my_creeps[i].range_to_target = this.my_creeps[i].pos.getRangeTo(Game.getObjectById(this.my_creeps[i].target));
         var target = Game.getObjectById(this.my_creeps[i].target);
-        if (target == null) { this.my_creeps[i].range_to_target = 0; continue; } 
+        if (target == null) { this.my_creeps[i].range_to_target = 0; continue; }
         this.my_creeps[i].range_to_target = this.rangeFromTo(this.my_creeps[i].pos, target.pos);
     }
 
