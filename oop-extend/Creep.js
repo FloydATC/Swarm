@@ -199,7 +199,7 @@ Creep.prototype.get_energy = function() {
     }
 
     // Consider fetching energy from a container
-    console.log(this+' considers fetching energy from a container to '+this.memory.task.type);
+    //console.log(this+' considers fetching energy from a container to '+this.memory.task.type);
     if (this.task != 'stockpile') {
         var containers = this.room.containers.slice();
         while (containers.length > 0) {
@@ -334,6 +334,7 @@ Creep.prototype.task_hunt = function() {
         this.move_to({ pos: new RoomPosition(25, 25, this.memory.destination) });
         return;
     }
+    if (this.hits < this.hitsMax) { this.heal(this); }// Attempt to heal self
     var spawn = this.shift_nearest(this.room.spawns.slice());
     if (spawn != null) {
         if (this.room.rangeFromTo(this.pos, spawn.pos) > 1) {
