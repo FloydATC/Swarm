@@ -61,7 +61,7 @@ Creep.prototype.execute = function() {
 
     if (Math.random() > 0.9) { this.speak(); }
     var debug = this.memory.debug || false;
-    if (debug) { console.log(this+' execute: task='+this.memory.task.type+' target='+this.memory.target+' is_full='+this.is_full()+' is_empty='+this.is_empty()); }
+    if (debug) { console.log(this+' execute: task='+this.memory.task.type+' target='+this.memory.target+' is_full='+this.is_full()+' is_empty='+this.is_empty()+' ttl='+this.ticksToLive); }
 
     // Consider new roads
     if (this.fatigue > 0 && this.memory.tracking == true) { this.room.consider_road(this); }
