@@ -16,7 +16,7 @@ Creep.prototype.initialize = function() {
         (this.pos.x < 49 ? this.pos.x+1 : this.pos.x),
         true // Result as plain array please
     );
-    if (this.memory.debug) { console.log(this.adjacent); }
+    //if (this.memory.debug) { console.log(this.adjacent); }
 }
 
 Creep.prototype.containers_within_reach = function() {
@@ -99,7 +99,7 @@ Creep.prototype.execute = function() {
     if (this.task == 'remote fetch') { this.task_remote_fetch(); return; }
     if (this.task == 'claim') { this.task_claim(); return; }
     if (this.task == 'travel') { this.task_travel(); return; }
-    if (this.task == 'upgrade') { this.task_upgrade(); return; }
+    if (this.task == 'upgrade' && this.memory.class == 'Zealot') { this.task_upgrade(); return; }
 
     // Carrying something else than energy? Ignore task and store it somewhere!
     if (_.sum(this.carry) > this.carry.energy) {
@@ -145,6 +145,7 @@ Creep.prototype.execute = function() {
     if (this.task == 'stockpile') { this.task_feed(); return; }
     if (this.task == 'build') { this.task_build(); return; }
     if (this.task == 'repair') { this.task_repair(); return; }
+    if (this.task == 'upgrade') { this.task_upgrade(); return; } // Note: Zealots are caught earlier!
 
     console.log(this.room+' '+this+' has unhandled task '+this.task);
 }
