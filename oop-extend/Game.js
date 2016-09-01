@@ -40,9 +40,11 @@ module.exports = {
                 lo_room.harvest_flags.push(flag);
 
                 // Calculate and set spawn parameters
-                //flag.memory.lead_time = 250; // How many ticks from spawn to arrival? FIXME!!!
-                flag.memory.cooldown = 300; // How many ticks minimum between spawns? FIXME!!!
-                flag.memory.workforce = { 'Miner': 1, 'Fetcher': 3 };
+                var lead = flag.memory.lead_time || 250; // Est.time from spawn command to flag reached
+                var fetchers = Math.ceil((CREEP_LIFE_TIME * SOURCE_ENERGY_NEUTRAL_CAPACITY / ENERGY_REGEN_TIME) / ((250 * CREEP_LIFE_TIME) / (lead * 2)));
+
+                flag.memory.cooldown = Math.floor(CREEP_LIFE_TIME / (fetchers+1)); // How many ticks minimum between spawns? FIXME!!!
+                flag.memory.workforce = { 'Miner': 1, 'Fetcher': fetchers };
 
                 //flag.memory.frequency = 250; // TTL / 6
                 //flag.memory.ticks = (flag.memory.ticks + 1) || 0;
