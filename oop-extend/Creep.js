@@ -265,7 +265,7 @@ Creep.prototype.get_energy = function() {
             } else {
                 if (free_slots < 1) { continue; } // Not enough left for me anyway
                 this.move_to(source);
-                this.memory.tracking = false;
+                this.memory.tracking = true;
                 source.used_slots = used_slots + 1;
             }
             return;
