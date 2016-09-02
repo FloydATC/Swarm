@@ -243,7 +243,7 @@ Creep.prototype.get_energy = function() {
                     this.memory.tracking = true;
                 } else {
                     this.move_to(storage);
-                    this.memory.tracking = false;
+                    this.memory.tracking = true;
                 }
                 return;
             }
