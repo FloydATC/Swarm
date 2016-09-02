@@ -326,10 +326,15 @@ Creep.prototype.task_hunt = function() {
             if (this.room.rangeFromTo(this.pos, target.pos) > 3) {
                 if (this.hits < this.hitsMax) { this.heal(this); }// Attempt to heal self
                 this.move_to(target); // Close on target
+                return;
+            }
+            if (this.at_exit() && this.room.controller) {
+                this.move_to(this.room.controller);
             } else {
                 this.stop();
-                this.rangedAttack(target);
             }
+
+            this.rangedAttack(target);
             return;
         }
     }
@@ -889,4 +894,10 @@ Creep.prototype.stop = function() {
     // Signal to other creeps that this creep will not be moving
     delete this.memory._move;
     delete this.memory.moving_to;
+}
+
+Creep.prototype.at_exit = function() {
+    if (this.pos.x == 0 || this.pos.x == 49) { return true; }
+    if (this.pos.y == 0 || this.pos.y == 49) { return true; }
+    return false;
 }
