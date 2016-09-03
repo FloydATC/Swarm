@@ -7,6 +7,7 @@ StructureLink.prototype.initialize = function() {
     this.room.link_count++;
     this.room.link_total += this.energy;
     this.room.link_average = Math.floor(this.room.link_total / this.room.link_count);
+    this.reserved_amount = 0;    
 }
 
 StructureLink.prototype.execute = function() {
