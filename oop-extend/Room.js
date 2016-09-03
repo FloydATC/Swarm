@@ -873,13 +873,13 @@ Room.prototype.expire_routes = function() {
     delete this.memory.router;
     if (this.memory.r) {
       var count = 0;
-        var maxage = 900; // Drop routing table for tiles not visited in 'maxage' ticks
+        var maxage = 1800; // Drop routing table for tiles not visited in 'maxage' ticks
         var tiles = Object.keys(this.memory.r);
         for (var i=0; i<tiles.length; i++) {
             var mru = this.memory.r[tiles[i]]['mru'];
             var age = Game.time - mru;
             if (age > maxage) {
-                console.log(this.link()+' tile '+tiles[i]+' mru='+mru+' age='+age+' maxage='+maxage);
+                //console.log(this.link()+' tile '+tiles[i]+' mru='+mru+' age='+age+' maxage='+maxage);
                 delete this.memory.r[tiles[i]];
                 count++;
             }
