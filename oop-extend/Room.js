@@ -850,6 +850,7 @@ Room.prototype.load_routing_table = function(tile) {
 Room.prototype.save_routing_table = function(tile, table) {
     if (!this.memory.r) { this.memory.r = {}; }
     if (!this.memory.r[tile]) { this.memory.r[tile] = {}; }
+    this.memory.r[tile]['mru'] = Game.time;
     this.memory.r[tile]['table'] = table.asBinaryString();
 }
 
