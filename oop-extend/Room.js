@@ -18,7 +18,7 @@ Room.prototype.initialize = function() {
     //this.extensions = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTENSION; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
     this.extensions = this.find_extensions();
     this.containers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_STORAGE; } });
-    this.storage = this.find(FIND_STRUCTURES, { filter: function(s) { s.structureType == STRUCTURE_STORAGE; } });
+    //this.storage = this.find(FIND_STRUCTURES, { filter: function(s) { s.structureType == STRUCTURE_STORAGE; } });
     this.construction_sites = this.find(FIND_CONSTRUCTION_SITES).sort( function(a,b) { return b.progress - a.progress; } ); // Nearest completion first
     var ambition = this.hp_ambition();
     this.need_repairs = this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits && s.hits < ambition && s.hits < s.hitsMax; } }).sort( function(a,b) { return (a.hits - b.hits) || (a.ticksToDecay - b.ticksToDecay); } ); // Most urgent first
@@ -130,7 +130,7 @@ Room.prototype.plan = function() {
     var drops = this.dropped_other.slice();
     var extensions = this.extensions;
     var containers = this.containers.slice().reverse(); // 3 with least energy
-    var storage = this.storage.slice().reverse(); // 3 with least energy
+    //var storage = this.storage.slice().reverse(); // 3 with least energy
     var my_creeps = this.my_creeps.slice(); // All classes
     var hostile_creeps = this.hostile_creeps.slice();
     var csites = this.construction_sites.slice(0,2); // Max 3 at a time
@@ -205,8 +205,8 @@ Room.prototype.plan = function() {
     // Build stuff?
     this.assign_task_build(drones, csites);
 
-    // Containers needs energy?
-    this.assign_task_stockpile(drones, storage);
+    // Storage needs energy?
+    this.assign_task_stockpile(drones, this.storage);
 
     // Zealots always upgrade
     this.assign_task_upgrade(zealots);
@@ -800,19 +800,15 @@ Room.prototype.assign_task_build = function(drones, csites) {
     }
 }
 
-Room.prototype.assign_task_stockpile = function(drones, containers) {
+Room.prototype.assign_task_stockpile = function(drones, storage) {
     //console.log(this.link()+' container assignments:');
-    while (drones.length > 0 && containers.length > 0) {
+    while (drones.length > 0 && storage) {
         var drone = drones.shift();
-        while (containers.length > 0) {
-            //var container = drone.shift_nearest(containers);
-            var container = containers.shift();
-            if (container.free > 0) {
-                drone.task = 'stockpile';
-                drone.target = container.id;
-                //console.log(drone.room+' '+drone.name+' assigned to '+drone.task+' '+container+' ('+container.energy+' energy)');
-                break;
-            }
+        if (storage.free > 0) {
+            drone.task = 'stockpile';
+            drone.target = storage.id;
+            //console.log(drone.room+' '+drone.name+' assigned to '+drone.task+' '+container+' ('+container.energy+' energy)');
+            break;
         }
         if (typeof drone.task == 'undefined') {
             // No containers need energy
