@@ -120,9 +120,9 @@ Routingtable.prototype.expand_binary = function() {
 }
 
 Routingtable.prototype.compress_binary = function() {
+    if (this.binary_expanded == null) { return; }
     this.binary_table = '';
     //this.binary_debug = '';
-    if (this.binary_expanded == null) { return; }
     var span_a1 = null;
     var span_a2 = null;
     var span_dir = null;
