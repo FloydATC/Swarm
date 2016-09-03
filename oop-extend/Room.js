@@ -876,7 +876,10 @@ Room.prototype.expire_routes = function() {
         var maxage = Game.time - 900; // Drop routing table for tiles not visited in 'maxage' ticks
         var tiles = Object.keys(this.memory.r);
         for (var i=0; i<tiles.length; i++) {
-            if (this.memory.r[tiles[i]]['mru'] < maxage) {
+            var mru = this.memory.r[tiles[i]]['mru'];
+            var age = Game.time - mru;
+            if (mru < maxage) {
+                console.log(this.link()+' tile '+tiles[i]+' mru='+mru+' age='+age+' maxage='+maxage);
                 delete this.memory.r[tiles[i]];
                 count++;
             }

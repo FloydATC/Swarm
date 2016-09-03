@@ -735,14 +735,14 @@ Creep.prototype.opposite_vector = function(x,y) {
     return [x*-1, y*-1];
 }
 
-Creep.prototype.learn_path = function() {
+Creep.prototype.learn_path = function(to, p) {
     if (this.memory.tracking == false) { return 'ERR_DO_NOT_TRACK'; } // Do not track this creep
-    if (typeof this.memory._move == 'undefined') { return 'ERR_UNDEF_MOVE'; } // No moveTo data
-    if (typeof this.memory._move.path == 'undefined') { return 'ERR_UNDEF_MOVE_PATH'; } // No moveTo path
-    if (this.memory._move.path.charAt(4) == 'u') { return 'ERR_U_DIRECTION'; } // Undefined path
-    if (typeof this.memory._move.dest == 'undefined') { return 'ERR_UNDEF_MOVE_DEST'; } // No moveTo destination
-    if (this.memory._move.room != this.memory._move.dest.room) { return 'ERR_NOT_LOCAL'; } // Not a local path
-    var p = this.memory._move.path;
+    if (typeof p == 'undefined') { return 'ERR_UNDEF_MOVE_PATH'; } // No moveTo path
+    if (p == '') { return 'ERR_EMPTY_MOVE_PATH'; } // No moveTo path
+    if (p.charAt(4) == 'u') { return 'ERR_U_DIRECTION'; } // Undefined path
+    if (to.roomName != this.pos.roomName) { return 'ERR_NOT_LOCAL'; }
+    //var p = this.memory._move.path;
+    //console.log(this+' at '+this.pos+' learn_path() '+p);
     var learned = 0;
     var offset = 4;
     var direction = p.charAt(offset);
@@ -770,8 +770,8 @@ Creep.prototype.learn_path = function() {
             //console.log(this+' path='+p+' length='+p.length+' p1='+offset1+' ('+x1+','+y1+') p2='+offset2+' ('+x2+','+y2+') direction='+nexthop);
             //this.room.set_direction({ 'x': x1, 'y': y1 }, { 'x': x2, 'y': y2 }, nexthop);
 //                var dst = ('0'+x2).slice(-2)+('0'+y2).slice(-2); // XXYY
-            x2 = this.memory._move.dest.x;
-            y2 = this.memory._move.dest.y;
+            x2 = to.x;
+            y2 = to.y;
             var dst = ('00'+x2).slice(-2)+('00'+y2).slice(-2); // XXYY
             //console.log('  learning route src='+src+' dst='+dst+' nexthop='+nexthop);
             //console.log('BEFORE '+table.asString()); // WARNING! PREMATURE CALL TO .asString() = MASSIVE CPU OVERHEAD
@@ -839,14 +839,17 @@ Creep.prototype.move_to = function(target) {
     }
     if (this.pos.roomName == target.pos.roomName) {
         //console.log(this.memory.class+' '+this+' ('+this.memory.task.type+') calculating cacheable path from '+this.pos+' to '+target.pos+' (EXPENSIVE)');
-        this.room.start_timer('moveTo');
-        this.moveTo(target, { ignoreCreeps: true } );
-        this.room.stop_timer('moveTo');
+        this.room.start_timer('findPath');
+        //this.moveTo(target, { ignoreCreeps: true } );
+        var p = this.room.findPath(this.pos, target.pos, { ignoreCreeps: true, serialize: true });
+        this.moveByPath(p);
+        //console.log(this+' p='+p+' _move.path='+this.memory._move.path);
+        this.room.stop_timer('findPath');
         //console.log('#DEBUG '+this+' moveTo('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+' IGNORING CREEPS) = '+this.memory._move.path);
         this.room.start_timer('learn_path');
-        var result = this.learn_path();
+        var result = this.learn_path(target.pos, p);
         this.room.stop_timer('learn_path');
-        //if (result != OK) { console.log(this+' learn path returned '+result); }
+        if (result != OK) { console.log(this+' learn path returned '+result); }
     } else {
         //console.log(this.memory.class+' '+this+' ('+this.memory.task.type+') calculating NON-CACHEABLE path to '+target.pos+' (EXPENSIVE)');
         this.room.start_timer('moveTo(*)');
