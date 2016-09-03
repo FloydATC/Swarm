@@ -107,11 +107,11 @@ Creep.prototype.execute = function() {
         if (target != null) {
             if (this.pos.inRangeTo(target, 1)) {
                 for (var cargo in this.carry) { this.transfer(target, cargo); break; }
-                this.memory.tracking = false;
+                this.memory.tracking = true;
 
             } else {
                 this.move_to(target);
-                this.memory.tracking = false;
+                this.memory.tracking = true;
             }
             return;
         }
@@ -384,7 +384,7 @@ Creep.prototype.task_ranged_attack = function() {
 
 Creep.prototype.task_recycle = function() {
     var target = Game.getObjectById(this.target);
-    this.memory.tracking = false;
+    this.memory.tracking = true;
     if (this.pos.inRangeTo(target, 1)) {
         this.stop();
         if (this.carry.energy > 0) {
@@ -643,7 +643,7 @@ Creep.prototype.task_feed_link = function() {
 
 Creep.prototype.task_build = function() {
     var target = Game.getObjectById(this.target);
-    this.memory.tracking = false;
+    this.memory.tracking = true;
     if (this.pos.inRangeTo(target, 3)) {
         this.stop();
         this.build(target);
@@ -656,7 +656,7 @@ Creep.prototype.task_build = function() {
 
 Creep.prototype.task_repair = function() {
     var target = Game.getObjectById(this.target);
-    this.memory.tracking = false;
+    this.memory.tracking = true|;
     //this.say(target.pos.x+','+target.pos.y);
     if (this.pos.inRangeTo(target, 3)) {
         this.stop();
@@ -813,6 +813,7 @@ Creep.prototype.move_to = function(target) {
             } else {
                 //console.log('  navigating towards '+exit.x+','+exit.y);
                 target = { pos: new RoomPosition(exit.x, exit.y, this.room.name) };
+                this.memory.tracking = true;
             }
         }
     }
