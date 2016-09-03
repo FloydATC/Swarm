@@ -656,7 +656,7 @@ Creep.prototype.task_build = function() {
 
 Creep.prototype.task_repair = function() {
     var target = Game.getObjectById(this.target);
-    this.memory.tracking = true|;
+    this.memory.tracking = true;
     //this.say(target.pos.x+','+target.pos.y);
     if (this.pos.inRangeTo(target, 3)) {
         this.stop();
