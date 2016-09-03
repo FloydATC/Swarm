@@ -136,7 +136,7 @@ Routingtable.prototype.compress_binary = function() {
         span_a1 = addr; span_a2 = addr; span_dir = dir; continue;
     }
     this.add_span(span_a1, span_a2, span_dir);
-    //console.log('Compressed '+this.binary_debug);
+    console.log('Compressed '+this.binary_debug);
 }
 
 Routingtable.prototype.add_span = function(addr1, addr2, dir) {
