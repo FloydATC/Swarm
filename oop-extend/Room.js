@@ -884,7 +884,7 @@ Room.prototype.expire_routes = function() {
                 count++;
             }
         }
-        console.log(this.link()+' binary route(s) expired: '+count);
+        //console.log(this.link()+' binary route(s) expired: '+count);
     }
 }
 
