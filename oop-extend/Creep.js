@@ -515,7 +515,7 @@ Creep.prototype.task_reserve = function() {
     if (this.room.name == this.memory.mine) {
         var ctrl = this.room.controller;
         if (ctrl == null) {
-            flag.remove(); return; } // User error
+            flag.remove(); return;  // User error
         }
 
         // Register as arrived if we are within 3 tiles. Old creep may be in the way.
