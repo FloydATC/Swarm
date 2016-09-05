@@ -512,7 +512,7 @@ Creep.prototype.task_reserve = function() {
     flag.assign_worker(this); // Check in with flag
     this.memory.tracking = true;
     // In the right room yet?
-    if (this.room.name == this.memory.mine) {
+    if (this.room.name == this.memory.reserve) {
         var ctrl = this.room.controller;
         if (ctrl == null) {
             flag.remove(); return;  // User error
@@ -528,18 +528,18 @@ Creep.prototype.task_reserve = function() {
         if (range > 1) {
             // Move closer
             this.move_to(ctrl);
-            console.log('Reserver '+this+' approaching controller ('+ctrl+' in '+this.memory.reserve+')');
+            //console.log('Reserver '+this+' approaching controller ('+ctrl+' in '+this.memory.reserve+')');
         } else {
             // Reserve controller
             this.stop();
             this.reserveController(ctrl);
-            console.log('Reserver '+this+' reserving controller ('+ctrl+' in '+this.memory.reserve+')');
+            //console.log('Reserver '+this+' reserving controller ('+ctrl+' in '+this.memory.reserve+')');
         }
         return;
     } else {
         // No. Try to reach the room marked with a flag.
         this.move_to(flag);
-        console.log('Reserver '+this+' moving to flag ('+flag+' in '+this.memory.reserve+')');
+        //console.log('Reserver '+this+' moving to flag ('+flag+' in '+this.memory.reserve+')');
         return;
     }
 }
