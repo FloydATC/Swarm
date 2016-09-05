@@ -96,6 +96,7 @@ Creep.prototype.execute = function() {
     if (this.task == 'recycle') { this.task_recycle(); return; }
     if (this.task == 'pick up') { this.task_pick_up(); return; }
     if (this.task == 'mine') { this.task_mine(); return; }
+    if (this.task == 'reserve') { this.task_reserve(); return; }
     if (this.task == 'remote fetch') { this.task_remote_fetch(); return; }
     if (this.task == 'claim') { this.task_claim(); return; }
     if (this.task == 'travel') { this.task_travel(); return; }
@@ -501,6 +502,44 @@ Creep.prototype.task_mine = function() {
         // No. Try to reach the room marked with a flag.
         this.move_to(flag);
         //console.log('Miner '+this+' moving to flag ('+flag+' in '+this.memory.mine+')');
+        return;
+    }
+}
+
+Creep.prototype.task_reserve = function() {
+    var flag = Game.flags[this.memory.flag];
+    if (flag == null) { this.suicide(); return; } // No work or carry parts.
+    flag.assign_worker(this); // Check in with flag
+    this.memory.tracking = true;
+    // In the right room yet?
+    if (this.room.name == this.memory.mine) {
+        var ctrl = this.room.controller;
+        if (ctrl == null) {
+            flag.remove(); return; } // User error
+        }
+
+        // Register as arrived if we are within 3 tiles. Old creep may be in the way.
+        var arrived = this.memory.arrived || 0;
+        var range = this.room.rangeFromTo(this.pos, ctrl.pos);
+        if (arrived == 0 && range <= 3) {
+            this.memory.arrived = Game.time;
+        }
+
+        if (range > 1) {
+            // Move closer
+            this.move_to(ctrl);
+            console.log('Reserver '+this+' approaching controller ('+ctrl+' in '+this.memory.reserve+')');
+        } else {
+            // Reserve controller
+            this.stop();
+            this.reserveController(ctrl);
+            console.log('Reserver '+this+' reserving controller ('+ctrl+' in '+this.memory.reserve+')');
+        }
+        return;
+    } else {
+        // No. Try to reach the room marked with a flag.
+        this.move_to(flag);
+        console.log('Reserver '+this+' moving to flag ('+flag+' in '+this.memory.reserve+')');
         return;
     }
 }

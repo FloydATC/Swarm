@@ -137,6 +137,7 @@ Room.prototype.plan = function() {
     var need_repairs = this.need_repairs.slice(0,2); // Max 3 at a time
 
     var miners = [];        // Mine energy (local or remote)
+    var reservers = [];     // Reserve room controller
     var fetchers = [];      // Fetch energy from remote mines
     var zealots = [];       // Camp next to controller and upgrade it
     var drones = [];        // Generic workers
@@ -152,6 +153,7 @@ Room.prototype.plan = function() {
         if (typeof creep == 'object') {
             if (!creep.memory.class) { creep.memory.class = 'Drone'; console.log(this.link()+' AMNESIAC '+creep+' assigned to Drone class'); }
             if (creep.memory.class == 'Miner')      { miners.push(creep);       continue; }
+            if (creep.memory.class == 'Reserver')   { reservers.push(creep);    continue; }
             if (creep.memory.class == 'Fetcher')    { fetchers.push(creep);     continue; }
             if (creep.memory.class == 'Zealot')     { zealots.push(creep);      continue; }
             if (creep.memory.class == 'Drone')      { drones.push(creep);       continue; }
@@ -216,6 +218,9 @@ Room.prototype.plan = function() {
 
     // Miners mine
     this.assign_task_mine(miners);
+
+    // Reservers reserve
+    this.assign_task_reserve(reservers);
 
     // Remote fetchers
     this.assign_task_remote_fetch(fetchers);
@@ -345,6 +350,19 @@ Room.prototype.plan = function() {
             }
         }
     }
+    if (this.reserve_flags) {
+        //console.log(this.link()+' has harvest flags to consider: '+this.harvest_flags);
+        for (var i in this.reserve_flags) {
+            var flag = this.reserve_flags[i];
+            var needs = flag.needs();
+            if (needs == 'Reserver') {
+                //console.log(this.link()+' spawning a remote miner for '+flag.pos.roomName);
+                var result = this.createCreep(this.schematic('Reserver'), undefined, { class: 'Reserver', home: this.name, reserve: flag.pos.roomName, flag: flag.name } );
+                if (result == OK) { flag.spawned('Reserver'); }
+                return;
+            }
+        }
+    }
 }
 
 Room.prototype.rangeFromTo = function(pos1, pos2) {
@@ -419,6 +437,7 @@ Room.prototype.schematic = function(c) {
         case 'Miner': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
         case 'Fetcher': { hash[WORK] = 1; hash[CARRY] = 5; hash[MOVE] = 3; break; }
         case 'Zealot': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
+        case 'Reserver': { hash[CLAIM] = 2; hash[MOVE] = 1; break; }
         case 'Drone.1': { hash[WORK] = 1; hash[CARRY] = 1; hash[MOVE] = 1; break; }
         case 'Drone.2': { hash[WORK] = 2; hash[CARRY] = 2; hash[MOVE] = 2; break; }
         case 'Drone.3': { hash[WORK] = 3; hash[CARRY] = 3; hash[MOVE] = 3; break; }
@@ -646,6 +665,15 @@ Room.prototype.assign_task_mine = function(miners) {
         miner.task = 'mine';
         miner.target = miner.id; // Dummy because flag doesn't have an id. Duh.
         //console.log(miner.name+' assigned to '+miner.task+' '+miner.target);
+    }
+}
+
+Room.prototype.assign_task_reserve = function(reservers) {
+    while (reservers.length > 0) {
+        var reserver = reservers.shift();
+        reserver.task = 'reserve';
+        reserver.target = reserver.id; // Dummy because flag doesn't have an id. Duh.
+        //console.log(reserver.name+' assigned to '+reserver.task+' '+reserver.target);
     }
 }
 

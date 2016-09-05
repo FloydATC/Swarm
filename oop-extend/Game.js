@@ -50,6 +50,40 @@ module.exports = {
                 //flag.memory.ticks = (flag.memory.ticks + 1) || 0;
             }
 
+            // Remote mine sources tagged with a "harvest" flag
+            if (flag.type() == 'reserve') {
+                // Find nearest room with an owned controller
+                //console.log('Assigning owner room to flag '+flag);
+                var lo_range = null;
+                var lo_room = null;
+                for (var name in this.rooms) {
+                    var room = this.rooms[name];
+                    if (room.controller && room.controller.my == true) {
+                        var range = this.manhattanDistance(flag.pos.roomName, room.name);
+                        //console.log('  candidate room '+room+' range is '+range);
+                        if (lo_range == null || range < lo_range) {
+                            lo_range = range;
+                            lo_room = room;
+                        }
+                    }
+                }
+                //console.log('  assigned to room '+room);
+                if (typeof flag.memory == 'undefined') { flag.memory = {}; }
+                flag.memory.owner = lo_room.name;
+                // Add this flag to that room
+                if (!lo_room.reserve_flags) { lo_room.reserve_flags = []; }
+                lo_room.reserve_flags.push(flag);
+
+                // Calculate and set spawn parameters
+                var lead = flag.memory.lead_time || 250; // Est.time from spawn command to flag reached
+
+                flag.memory.cooldown = 300;
+                flag.memory.workforce = { 'Reserver': 1 };
+
+                //flag.memory.frequency = 250; // TTL / 6
+                //flag.memory.ticks = (flag.memory.ticks + 1) || 0;
+            }
+
             // All owned controllers should have a flag. Non-owned should not.
             if (flag.type() == 'controller') {
                 if (flag.memory.controller) {
