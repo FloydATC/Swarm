@@ -343,7 +343,8 @@ Room.prototype.plan = function() {
             }
             if (needs == 'Fetcher') {
                 //console.log(this.link()+' spawning a remote fetcher for '+flag.pos.roomName);
-                var result = this.createCreep(this.schematic('Fetcher'), undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
+                var result = this.createCreep(this.schematic('Fetcher.2'), undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Fetcher.1'), undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } ); }
                 if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } ); }
                 if (result == OK) { flag.spawned('Fetcher'); }
                 return;
@@ -435,7 +436,8 @@ Room.prototype.schematic = function(c) {
         case 'Biter': { hash[ATTACK] = 1; hash[MOVE] = 1; break; }
         case 'Hunter': { hash[TOUGH] = 2; hash[MOVE] = 5; hash[RANGED_ATTACK] = 4; hash[HEAL] = 4; break; }
         case 'Miner': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
-        case 'Fetcher': { hash[WORK] = 1; hash[CARRY] = 5; hash[MOVE] = 3; break; }
+        case 'Fetcher.1': { hash[WORK] = 1; hash[CARRY] = 5; hash[MOVE] = 3; break; }
+        case 'Fetcher.2': { hash[WORK] = 1; hash[CARRY] = 10; hash[MOVE] = 6; break; }
         case 'Zealot': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
         case 'Reserver': { hash[CLAIM] = 2; hash[MOVE] = 1; break; }
         case 'Drone.1': { hash[WORK] = 1; hash[CARRY] = 1; hash[MOVE] = 1; break; }
