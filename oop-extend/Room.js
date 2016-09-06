@@ -356,7 +356,12 @@ Room.prototype.plan = function() {
         for (var i in this.reserve_flags) {
             var flag = this.reserve_flags[i];
             var needs = flag.needs();
-            if (needs == 'Reserver') {
+            // Check room reservation if possible. Above 4500? Don't spawn reserver just yet.
+            var res_ticks = 0;
+            if (Game.rooms[flag.pos.roomName] && Game.rooms[flag.pos.roomName].controller && Game.rooms[flag.pos.roomName].controller.reservation) {
+                res_ticks = Game.rooms[flag.pos.roomName].controller.reservation.ticksToEnd;
+            }
+            if (needs == 'Reserver' && res_ticks <= 4500) {
                 //console.log(this.link()+' spawning a remote miner for '+flag.pos.roomName);
                 var result = this.createCreep(this.schematic('Reserver'), undefined, { class: 'Reserver', home: this.name, reserve: flag.pos.roomName, flag: flag.name } );
                 if (result == OK) { flag.spawned('Reserver'); }
