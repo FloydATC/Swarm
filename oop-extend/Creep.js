@@ -765,7 +765,8 @@ Creep.prototype.direction_vector = function(direction) {
         console.log(arguments.callee.trace());
     }
     catch (e) {
-        console.log('Exception: '+e);
+        console.log('Exception in direction_vector: '+e+', stack: '+e.stack);
+        Game.notify('Exception in direction_vector: '+e+', stack:'+e.stack);
     }
     return vec[0];
 }
