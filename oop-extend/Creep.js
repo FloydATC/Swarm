@@ -151,6 +151,14 @@ Creep.prototype.execute = function() {
     console.log(this.room+' '+this+' has unhandled task '+this.task);
 }
 
+Creep.prototype.start_timer = function() {
+    this.memory.timer_start = Game.time;
+}
+
+Creep.prototype.stop_timer = function() {
+    this.memory.timer_last = Game.time - this.memory.timer_start;
+}
+
 Creep.prototype.get_energy = function() {
     var debug = this.memory.debug || false;
 
@@ -549,8 +557,12 @@ Creep.prototype.task_remote_fetch = function() {
     if (flag == null) { this.memory.class = 'Drone'; return; }
     flag.assign_worker(this); // Check in with flag
     this.memory.tracking = true;
-    if (this.memory.working == true && this.is_empty()) { this.memory.working = false; }
-    if (this.memory.working == false && this.is_full()) { this.memory.working = true; }
+    if (this.memory.working == true && this.is_empty()) { this.memory.working = false; this.timer_start(); }
+    if (this.memory.working == false && this.is_full()) { this.memory.working = true; this.timer_stop(); }
+    if (this.memory.timer_last) {
+        console.log(this+' last get_energy timer was '+this.memory.timer_last);
+        delete this.memory.timer_last;
+    }
     if (this.memory.working == false) {
         // In the right room yet?
         if (this.room.name == this.memory.mine) {
