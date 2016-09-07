@@ -557,10 +557,11 @@ Creep.prototype.task_remote_fetch = function() {
     if (flag == null) { this.memory.class = 'Drone'; return; }
     flag.assign_worker(this); // Check in with flag
     this.memory.tracking = true;
-    if (this.memory.working == true && this.is_empty()) { this.memory.working = false; this.timer_start(); }
-    if (this.memory.working == false && this.is_full()) { this.memory.working = true; this.timer_stop(); }
+    if (this.memory.working == true && this.is_empty()) { this.memory.working = false; this.start_timer(); }
+    if (this.memory.working == false && this.is_full()) { this.memory.working = true; this.stop_timer(); }
     if (this.memory.timer_last) {
         console.log(this+' last get_energy timer was '+this.memory.timer_last);
+        flag.memory.rtt = Math.floor(((flag.memory.rtt || this.memory.timer_last) + this.memory.timer_last) / 2);
         delete this.memory.timer_last;
     }
     if (this.memory.working == false) {
