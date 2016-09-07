@@ -41,8 +41,9 @@ module.exports = {
 
                 // Calculate and set spawn parameters
                 var lead = flag.memory.lead_time || 250; // Est.time from spawn command to flag reached
+                var rtt = flag.memory.rtt || lead; // rtt becomes available only after a fetcher has completed a cycle
                 var capacity = 500; // Assumes 10 carry parts
-                var fetchers = Math.floor((CREEP_LIFE_TIME * SOURCE_ENERGY_CAPACITY / ENERGY_REGEN_TIME) / ((capacity * CREEP_LIFE_TIME) / (lead * 1.2)));
+                var fetchers = Math.floor((CREEP_LIFE_TIME * SOURCE_ENERGY_CAPACITY / ENERGY_REGEN_TIME) / ((capacity * CREEP_LIFE_TIME) / (rtt * 2)));
 
                 flag.memory.cooldown = Math.floor(CREEP_LIFE_TIME / (fetchers+1)); // How many ticks minimum between spawns? FIXME!!!
                 flag.memory.workforce = { 'Miner': 1, 'Fetcher': fetchers };
