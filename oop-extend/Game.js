@@ -23,7 +23,7 @@ module.exports = {
                 var lo_room = null;
                 for (var name in this.rooms) {
                     var room = this.rooms[name];
-                    if (room.controller && room.controller.my == true) {
+                    if (room.controller && room.controller.my == true && room.controller.level > 2) {
                         var range = this.manhattanDistance(flag.pos.roomName, room.name);
                         //console.log('  candidate room '+room+' range is '+range);
                         if (lo_range == null || range < lo_range) {
@@ -60,7 +60,7 @@ module.exports = {
                 var lo_room = null;
                 for (var name in this.rooms) {
                     var room = this.rooms[name];
-                    if (room.controller && room.controller.my == true) {
+                    if (room.controller && room.controller.my == true && room.controller.level > 2) {
                         var range = this.manhattanDistance(flag.pos.roomName, room.name);
                         //console.log('  candidate room '+room+' range is '+range);
                         if (lo_range == null || range < lo_range) {
