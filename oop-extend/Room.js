@@ -313,7 +313,7 @@ Room.prototype.plan = function() {
             // Try to spawn a drone appropriate for this room controller level
             var result = null;
             for (var level=this.controller.level; level>0; level--) {
-                result = this.createCreep(this.schematic('Drone.'+level), undefined, class: 'Swarmer', destination: Game.request_drones });
+                result = this.createCreep(this.schematic('Drone.'+level), undefined, { class: 'Swarmer', destination: Game.request_drones });
                 if (result == OK) { break; }
                 if (result == ERR_NOT_ENOUGH_ENERGY) { continue; }
                 //console.log(this.link()+' createCreep returned '+result);
