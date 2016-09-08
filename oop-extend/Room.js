@@ -310,7 +310,16 @@ Room.prototype.plan = function() {
     if (Game.request_drones && Game.time % 300 == 0) {
         if (Game.manhattanDistance(this.name, Game.request_drones) <= 2 && Game.rooms[Game.request_drones].controller && Game.rooms[Game.request_drones].controller.my == true) {
             //console.log(this.link()+' spawning a creep to build spawn in '+Game.request_drones);
-            var result = this.createCreep(this.schematic('Drone'), undefined, { class: 'Swarmer', destination: Game.request_drones });
+            // Try to spawn a drone appropriate for this room controller level
+            var result = null;
+            for (var level=this.controller.level; level>0; level--) {
+                result = this.createCreep(this.schematic('Drone.'+level), undefined, class: 'Swarmer', destination: Game.request_drones });
+                if (result == OK) { break; }
+                if (result == ERR_NOT_ENOUGH_ENERGY) { continue; }
+                //console.log(this.link()+' createCreep returned '+result);
+                break;
+            }
+            //var result = this.createCreep(this.schematic('Drone'), undefined, { class: 'Swarmer', destination: Game.request_drones });
             return;
         } else {
             //console.log(this.link()+' would like to help build but, gee, '+Game.request_drones+' is awfully far away: '+Game.manhattanDistance(this.name, Game.request_drones));
