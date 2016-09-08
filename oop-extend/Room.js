@@ -299,7 +299,7 @@ Room.prototype.plan = function() {
     }
     //console.log(this.link()+' time='+Game.time+' colonize='+(Game.colonize ? 'yes' : 'no')+' request='+(Game.request_drones ? 'yes' : 'no'));
     if (Game.colonize && Game.time % 300 == 0) {
-        if (Game.manhattanDistance(this.name, Game.colonize) <= 2 && Game.rooms[Game.colonize].controller && Game.rooms[Game.colonize].controller.my == false) {
+        if (Game.manhattanDistance(this.name, Game.colonize) <= 2 && (!(Game.rooms[Game.colonize]) || Game.rooms[Game.colonize].controller && Game.rooms[Game.colonize].controller.my == false)) {
             //console.log(this.link()+' spawning a creep to claim '+Game.colonize);
             var result = this.createCreep([MOVE,CARRY,WORK,CLAIM], undefined, { class: 'Swarmer', destination: Game.colonize });
             return;
