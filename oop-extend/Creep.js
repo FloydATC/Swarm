@@ -557,8 +557,8 @@ Creep.prototype.task_remote_fetch = function() {
     if (flag == null) { this.memory.class = 'Drone'; return; }
     flag.assign_worker(this); // Check in with flag
     this.memory.tracking = true;
-    if (this.memory.working == true && this.is_empty()) { this.memory.working = false; this.start_timer(); }
-    if (this.memory.working == false && this.is_full()) { this.memory.working = true; this.stop_timer(); }
+    if (this.memory.working == true && this.is_empty()) { this.memory.working = false; }
+    if (this.memory.working == false && this.is_full()) { this.memory.working = true; }
     if (this.memory.timer_last) {
         var trip = this.memory.timer_last * 2;
         flag.memory.rtt = Math.floor(((flag.memory.rtt || trip) + trip) / 2);
@@ -579,6 +579,7 @@ Creep.prototype.task_remote_fetch = function() {
                 // Get energy -- dedicated miner missing or behind schedule?
                 this.stop();
                 this.harvest(source);
+                this.stop_timer();
                 //console.log('Fetcher '+this+' harvesting source ('+source+' in '+this.memory.mine+')');
             }
             // Dropped energy within reach? Grab it.
@@ -586,6 +587,7 @@ Creep.prototype.task_remote_fetch = function() {
             var treasures = this.energy_within_reach();
             if (treasures.length > 0) {
                 this.pickup(treasures[0]);
+                this.stop_timer();
             }
             return;
         } else {
@@ -606,6 +608,7 @@ Creep.prototype.task_remote_fetch = function() {
             var range = this.room.rangeFromTo(this.pos, target.pos);
             if (upgrader && range <= 1) {
                 this.drop(RESOURCE_ENERGY);
+                this.start_timer();
                 //console.log('Fetcher '+this+' assisting ('+upgrader+' in '+this.memory.home+')');
                 return;
             }
