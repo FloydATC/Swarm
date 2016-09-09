@@ -42,6 +42,7 @@ module.exports = {
                 // Calculate and set spawn parameters
                 var lead = flag.memory.lead_time || 250; // Est.time from spawn command to flag reached
                 var rtt = flag.memory.rtt || (lead * 2); // rtt becomes available only after a fetcher has completed a cycle
+                rtt = 200; // FIXME; calculation is still off -- use hc for now
                 var capacity = 500; // Assumes 10 carry parts
                 var fetchers = Math.floor((CREEP_LIFE_TIME * SOURCE_ENERGY_CAPACITY / ENERGY_REGEN_TIME) / ((capacity * CREEP_LIFE_TIME) / rtt));
 
