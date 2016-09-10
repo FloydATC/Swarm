@@ -581,8 +581,9 @@ Creep.prototype.task_remote_fetch = function() {
             // Yes, in the right room
 
             // Is there energy on the ground melting away?
-            var loot = this.room.findClosestByRange(FIND_DROPPED_ENERGY);
+            var loot = this.pos.findClosestByRange(FIND_DROPPED_ENERGY);
             if (loot != null) {
+                console.log('fetcher '+this+' spotted energy on the ground: '+loot);
                 var range = this.room.rangeFromTo(this.pos, loot.pos);
                 if (range > 1) {
                     this.move_to(loot);
