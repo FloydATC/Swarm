@@ -166,6 +166,10 @@ Creep.prototype.stop_timer = function() {
     }
 }
 
+Creep.prototype.cancel_timer = function() {
+    this.memory.timer_start = 0;
+}
+
 Creep.prototype.get_energy = function() {
     var debug = this.memory.debug || false;
 
@@ -574,7 +578,23 @@ Creep.prototype.task_remote_fetch = function() {
     if (this.memory.working == false) {
         // In the right room yet?
         if (this.room.name == this.memory.mine) {
-            // Yes. Locate source at flag
+            // Yes, in the right room
+
+            // Is there energy on the ground melting away?
+            var loot = this.room.findClosestByRange(FIND_DROPPED_ENERGY);
+            if (loot != null) {
+                var range = this.room.rangeFromTo(this.pos, loot.pos);
+                if (range > 1) {
+                    this.move_to(loot);
+                } else {
+                    this.stop();
+                    this.pickup(loot);
+                    this.cancel_timer(); // Invalid measurement
+                }
+                return;
+            }
+
+            // Locate source at flag
             var found = this.room.lookForAt(LOOK_SOURCES, flag);
             var source = found[0];
             if (source == null) { flag.remove(); return; } // User error
