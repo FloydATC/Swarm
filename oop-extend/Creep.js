@@ -927,7 +927,7 @@ Creep.prototype.move_to = function(target) {
         }
     //}
 
-    if (this.pos.roomName == target.pos.roomName) {
+    //if (this.pos.roomName == target.pos.roomName) {
         //console.log(this.memory.class+' '+this+' ('+this.memory.task.type+') calculating cacheable path from '+this.pos+' to '+target.pos+' (EXPENSIVE)');
         this.room.start_timer('findPath');
         //this.moveTo(target, { ignoreCreeps: true } );
@@ -990,12 +990,12 @@ Creep.prototype.move_to = function(target) {
         //var result = this.learn_serialized_path(target.pos, p);
         //this.room.stop_timer('learn_serialized_path');
         //if (result != OK) { console.log(this+' learn path returned '+result); }
-    } else {
-        //console.log(this.memory.class+' '+this+' ('+this.memory.task.type+') calculating NON-CACHEABLE path to '+target.pos+' (EXPENSIVE)');
-        this.room.start_timer('moveTo(*)');
-        this.moveTo(target, { ignoreCreeps: false } );
-        this.room.stop_timer('moveTo(*)');
-    }
+    //} else {
+    //    //console.log(this.memory.class+' '+this+' ('+this.memory.task.type+') calculating NON-CACHEABLE path to '+target.pos+' (EXPENSIVE)');
+    //    this.room.start_timer('moveTo(*)');
+    //    this.moveTo(target, { ignoreCreeps: false } );
+    //    this.room.stop_timer('moveTo(*)');
+    //}
 }
 
 Creep.prototype.next_position = function(direction) {
