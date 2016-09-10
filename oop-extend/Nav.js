@@ -21,9 +21,9 @@ module.exports = {
                 var tablename = (from.roomName === dest.roomName ? 'local' : dest.roomName);
                 if (table == null || table.roomname != from.roomName || table.tilename != tilename || table.tablename != tablename) {
                     if (table != null) {
-                        module.exports.set_table(table.roomname, table.tilename, table.tablename, table);
+                        module.exports.set_table(table.roomname, table.tilename, table.tablename, table, debug);
                     }
-                    table = module.exports.get_table(from.roomName, tilename, tablename);
+                    table = module.exports.get_table(from.roomName, tilename, tablename, debug);
                     table.roomname = from.roomName;
                     table.tilename = tilename;
                     table.tablename = tablename;
@@ -34,16 +34,16 @@ module.exports = {
             var tablename = (from.roomName === dest.roomName ? 'local' : dest.roomName);
             if (table == null || table.roomname != from.roomName || table.tilename != tilename || table.tablename != tablename) {
                 if (table != null) {
-                    module.exports.set_table(table.roomname, table.tilename, table.tablename, table);
+                    module.exports.set_table(table.roomname, table.tilename, table.tablename, table, debug);
                 }
-                table = module.exports.get_table(from.roomName, tilename, tablename);
+                table = module.exports.get_table(from.roomName, tilename, tablename, debug);
                 table.roomname = from.roomName;
                 table.tilename = tilename;
                 table.tablename = tablename;
             }
             if (debug) { console.log('NAV>     from '+from+' move '+dir+' to reach '+final+' (final)'); }
             table.setDirectionTo(final.x + (final.y * 50), dir);
-            module.exports.set_table(table.roomname, table.tilename, table.tablename, table);
+            module.exports.set_table(table.roomname, table.tilename, table.tablename, table, debug);
 
             from = next;
             if (from.roomName != src.roomName) {
@@ -59,14 +59,14 @@ module.exports = {
         if (src.roomName != dst.roomName) { debug = true; }
         var tilename = ('0'+src.x).slice(-2) + ('0'+src.y).slice(-2); // Format as XXYY
         var tablename = (src.roomName === dst.roomName ? 'local' : dst.roomName);
-        var table = module.exports.get_table(src.roomName, tilename, tablename);
+        var table = module.exports.get_table(src.roomName, tilename, tablename, debug);
         var dir = table.getDirectionTo(dst.x + (50 * dst.y));
         if (debug) { console.log('NAV>     get_direction('+src+','+dst+') = '+dir); }
         return dir;
     },
 
-    get_table: function(roomname, tilename, tablename) {
-        console.log('NAV>   get_table('+roomname+', '+tilename+', '+tablename+')');
+    get_table: function(roomname, tilename, tablename, debug) {
+        if (debug) { console.log('NAV>   get_table('+roomname+', '+tilename+', '+tablename+')'); }
         if (!Memory.rooms[roomname]) { return new Routingtable();  }
         if (!Memory.rooms[roomname].r) { return new Routingtable(); }
         if (!Memory.rooms[roomname].r[tilename]) { return new Routingtable(); }
@@ -75,8 +75,8 @@ module.exports = {
         return new Routingtable(Memory.rooms[roomname].r[tilename][tablename]);
     },
 
-    set_table: function(roomname, tilename, tablename, table) {
-        console.log('NAV>   set_table('+roomname+', '+tilename+', '+tablename+', '+table+')');
+    set_table: function(roomname, tilename, tablename, table, debug) {
+        if (debug) { console.log('NAV>   set_table('+roomname+', '+tilename+', '+tablename+', '+table+')'); }
         if (!Memory.rooms[roomname]) { Memory.rooms[roomname] = {}; }
         if (!Memory.rooms[roomname].r) { Memory.rooms[roomname].r = {}; }
         if (!Memory.rooms[roomname].r[tilename]) { Memory.rooms[roomname].r[tilename] = {}; }
