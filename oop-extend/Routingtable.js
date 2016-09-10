@@ -145,9 +145,9 @@ Routingtable.prototype.compress_binary = function() {
 
 Routingtable.prototype.add_span = function(addr1, addr2, dir) {
     if (dir == 0 || dir == null) { return; } // Do not store 0 (unknown) direction
+    var code = dir<<12;
     if (addr1 == addr2) {
         // Single address
-        var code = dir<<12;
         this.binary_table = this.binary_table + String.fromCharCode(addr1 | code);
         //this.binary_debug = this.binary_debug + addr1+'='+dir+';';
     } else {
