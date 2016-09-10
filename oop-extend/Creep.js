@@ -584,7 +584,7 @@ Creep.prototype.task_remote_fetch = function() {
             // Is there energy on the ground melting away?
             var loot = this.pos.findClosestByRange(FIND_DROPPED_ENERGY);
             if (loot != null && loot.amount >= 50) {
-                console.log('fetcher '+this+' spotted energy on the ground: '+loot);
+                //console.log('fetcher '+this+' spotted energy on the ground: '+loot);
                 var range = this.room.rangeFromTo(this.pos, loot.pos);
                 if (range > 1) {
                     this.move_to(loot);
@@ -946,11 +946,14 @@ Creep.prototype.move_to = function(target) {
 
                 roomCallback: function(roomName) {
 
-                    console.log('  roomCallback('+roomName+')');
+                    //console.log('  roomCallback('+roomName+')');
 
                     let room = Game.rooms[roomName];
                     if (!room) { console.log('  no vision in '+roomName); return; } // No vision so pathfinding will be inaccurate
-                    if (room.costmatrix) { console.log('  reusing costmatrix for '+roomName); return room.costmatrix; }
+                    if (room.costmatrix) {
+                        //console.log('  reusing costmatrix for '+roomName);
+                        return room.costmatrix;
+                    }
                     let costs = new PathFinder.CostMatrix;
 
                     // Prefer roads, avoid non-walkable structures
