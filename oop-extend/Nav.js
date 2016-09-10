@@ -3,7 +3,9 @@ var Routingtable = require('Routingtable');
 
 module.exports = {
     learn_path: function(src, final, path) {
-        console.log('NAV> learn_path('+src+', '+final+', '+path+')');
+        var debug = false;
+        if (src.roomName != final.roomName) { debug = true; }
+        if (debug) { console.log('NAV> learn_path('+src+', '+final+', '+path+')'); }
         var from = src;
         var table = null;
         for (var i=0; i<path.length; i++) {
@@ -26,7 +28,7 @@ module.exports = {
                     table.tilename = tilename;
                     table.tablename = tablename;
                 }
-                console.log('NAV>     from '+from+' move '+dir+' to reach '+dest);
+                if (debug) { console.log('NAV>     from '+from+' move '+dir+' to reach '+dest); }
                 table.setDirectionTo(dest.x + (dest.y * 50), dir);
             }
             var tablename = (from.roomName === dest.roomName ? 'local' : dest.roomName);
@@ -39,14 +41,14 @@ module.exports = {
                 table.tilename = tilename;
                 table.tablename = tablename;
             }
-            console.log('NAV>     from '+from+' move '+dir+' to reach '+final+' (final)');
+            if (debug) { console.log('NAV>     from '+from+' move '+dir+' to reach '+final+' (final)'); }
             table.setDirectionTo(final.x + (final.y * 50), dir);
             module.exports.set_table(table.roomname, table.tilename, table.tablename, table);
 
             from = next;
             if (from.roomName != src.roomName) {
                 // Limit learning to current room
-                console.log('NAV>     will not learn past room boundary'); 
+                if (debug) { console.log('NAV>     will not learn past room boundary'); }
                 return;
             }
         }
@@ -57,12 +59,12 @@ module.exports = {
         var tablename = (src.roomName === dst.roomName ? 'local' : dst.roomName);
         var table = module.exports.get_table(src.roomName, tilename, tablename);
         var dir = table.getDirectionTo(dst.x + (50 * dst.y));
-        console.log('NAV>     get_direction('+src+','+dst+') = '+dir);
+        //console.log('NAV>     get_direction('+src+','+dst+') = '+dir);
         return dir;
     },
 
     get_table: function(roomname, tilename, tablename) {
-        console.log('NAV>   get_table('+roomname+', '+tilename+', '+tablename+')');
+        //console.log('NAV>   get_table('+roomname+', '+tilename+', '+tablename+')');
         if (!Memory.rooms[roomname]) { return new Routingtable();  }
         if (!Memory.rooms[roomname].r) { return new Routingtable(); }
         if (!Memory.rooms[roomname].r[tilename]) { return new Routingtable(); }
@@ -72,7 +74,7 @@ module.exports = {
     },
 
     set_table: function(roomname, tilename, tablename, table) {
-        console.log('NAV>   set_table('+roomname+', '+tilename+', '+tablename+', '+table+')');
+        //console.log('NAV>   set_table('+roomname+', '+tilename+', '+tablename+', '+table+')');
         if (!Memory.rooms[roomname]) { Memory.rooms[roomname] = {}; }
         if (!Memory.rooms[roomname].r) { Memory.rooms[roomname].r = {}; }
         if (!Memory.rooms[roomname].r[tilename]) { Memory.rooms[roomname].r[tilename] = {}; }
