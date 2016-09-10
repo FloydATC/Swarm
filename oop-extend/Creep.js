@@ -590,7 +590,7 @@ Creep.prototype.task_remote_fetch = function() {
                 } else {
                     this.stop();
                     this.pickup(loot);
-                    this.cancel_timer(); // Invalid measurement
+                    this.stop_timer();
                 }
                 return;
             }
