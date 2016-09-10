@@ -152,11 +152,18 @@ Creep.prototype.execute = function() {
 }
 
 Creep.prototype.start_timer = function() {
-    this.memory.timer_start = Game.time;
+    if (!(this.memory.timer_start > 0)) {
+        //this.say('START');
+        this.memory.timer_start = Game.time;
+    }
 }
 
 Creep.prototype.stop_timer = function() {
-    this.memory.timer_last = Game.time - this.memory.timer_start;
+    if (this.memory.timer_start > 0) {
+        //this.say('STOP');
+        this.memory.timer_last = Game.time - this.memory.timer_start;
+        this.memory.timer_start = 0;
+    }
 }
 
 Creep.prototype.get_energy = function() {
