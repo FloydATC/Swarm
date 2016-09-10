@@ -1,3 +1,4 @@
+var Nav = require('Nav');
 
 module.exports = {}; // Nothing.
 
@@ -819,14 +820,14 @@ Creep.prototype.opposite_vector = function(x,y) {
     return [x*-1, y*-1];
 }
 
-Creep.prototype.learn_path = function(to, p) {
+Creep.prototype.learn_serialized_path = function(to, p) {
     if (this.memory.tracking == false) { return 'ERR_DO_NOT_TRACK'; } // Do not track this creep
     if (typeof p == 'undefined') { return 'ERR_UNDEF_MOVE_PATH'; } // No moveTo path
     if (p == '') { return 'ERR_EMPTY_MOVE_PATH'; } // No moveTo path
     if (p.charAt(4) == 'u') { return 'ERR_U_DIRECTION'; } // Undefined path
     if (to.roomName != this.pos.roomName) { return 'ERR_NOT_LOCAL'; }
     //var p = this.memory._move.path;
-    //console.log(this+' at '+this.pos+' learn_path() '+p);
+    //console.log(this+' at '+this.pos+' learn_serialized_path() '+p);
     var learned = 0;
     var offset = 4;
     var direction = p.charAt(offset);
@@ -874,8 +875,10 @@ Creep.prototype.learn_path = function(to, p) {
 
 Creep.prototype.move_to = function(target) {
     if (this.fatigue > 0) { return; }
-    this.add_stats('move')
+    this.add_stats('move');
+    //this.memory.tracking = false; // DEBUG pathfinder
 
+/*
     if (this.pos.roomName != target.pos.roomName) {
         var direction = this.room.direction_to_room(target.pos.roomName);
         if (direction == null) {
@@ -901,10 +904,12 @@ Creep.prototype.move_to = function(target) {
             }
         }
     }
+*/
 
-    if (this.pos.roomName == target.pos.roomName) {
+    // Check for tile hint
+    //if (this.pos.roomName == target.pos.roomName) {
         //console.log(this+' getting direction from local router');
-        var direction = this.room.get_direction(this.pos, target.pos);
+        var direction = Nav.get_direction(this.pos, target.pos);
         if (direction >= 1 && direction <= 8 && Math.random() > 0.02) {
             //console.log('#DEBUG '+this+' ROUTER move('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+')');
             var newpos = this.next_position(direction);
@@ -920,20 +925,70 @@ Creep.prototype.move_to = function(target) {
             }
             return;
         }
-    }
+    //}
+
     if (this.pos.roomName == target.pos.roomName) {
         //console.log(this.memory.class+' '+this+' ('+this.memory.task.type+') calculating cacheable path from '+this.pos+' to '+target.pos+' (EXPENSIVE)');
         this.room.start_timer('findPath');
         //this.moveTo(target, { ignoreCreeps: true } );
         var p = this.room.findPath(this.pos, target.pos, { ignoreCreeps: true, serialize: true });
-        this.moveByPath(p);
+
+        // Use new pathfinder
+        var goal = { pos: target.pos, range: 1 };
+        var ret = PathFinder.search(
+            this.pos, goal,
+            {
+                // We need to set the defaults costs higher so that we
+                // can set the road cost lower in `roomCallback`
+                plainCost: 2,
+                swampCost: 10,
+
+                roomCallback: function(roomName) {
+
+                    console.log('  roomCallback('+roomName+')');
+
+                    let room = Game.rooms[roomName];
+                    if (!room) { console.log('  no vision in '+roomName); return; } // No vision so pathfinding will be inaccurate
+                    if (room.costmatrix) { console.log('  reusing costmatrix for '+roomName); return room.costmatrix; }
+                    let costs = new PathFinder.CostMatrix;
+
+                    // Prefer roads, avoid non-walkable structures
+                    room.find(FIND_STRUCTURES).forEach(function(s) {
+                        if (s.structureType === STRUCTURE_ROAD) {
+                            // Favor roads over plain tiles
+                            costs.set(s.pos.x, s.pos.y, 1);
+                        } else if (s.structureType !== STRUCTURE_CONTAINER && (s.structureType !== STRUCTURE_RAMPART || !s.my)) {
+                            // Can't walk through non-walkable buildings
+                            costs.set(s.pos.x, s.pos.y, 0xff);
+                        }
+                    });
+
+                    // Examine construction sites
+                    room.find(FIND_CONSTRUCTION_SITES).forEach(function(csite) {
+                        if (csite.structureType === STRUCTURE_ROAD) {
+                            // Favor unfinished roads over plain tiles
+                            costs.set(csite.pos.x, csite.pos.y, 1.5);
+                        }
+                    });
+
+                    room.costmatrix = costs;
+
+                    return costs;
+                },
+            }
+        );
+        //console.log(this+' PathFinder returned '+ret.path);
+        Nav.learn_path(this.pos, target.pos, ret.path);
+
+        this.moveTo(ret.path[0]);
+        //this.moveByPath(p);
         //console.log(this+' p='+p+' _move.path='+this.memory._move.path);
         this.room.stop_timer('findPath');
         //console.log('#DEBUG '+this+' moveTo('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+' IGNORING CREEPS) = '+this.memory._move.path);
-        this.room.start_timer('learn_path');
-        var result = this.learn_path(target.pos, p);
-        this.room.stop_timer('learn_path');
-        if (result != OK) { console.log(this+' learn path returned '+result); }
+        //this.room.start_timer('learn_serialized_path');
+        //var result = this.learn_serialized_path(target.pos, p);
+        //this.room.stop_timer('learn_serialized_path');
+        //if (result != OK) { console.log(this+' learn path returned '+result); }
     } else {
         //console.log(this.memory.class+' '+this+' ('+this.memory.task.type+') calculating NON-CACHEABLE path to '+target.pos+' (EXPENSIVE)');
         this.room.start_timer('moveTo(*)');
