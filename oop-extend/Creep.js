@@ -978,6 +978,7 @@ Creep.prototype.move_to = function(target) {
             }
         );
         //console.log(this+' PathFinder returned '+ret.path);
+        this.say('slow');
         Nav.learn_path(this.pos, target.pos, ret.path);
 
         this.moveTo(ret.path[0]);
