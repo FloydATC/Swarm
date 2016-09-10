@@ -36,31 +36,31 @@ Routingtable.prototype.asBinaryString = function() {
 
 Routingtable.prototype.getDirectionTo = function(address, debug) {
     // Use binary format
-    if (debug) { console.log(this+' lookup address '+address); }
+    //if (debug) { console.log(this+' lookup address '+address); }
     var table = this.binary_table;
     for (var i=0; i<table.length; i++) {
         var code1 = table.charCodeAt(i);
-        if (debug) { console.log('  code1='+code1); }
+        //if (debug) { console.log('  code1='+code1); }
         var addr1 = code1 & 0x0fff;
-        if (debug) { console.log('  found '+addr1); }
+        //if (debug) { console.log('  found '+addr1); }
         if (addr1 > address) { return null; } // Address not in table
         var dir = code1>>12;
         if (dir == 0) {
             // Range
             i++;
             var code2 = table.charCodeAt(i);
-            if (debug) { console.log('  code2='+code2); }
+            //if (debug) { console.log('  code2='+code2); }
             var addr2 = code2 & 0x0fff;
             dir = code2>>12;
-            if (debug) { console.log('  spans to '+addr2+' dir='+dir); }
+            //if (debug) { console.log('  spans to '+addr2+' dir='+dir); }
             if (addr1 <= address && addr2 >= address) { return dir; } // Range match found
         } else {
             // Single address
-            if (debug) { console.log('  single address dir='+dir); }
+            //if (debug) { console.log('  single address dir='+dir); }
             if (addr1 == address) { return dir; } // Address match found
         }
     }
-    if (debug) { console.log('  not found'); }
+    //if (debug) { console.log('  not found'); }
     return null; // Address not in table
 }
 
@@ -154,7 +154,7 @@ Routingtable.prototype.add_span = function(addr1, addr2, dir) {
         // Address range
         this.binary_table = this.binary_table + String.fromCharCode(addr1) + String.fromCharCode(addr2 | code);
         //this.binary_debug = this.binary_debug + addr1+'-'+addr2+'='+dir+';';
-        console.log('span '+addr1+'-'+addr2+'='+dir+' > '+addr1+','+addr2+'|'+code+'='+(addr2|code));
+        //console.log('span '+addr1+'-'+addr2+'='+dir+' > '+addr1+','+addr2+'|'+code+'='+(addr2|code));
     }
 }
 
