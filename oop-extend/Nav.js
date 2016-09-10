@@ -4,7 +4,7 @@ var Routingtable = require('Routingtable');
 module.exports = {
     learn_path: function(src, final, path) {
         var debug = false;
-        if (src.roomName != final.roomName) { debug = true; }
+        //if (src.roomName != final.roomName) { debug = true; }
         if (debug) { console.log('NAV> learn_path('+src+', '+final+', '+path+')'); }
         var from = src;
         var table = null;
@@ -58,7 +58,8 @@ module.exports = {
 
     get_direction: function(src, dst) {
         var debug = false;
-        if (src.roomName != dst.roomName) { debug = true; }
+        //if (src.roomName != dst.roomName) { debug = true; }
+        if (src.roomName == 'E25N38' && dst.roomName != 'E25N38') { debug = true; }
         var tilename = ('0'+src.x).slice(-2) + ('0'+src.y).slice(-2); // Format as XXYY
         var tablename = (src.roomName === dst.roomName ? 'local' : dst.roomName);
         var table = module.exports.get_table(src.roomName, tilename, tablename, debug);
