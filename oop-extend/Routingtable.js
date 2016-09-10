@@ -34,30 +34,30 @@ Routingtable.prototype.asBinaryString = function() {
     return this.binary_table;
 }
 
-Routingtable.prototype.getDirectionTo = function(address) {
+Routingtable.prototype.getDirectionTo = function(address, debug) {
     // Use binary format
-    //console.log(this+' lookup address '+address);
+    if (debug) { console.log(this+' lookup address '+address); }
     var table = this.binary_table;
     for (var i=0; i<table.length; i++) {
         var code1 = table.charCodeAt(i);
         var addr1 = code1 & 0x0fff;
-        //console.log('  found '+addr1);
+        if (debug) { console.log('  found '+addr1); }
         if (addr1 > address) { return null; } // Address not in table
         var dir = code1>>12;
         if (dir == 0) {
             // Range
             var code2 = table.charCodeAt(i++);
             var addr2 = code2 & 0x0fff;
-            //console.log('  spans to '+addr2);
+            if (debug) { console.log('  spans to '+addr2); }
             dir = code2>>12;
             if (addr1 <= address && addr2 >= address) { return dir; } // Range match found
         } else {
             // Single address
-            //console.log('  single address');
+            if (debug) { console.log('  single address'); }
             if (addr1 == address) { return dir; } // Address match found
         }
     }
-    //console.log('  not found');
+    if (debug) { console.log('  not found'); }
     return null; // Address not in table
 }
 

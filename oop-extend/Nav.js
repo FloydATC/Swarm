@@ -63,7 +63,7 @@ module.exports = {
         var tilename = ('0'+src.x).slice(-2) + ('0'+src.y).slice(-2); // Format as XXYY
         var tablename = (src.roomName === dst.roomName ? 'local' : dst.roomName);
         var table = module.exports.get_table(src.roomName, tilename, tablename, debug);
-        var dir = table.getDirectionTo(dst.x + (50 * dst.y));
+        var dir = table.getDirectionTo(dst.x + (50 * dst.y), debug);
         if (debug) { console.log('NAV>     get_direction('+src+','+dst+') = '+dir); }
         return dir;
     },
