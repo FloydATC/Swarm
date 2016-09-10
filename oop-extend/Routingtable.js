@@ -154,7 +154,7 @@ Routingtable.prototype.add_span = function(addr1, addr2, dir) {
         // Address range
         this.binary_table = this.binary_table + String.fromCharCode(addr1) + String.fromCharCode(addr2 | code);
         //this.binary_debug = this.binary_debug + addr1+'-'+addr2+'='+dir+';';
-        console.log('span '+addr1+'-'+addr2+'='+dir+' > '+addr1+','+(addr2|code));
+        console.log('span '+addr1+'-'+addr2+'='+dir+' > '+addr1+','+addr2+'|'+code+'='+(addr2|code));
     }
 }
 
