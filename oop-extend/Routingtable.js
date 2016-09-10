@@ -46,7 +46,7 @@ Routingtable.prototype.getDirectionTo = function(address, debug) {
         var dir = code1>>12;
         if (dir == 0) {
             // Range
-            var code2 = table.charCodeAt(i++);
+            var code2 = table.charCodeAt(++i);
             var addr2 = code2 & 0x0fff;
             if (debug) { console.log('  spans to '+addr2); }
             dir = code2>>12;
