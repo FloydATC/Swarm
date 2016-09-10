@@ -66,7 +66,7 @@ module.exports = {
     },
 
     get_table: function(roomname, tilename, tablename) {
-        //console.log('NAV>   get_table('+roomname+', '+tilename+', '+tablename+')');
+        console.log('NAV>   get_table('+roomname+', '+tilename+', '+tablename+')');
         if (!Memory.rooms[roomname]) { return new Routingtable();  }
         if (!Memory.rooms[roomname].r) { return new Routingtable(); }
         if (!Memory.rooms[roomname].r[tilename]) { return new Routingtable(); }
@@ -76,7 +76,7 @@ module.exports = {
     },
 
     set_table: function(roomname, tilename, tablename, table) {
-        //console.log('NAV>   set_table('+roomname+', '+tilename+', '+tablename+', '+table+')');
+        console.log('NAV>   set_table('+roomname+', '+tilename+', '+tablename+', '+table+')');
         if (!Memory.rooms[roomname]) { Memory.rooms[roomname] = {}; }
         if (!Memory.rooms[roomname].r) { Memory.rooms[roomname].r = {}; }
         if (!Memory.rooms[roomname].r[tilename]) { Memory.rooms[roomname].r[tilename] = {}; }
