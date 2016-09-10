@@ -934,6 +934,7 @@ Creep.prototype.move_to = function(target) {
         var p = this.room.findPath(this.pos, target.pos, { ignoreCreeps: true, serialize: true });
 
         // Use new pathfinder
+        this.say('slow');
         var goal = { pos: target.pos, range: 1 };
         var ret = PathFinder.search(
             this.pos, goal,
@@ -978,7 +979,6 @@ Creep.prototype.move_to = function(target) {
             }
         );
         //console.log(this+' PathFinder returned '+ret.path);
-        this.say('slow');
         Nav.learn_path(this.pos, target.pos, ret.path);
 
         this.moveTo(ret.path[0]);
