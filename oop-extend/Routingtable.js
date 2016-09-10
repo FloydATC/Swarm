@@ -46,7 +46,8 @@ Routingtable.prototype.getDirectionTo = function(address, debug) {
         var dir = code1>>12;
         if (dir == 0) {
             // Range
-            var code2 = table.charCodeAt(++i);
+            i++;
+            var code2 = table.charCodeAt(i);
             var addr2 = code2 & 0x0fff;
             if (debug) { console.log('  spans to '+addr2); }
             dir = code2>>12;
@@ -99,7 +100,8 @@ Routingtable.prototype.expand_binary = function() {
         //console.log('code '+code1+' contains address '+addr1+' direction '+dir);
         if (dir == 0) {
             // Range
-            var code2 = table.charCodeAt(++i);
+            i++;
+            var code2 = table.charCodeAt(i);
             var addr2 = code2 & 0x0fff;
             dir = code2>>12;
             for (var addr=addr1; addr<=addr2; addr++) {
