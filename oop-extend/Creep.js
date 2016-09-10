@@ -876,129 +876,84 @@ Creep.prototype.learn_serialized_path = function(to, p) {
 Creep.prototype.move_to = function(target) {
     if (this.fatigue > 0) { return; }
     this.add_stats('move');
-    //this.memory.tracking = false; // DEBUG pathfinder
-
-/*
-    if (this.pos.roomName != target.pos.roomName) {
-        var direction = this.room.direction_to_room(target.pos.roomName);
-        if (direction == null) {
-            console.log('  unable to find route from '+this.link()+' to '+target.pos.roomName);
-        } else {
-            var exits = this.room.get_exits(direction);
-            //console.log('  candidates: '+JSON.stringify(exits));
-            var exit = null;
-            var nearest_dist = null;
-            for (var i=0; i<exits.length; i++) {
-                var distance = this.room.manhattanDistance(this.pos, exits[i]);
-                if (nearest_dist == null || distance < nearest_dist) {
-                    exit = exits[i];
-                    nearest_dist = distance;
-                }
-            }
-            if (exit == null) {
-                console.log('  no exits found from '+this.link()+' in direction '+direction);
-            } else {
-                //console.log('  navigating towards '+exit.x+','+exit.y);
-                target = { pos: new RoomPosition(exit.x, exit.y, this.room.name) };
-                this.memory.tracking = true;
-            }
-        }
-    }
-*/
 
     // Check for tile hint
-    //if (this.pos.roomName == target.pos.roomName) {
-        //console.log(this+' getting direction from local router');
-        var direction = Nav.get_direction(this.pos, target.pos);
-        if (direction >= 1 && direction <= 8 && Math.random() > 0.02) {
-            //console.log('#DEBUG '+this+' ROUTER move('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+')');
-            var newpos = this.next_position(direction);
-            if (this.reserve_position(newpos) == true) {
-                this.move(direction);
-                this.say(direction);
-                delete this.memory._move;
-            } else {
-                this.say('Traffic');
-                this.room.start_timer('moveTo');
-                this.moveTo(target); // Try to avoid other creeps but do not learn path
-                this.room.stop_timer('moveTo');
-            }
-            return;
+    var direction = Nav.get_direction(this.pos, target.pos);
+    if (direction >= 1 && direction <= 8 && Math.random() > 0.02) {
+        //console.log('#DEBUG '+this+' ROUTER move('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+')');
+        var newpos = this.next_position(direction);
+        if (this.reserve_position(newpos) == true) {
+            this.move(direction);
+            //this.say(direction);
+            delete this.memory._move;
+        } else {
+            this.say('Traffic');
+            this.room.start_timer('moveTo');
+            this.moveTo(target); // Try to avoid other creeps but do not learn path
+            this.room.stop_timer('moveTo');
         }
-    //}
+        return;
+    }
 
-    //if (this.pos.roomName == target.pos.roomName) {
-        //console.log(this.memory.class+' '+this+' ('+this.memory.task.type+') calculating cacheable path from '+this.pos+' to '+target.pos+' (EXPENSIVE)');
-        this.room.start_timer('findPath');
-        //this.moveTo(target, { ignoreCreeps: true } );
-        var p = this.room.findPath(this.pos, target.pos, { ignoreCreeps: true, serialize: true });
+    //console.log(this.memory.class+' '+this+' ('+this.memory.task.type+') calculating cacheable path from '+this.pos+' to '+target.pos+' (EXPENSIVE)');
+    this.room.start_timer('findPath');
+    //this.moveTo(target, { ignoreCreeps: true } );
+    var p = this.room.findPath(this.pos, target.pos, { ignoreCreeps: true, serialize: true });
 
-        // Use new pathfinder
-        this.say('slow');
-        var goal = { pos: target.pos, range: 1 };
-        var ret = PathFinder.search(
-            this.pos, goal,
-            {
-                // We need to set the defaults costs higher so that we
-                // can set the road cost lower in `roomCallback`
-                plainCost: 2,
-                swampCost: 10,
+    // Use new pathfinder
+    this.say('slow');
+    var goal = { pos: target.pos, range: 1 };
+    var ret = PathFinder.search(
+        this.pos, goal,
+        {
+            // We need to set the defaults costs higher so that we
+            // can set the road cost lower in `roomCallback`
+            plainCost: 2,
+            swampCost: 10,
 
-                roomCallback: function(roomName) {
+            roomCallback: function(roomName) {
 
-                    //console.log('  roomCallback('+roomName+')');
+                //console.log('  roomCallback('+roomName+')');
 
-                    let room = Game.rooms[roomName];
-                    if (!room) { console.log('  no vision in '+roomName); return; } // No vision so pathfinding will be inaccurate
-                    if (room.costmatrix) {
-                        //console.log('  reusing costmatrix for '+roomName);
-                        return room.costmatrix;
+                let room = Game.rooms[roomName];
+                if (!room) { console.log('  no vision in '+roomName); return; } // No vision so pathfinding will be inaccurate
+                if (room.costmatrix) {
+                    //console.log('  reusing costmatrix for '+roomName);
+                    return room.costmatrix;
+                }
+                let costs = new PathFinder.CostMatrix;
+
+                // Prefer roads, avoid non-walkable structures
+                room.find(FIND_STRUCTURES).forEach(function(s) {
+                    if (s.structureType === STRUCTURE_ROAD) {
+                        // Favor roads over plain tiles
+                        costs.set(s.pos.x, s.pos.y, 1);
+                    } else if (s.structureType !== STRUCTURE_CONTAINER && (s.structureType !== STRUCTURE_RAMPART || !s.my)) {
+                        // Can't walk through non-walkable buildings
+                        costs.set(s.pos.x, s.pos.y, 0xff);
                     }
-                    let costs = new PathFinder.CostMatrix;
+                });
 
-                    // Prefer roads, avoid non-walkable structures
-                    room.find(FIND_STRUCTURES).forEach(function(s) {
-                        if (s.structureType === STRUCTURE_ROAD) {
-                            // Favor roads over plain tiles
-                            costs.set(s.pos.x, s.pos.y, 1);
-                        } else if (s.structureType !== STRUCTURE_CONTAINER && (s.structureType !== STRUCTURE_RAMPART || !s.my)) {
-                            // Can't walk through non-walkable buildings
-                            costs.set(s.pos.x, s.pos.y, 0xff);
-                        }
-                    });
+                // Examine construction sites
+                room.find(FIND_CONSTRUCTION_SITES).forEach(function(csite) {
+                    if (csite.structureType === STRUCTURE_ROAD) {
+                        // Favor unfinished roads over plain tiles
+                        costs.set(csite.pos.x, csite.pos.y, 1.5);
+                    }
+                });
 
-                    // Examine construction sites
-                    room.find(FIND_CONSTRUCTION_SITES).forEach(function(csite) {
-                        if (csite.structureType === STRUCTURE_ROAD) {
-                            // Favor unfinished roads over plain tiles
-                            costs.set(csite.pos.x, csite.pos.y, 1.5);
-                        }
-                    });
+                room.costmatrix = costs;
 
-                    room.costmatrix = costs;
-
-                    return costs;
-                },
-            }
-        );
-        //console.log(this+' PathFinder returned '+ret.path);
-        Nav.learn_path(this.pos, target.pos, ret.path);
-
-        this.moveTo(ret.path[0]);
-        //this.moveByPath(p);
-        //console.log(this+' p='+p+' _move.path='+this.memory._move.path);
-        this.room.stop_timer('findPath');
-        //console.log('#DEBUG '+this+' moveTo('+this.pos.x+','+this.pos.y+' - '+target.pos.x+','+target.pos.y+' IGNORING CREEPS) = '+this.memory._move.path);
-        //this.room.start_timer('learn_serialized_path');
-        //var result = this.learn_serialized_path(target.pos, p);
-        //this.room.stop_timer('learn_serialized_path');
-        //if (result != OK) { console.log(this+' learn path returned '+result); }
-    //} else {
-    //    //console.log(this.memory.class+' '+this+' ('+this.memory.task.type+') calculating NON-CACHEABLE path to '+target.pos+' (EXPENSIVE)');
-    //    this.room.start_timer('moveTo(*)');
-    //    this.moveTo(target, { ignoreCreeps: false } );
-    //    this.room.stop_timer('moveTo(*)');
-    //}
+                return costs;
+            },
+        }
+    );
+    //console.log(this+' PathFinder returned '+ret.path);
+    Nav.learn_path(this.pos, target.pos, ret.path);
+    this.moveTo(ret.path[0]);
+    //this.moveByPath(p);
+    //console.log(this+' p='+p+' _move.path='+this.memory._move.path);
+    this.room.stop_timer('findPath');
 }
 
 Creep.prototype.next_position = function(direction) {
