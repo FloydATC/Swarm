@@ -55,11 +55,13 @@ module.exports = {
     },
 
     get_direction: function(src, dst) {
+        var debug = false;
+        if (src.roomName != dst.roomName) { debug = true; }
         var tilename = ('0'+src.x).slice(-2) + ('0'+src.y).slice(-2); // Format as XXYY
         var tablename = (src.roomName === dst.roomName ? 'local' : dst.roomName);
         var table = module.exports.get_table(src.roomName, tilename, tablename);
         var dir = table.getDirectionTo(dst.x + (50 * dst.y));
-        //console.log('NAV>     get_direction('+src+','+dst+') = '+dir);
+        if (debug) { console.log('NAV>     get_direction('+src+','+dst+') = '+dir); }
         return dir;
     },
 
