@@ -53,7 +53,7 @@ module.exports = {
         var tablename = (src.roomName === dst.roomName ? 'local' : dst.roomName);
         var table = module.exports.get_table(src.roomName, tilename, tablename);
         var dir = table.getDirectionTo(dst.x + (50 * dst.y));
-        console.log('NAV>   get_direction('+src+','+dst+') = '+dir);
+        console.log('NAV>     get_direction('+src+','+dst+') = '+dir);
         return dir;
     },
 
