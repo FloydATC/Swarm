@@ -49,12 +49,12 @@ Routingtable.prototype.getDirectionTo = function(address, debug) {
             i++;
             var code2 = table.charCodeAt(i);
             var addr2 = code2 & 0x0fff;
-            if (debug) { console.log('  spans to '+addr2); }
             dir = code2>>12;
+            if (debug) { console.log('  spans to '+addr2+' dir='+dir); }
             if (addr1 <= address && addr2 >= address) { return dir; } // Range match found
         } else {
             // Single address
-            if (debug) { console.log('  single address'); }
+            if (debug) { console.log('  single address dir='+dir); }
             if (addr1 == address) { return dir; } // Address match found
         }
     }
