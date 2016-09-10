@@ -40,6 +40,7 @@ Routingtable.prototype.getDirectionTo = function(address, debug) {
     var table = this.binary_table;
     for (var i=0; i<table.length; i++) {
         var code1 = table.charCodeAt(i);
+        if (debug) { console.log('  code1='+code1); }
         var addr1 = code1 & 0x0fff;
         if (debug) { console.log('  found '+addr1); }
         if (addr1 > address) { return null; } // Address not in table
@@ -48,6 +49,7 @@ Routingtable.prototype.getDirectionTo = function(address, debug) {
             // Range
             i++;
             var code2 = table.charCodeAt(i);
+            if (debug) { console.log('  code2='+code2); }
             var addr2 = code2 & 0x0fff;
             dir = code2>>12;
             if (debug) { console.log('  spans to '+addr2+' dir='+dir); }
