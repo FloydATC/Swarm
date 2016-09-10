@@ -265,10 +265,9 @@ Room.prototype.plan = function() {
             var needs = flag.needs();
             if (needs == 'Miner') {
                 //console.log(this.link()+' spawning a local miner for '+flag.pos.roomName);
-                var result = this.createCreep(this.schematic('Miner'), undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } );
-                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,WORK,WORK,WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } ); }
-                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,WORK,WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } ); }
-                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } ); }
+                var result = this.createCreep(this.schematic('Miner.3'), undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } );
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Miner.2'), undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } ); }
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Miner.1'), undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } ); }
                 if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } ); }
                 if (result == OK) { flag.spawned('Miner'); }
                 return;
@@ -345,7 +344,9 @@ Room.prototype.plan = function() {
             var needs = flag.needs();
             if (needs == 'Miner') {
                 //console.log(this.link()+' spawning a remote miner for '+flag.pos.roomName);
-                var result = this.createCreep(this.schematic('Miner'), undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
+                var result = this.createCreep(this.schematic('Miner.3'), undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Miner.2'), undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } ); }
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Miner.1'), undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } ); }
                 if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: flag.pos.roomName, flag: flag.name } ); }
                 if (result == OK) { flag.spawned('Miner'); }
                 return;
@@ -449,7 +450,9 @@ Room.prototype.schematic = function(c) {
         case 'Spitter': { hash[RANGED_ATTACK] = 1; hash[MOVE] = 1; break; }
         case 'Biter': { hash[ATTACK] = 1; hash[MOVE] = 1; break; }
         case 'Hunter': { hash[TOUGH] = 2; hash[MOVE] = 5; hash[RANGED_ATTACK] = 4; hash[HEAL] = 4; break; }
-        case 'Miner': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
+        case 'Miner.3': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
+        case 'Miner.2': { hash[WORK] = 3; hash[CARRY] = 1; hash[MOVE] = 2; break; }
+        case 'Miner.1': { hash[WORK] = 2; hash[CARRY] = 1; hash[MOVE] = 1; break; }
         case 'Fetcher.1': { hash[WORK] = 1; hash[CARRY] = 5; hash[MOVE] = 3; break; }
         case 'Fetcher.2': { hash[WORK] = 1; hash[CARRY] = 10; hash[MOVE] = 6; break; }
         case 'Zealot': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
