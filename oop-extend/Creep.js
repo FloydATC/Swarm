@@ -582,7 +582,7 @@ Creep.prototype.task_remote_fetch = function() {
 
             // Is there energy on the ground melting away?
             var loot = this.pos.findClosestByRange(FIND_DROPPED_ENERGY);
-            if (loot != null) {
+            if (loot != null && loot.amount >= 50) {
                 console.log('fetcher '+this+' spotted energy on the ground: '+loot);
                 var range = this.room.rangeFromTo(this.pos, loot.pos);
                 if (range > 1) {
