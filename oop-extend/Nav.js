@@ -44,7 +44,11 @@ module.exports = {
             module.exports.set_table(table.roomname, table.tilename, table.tablename, table);
 
             from = next;
-            if (from.roomName != src.roomName) { return; } // Limit learning to current room
+            if (from.roomName != src.roomName) {
+                // Limit learning to current room
+                console.log('NAV>     will not learn past room boundary'); 
+                return;
+            }
         }
     },
 
