@@ -20,7 +20,7 @@ module.exports = {
                 var dest = path[j];
                 var tablename = (from.roomName === dest.roomName ? 'local' : dest.roomName);
                 if (table == null || table.roomname != from.roomName || table.tilename != tilename || table.tablename != tablename) {
-                    if (table != null) {
+                    if (table != null && table.dirty) {
                         module.exports.set_table(table.roomname, table.tilename, table.tablename, table, debug);
                     }
                     table = module.exports.get_table(from.roomName, tilename, tablename, debug);
@@ -30,10 +30,11 @@ module.exports = {
                 }
                 if (debug) { console.log('NAV>     from '+from+' move '+dir+' to reach '+dest); }
                 table.setDirectionTo(dest.x + (dest.y * 50), dir);
+                table.dirty = true;
             }
             var tablename = (from.roomName === dest.roomName ? 'local' : dest.roomName);
             if (table == null || table.roomname != from.roomName || table.tilename != tilename || table.tablename != tablename) {
-                if (table != null) {
+                if (table != null && table.dirty) {
                     module.exports.set_table(table.roomname, table.tilename, table.tablename, table, debug);
                 }
                 table = module.exports.get_table(from.roomName, tilename, tablename, debug);
@@ -43,6 +44,7 @@ module.exports = {
             }
             if (debug) { console.log('NAV>     from '+from+' move '+dir+' to reach '+final+' (final)'); }
             table.setDirectionTo(final.x + (final.y * 50), dir);
+            table.dirty = true;
             module.exports.set_table(table.roomname, table.tilename, table.tablename, table, debug);
 
             from = next;
@@ -82,6 +84,7 @@ module.exports = {
         if (!Memory.rooms[roomname].r[tilename]) { Memory.rooms[roomname].r[tilename] = {}; }
         Memory.rooms[roomname].r[tilename].mru = Game.time;
         Memory.rooms[roomname].r[tilename][tablename] = table.asBinaryString();
+        table.dirty = false;
     },
 
     direction_of_vector: function(vec) {
