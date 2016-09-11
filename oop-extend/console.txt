@@ -22,3 +22,7 @@ Object.keys(Game.creeps).length
 
 // Enable debugging for a specific creep
 Memory.creeps['James'].debug = true;
+
+// Profiling
+Game.profiler.profile(1000)
+Game.profiler.email(1000)

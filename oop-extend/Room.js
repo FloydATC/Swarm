@@ -383,7 +383,11 @@ Room.prototype.plan = function() {
 
 Room.prototype.rangeFromTo = function(pos1, pos2) {
     if (pos1.roomName != pos2.roomName) { return Infinity; }
-    return Math.max(Math.abs(pos1.x - pos2.x), Math.abs(pos1.y - pos2.y));
+    var x = pos1.x - pos2.x;
+    var y = pos1.y - pos2.y;
+    x = (x >= 0 ? x : 0 - x); // Abs()
+    y = (y >= 0 ? y : 0 - y); // Abs()
+    return (x >= y ? x : y); // Math.max(Math.abs(pos1.x - pos2.x), Math.abs(pos1.y - pos2.y));
 }
 
 Room.prototype.optimize = function() {
