@@ -791,22 +791,15 @@ Room.prototype.assign_task_pick_up = function(drones, drops) {
 
 Room.prototype.assign_task_feed_extension = function(drones, extensions) {
     var count = 0;
+    extensions = _.filter(extensions, function(e) { return e.energy < e.energyCapacity; } );
     while (drones.length > 0 && extensions.length > 0 && count < 3) {
         var drone = drones.shift();
         while (extensions.length > 0) {
             var extension = drone.shift_nearest(extensions);
-            if (extension.energy < extension.energyCapacity) {
-                drone.task = 'feed extension';
-                drone.target = extension.id;
-                count++;
-                //console.log(drone.name+' assigned to '+drone.task+' '+extension);
-                break;
-            }
-        }
-        //console.log(drone.room+' '+drone+' task '+drone.task);
-        if (typeof drone.task == 'undefined') {
-            // No extensions need energy
-            drones.push(drone);
+            drone.task = 'feed extension';
+            drone.target = extension.id;
+            count++;
+            //console.log(drone.name+' assigned to '+drone.task+' '+extension);
             break;
         }
     }
