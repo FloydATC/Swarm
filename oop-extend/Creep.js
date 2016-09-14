@@ -642,6 +642,9 @@ Creep.prototype.task_remote_fetch = function() {
                 return;
             }
             if (range > 1) {
+                // Adjacent link? Try to unload (use link as "drop box")
+                var links = this.links_within_reach();
+                if (links.length > 0) { this.transferEnergy(links[0]); }
                 this.move_to(target);
                 //console.log('Fetcher '+this+' approaching target ('+target+' in '+this.memory.home+')');
                 //return;
@@ -781,7 +784,9 @@ Creep.prototype.task_upgrade = function() {
             //console.log(this+' has free space');
             //var treasures = this.pos.findInRange(FIND_DROPPED_ENERGY, 1);
             var treasures = this.energy_within_reach();
-            if (treasures.length > 0) { this.pickup(treasures[0]); }
+            if (treasures.length > 0) { this.pickup(treasures[0]); return; }
+            var links = this.links_within_reach();
+            if (links.length > 0) { this.withdraw(links[0], RESOURCE_ENERGY, this.free); return; }
         }
         return;
     }
