@@ -772,7 +772,7 @@ Room.prototype.assign_task_feed_link = function(drones, links) {
         var drone = drones.shift();
         if (links.length > 0) {
             var link = drone.shift_nearest(links);
-            if (this.link_average < link.energyCapacity / 2) {
+            if (this.link_average < link.energyCapacity / 4) {
                 // Link network needs energy, we just need the closest link
                 drone.task = 'feed link';
                 drone.target = link.id; // Will switch whenever needed
