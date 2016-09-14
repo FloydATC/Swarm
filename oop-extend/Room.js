@@ -739,7 +739,7 @@ Room.prototype.assign_task_feed_tower = function(drones, towers) {
         var drone = drones.shift();
         while (towers.length > 0) {
             var tower = drone.shift_nearest(towers);
-            if (tower.energy < tower.energyCapacity) {
+            if (tower.energy_pct < 95) {
                 drone.task = 'feed tower';
                 drone.target = tower.id;
                 //console.log(drone.name+' assigned to '+drone.task+' '+drone.target);
