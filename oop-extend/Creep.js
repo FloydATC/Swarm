@@ -644,7 +644,7 @@ Creep.prototype.task_remote_fetch = function() {
             if (range > 1) {
                 // Adjacent link? Try to unload (use link as "drop box")
                 var links = this.links_within_reach();
-                if (links.length > 0) { this.say('POST'); this.transferEnergy(links[0]); }
+                if (links.length > 0) { this.say('POST'); this.transfer(links[0], RESOURCE_ENERGY); }
                 this.move_to(target);
                 //console.log('Fetcher '+this+' approaching target ('+target+' in '+this.memory.home+')');
                 //return;
