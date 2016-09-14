@@ -77,6 +77,9 @@ Room.prototype.initialize = function() {
         }
     }
 
+
+    delete this.memory.exits;
+/*
     // Record exits if not already done (Store in encoded format)
     if (typeof this.memory.exits == 'undefined') {
         this.memory.exits = {};
@@ -93,6 +96,7 @@ Room.prototype.initialize = function() {
             this.memory.exits[direction] = encoded;
         }
     }
+*/
 
 
     for (var i=0; i<this.links.length; i++) { this.links[i].initialize(); }
@@ -106,7 +110,11 @@ Room.prototype.initialize = function() {
     this.containers = this.containers.sort( function(a,b) { return a.free - b.free; } ); // Note: Must initialize before sorting
 }
 
-Room.prototype.get_exits = function(direction) {
+Room.prototype.under_attack = function() {
+    return (this.hostile_creeps.length > 0); // true if hostiles spotted
+}
+
+/*Room.prototype.get_exits = function(direction) {
     var encoded = this.memory.exits[direction];
     //console.log(this.link()+' direction '+direction+' encoded exits = '+encoded);
     var decoded = [];
@@ -116,7 +124,7 @@ Room.prototype.get_exits = function(direction) {
         decoded.push( { x: value % 50, y: Math.floor(value / 50) } );
     }
     return decoded;
-}
+}*/
 
 Room.prototype.manhattanDistance = function(p1, p2) {
     return Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
@@ -297,7 +305,7 @@ Room.prototype.plan = function() {
         }
     }
     //console.log(this.link()+' time='+Game.time+' colonize='+(Game.colonize ? 'yes' : 'no')+' request='+(Game.request_drones ? 'yes' : 'no'));
-    if (Game.colonize && Game.time % 300 == 0) {
+    if (Game.colonize && Game.time % 300 == 0 && this.under_attack() == false) {
         if (Game.manhattanDistance(this.name, Game.colonize) <= 2 && (!(Game.rooms[Game.colonize]) || Game.rooms[Game.colonize].controller && Game.rooms[Game.colonize].controller.my == false)) {
             //console.log(this.link()+' spawning a creep to claim '+Game.colonize);
             var result = this.createCreep([MOVE,CARRY,WORK,CLAIM], undefined, { class: 'Swarmer', destination: Game.colonize });
@@ -306,7 +314,7 @@ Room.prototype.plan = function() {
             //console.log(this.link()+' would like to help colonize but, gee, '+Game.colonize+' is awfully far away: '+Game.manhattanDistance(this.name, Game.colonize));
         }
     }
-    if (Game.request_drones && Game.time % 300 == 0) {
+    if (Game.request_drones && Game.time % 300 == 0 && this.under_attack() == false) {
         if (Game.manhattanDistance(this.name, Game.request_drones) <= 2 && Game.rooms[Game.request_drones].controller && Game.rooms[Game.request_drones].controller.my == true) {
             //console.log(this.link()+' spawning a creep to build spawn in '+Game.request_drones);
             // Try to spawn a drone appropriate for this room controller level
@@ -324,7 +332,7 @@ Room.prototype.plan = function() {
             //console.log(this.link()+' would like to help build but, gee, '+Game.request_drones+' is awfully far away: '+Game.manhattanDistance(this.name, Game.request_drones));
         }
     }
-    if (this.controller && this.controller.flag) {
+    if (this.controller && this.controller.flag && this.under_attack() == false) {
         var flag = this.controller.flag;
         var needs = flag.needs();
         //console.log(this.link()+' flag '+flag+' needs '+needs);
@@ -337,7 +345,7 @@ Room.prototype.plan = function() {
             return;
         }
     }
-    if (this.harvest_flags) {
+    if (this.harvest_flags && this.under_attack() == false) {
         //console.log(this.link()+' has harvest flags to consider: '+this.harvest_flags);
         for (var i in this.harvest_flags) {
             var flag = this.harvest_flags[i];
@@ -361,7 +369,7 @@ Room.prototype.plan = function() {
             }
         }
     }
-    if (this.reserve_flags) {
+    if (this.reserve_flags && this.under_attack() == false) {
         //console.log(this.link()+' has harvest flags to consider: '+this.harvest_flags);
         for (var i in this.reserve_flags) {
             var flag = this.reserve_flags[i];
@@ -561,6 +569,7 @@ Room.prototype.calc_spawn_reserves = function() {
 
 Room.prototype.consider_road = function(creep) {
     // creep.fatigue, creep.pos => construct road?
+    if (this.under_attack() == true) { return; }
     creep.say('Road?');
     if (this.construction_sites.length > 2) { return; } // Throttle construction work
     var coord = creep.pos.x + ',' + creep.pos.y;
@@ -827,6 +836,7 @@ Room.prototype.assign_task_repair = function(drones, need_repairs){
 }
 
 Room.prototype.assign_task_build = function(drones, csites) {
+    if (this.under_attack() == true) { return; }
     while (drones.length > 0 && csites.length > 0) {
         var drone = drones.shift();
         var csite = drone.shift_nearest(csites);
@@ -870,6 +880,7 @@ Room.prototype.assign_task_recycle = function(drones) {
 }
 
 Room.prototype.assign_task_upgrade = function(drones) {
+    if (this.under_attack() == true) { return; }
     while (drones.length > 0 && this.controller && this.controller.my) {
         var drone = drones.shift();
         drone.task = 'upgrade';
@@ -879,22 +890,22 @@ Room.prototype.assign_task_upgrade = function(drones) {
 
 }
 
-Room.prototype.load_routing_table = function(tile) {
+/*Room.prototype.load_routing_table = function(tile) {
     if (!this.memory.r) { this.memory.r = {}; }
     if (!this.memory.r[tile]) { this.memory.r[tile] = {}; }
     this.memory.r[tile]['mru'] = Game.time;
     var table = new Routingtable(this.memory.r[tile]['table']);
     return table;
-}
+}*/
 
-Room.prototype.save_routing_table = function(tile, table) {
+/*Room.prototype.save_routing_table = function(tile, table) {
     if (!this.memory.r) { this.memory.r = {}; }
     if (!this.memory.r[tile]) { this.memory.r[tile] = {}; }
     this.memory.r[tile]['mru'] = Game.time;
     this.memory.r[tile]['table'] = table.asBinaryString();
-}
+}*/
 
-Room.prototype.get_direction = function(src, dst) {
+/*Room.prototype.get_direction = function(src, dst) {
     var pos1 = ('0'+src.x).slice(-2) + ('0'+src.y).slice(-2); // Format as XXYY
     //var pos2 = ('0'+dst.x).slice(-2) + ('0'+dst.y).slice(-2); // Format as XXYY
     //console.log('???:'+pos1+'-'+pos2);
@@ -907,7 +918,7 @@ Room.prototype.get_direction = function(src, dst) {
     var direction = table.getDirectionTo(dst.x + (50 * dst.y));
     //console.log('HIT:'+pos1+'='+direction);
     return direction;
-}
+}*/
 
 Room.prototype.expire_routes = function() {
     delete this.memory.router;
@@ -953,7 +964,7 @@ Room.prototype.show_totals = function() {
     console.log(report);
 }
 
-Room.prototype.direction_to_room = function(name) {
+/*Room.prototype.direction_to_room = function(name) {
     var direction = this.memory.to[name];
     if (direction != null) {
         //console.log(this.link()+' used room route cache entry for '+name);
@@ -973,7 +984,7 @@ Room.prototype.direction_to_room = function(name) {
     this.stop_timer('findRoute');
     this.memory.to[name] = route[0].exit;
     return route[0].exit;
-}
+}*/
 
 Room.prototype.find_roads = function() {
     var start = null;
