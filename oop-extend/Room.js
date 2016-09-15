@@ -338,7 +338,12 @@ Room.prototype.plan = function() {
         //console.log(this.link()+' flag '+flag+' needs '+needs);
         if (needs == 'Zealot') {
             //console.log(this.link()+' spawning a zealot for '+flag.pos.roomName);
-            var result = this.createCreep(this.schematic('Zealot'), undefined, { class: 'Zealot', home: this.name, flag: flag.name } );
+            var result = ERR_NOT_ENOUGH_ENERGY;
+            if (this.storage && this.storage.energy_pct >= 75) {
+                // Boost upgrading if the room is doing well
+                result = this.createCreep(this.schematic('Zealot.2'), undefined, { class: 'Zealot', home: this.name, flag: flag.name } );
+            }
+            if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Zealot.1'), undefined, { class: 'Zealot', home: this.name, flag: flag.name } ); }
             if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Zealot', home: this.name, flag: flag.name } ); }
             if (result == OK) { flag.spawned('Zealot'); }
             //console.log('spawn zealot: '+result);
@@ -463,7 +468,8 @@ Room.prototype.schematic = function(c) {
         case 'Miner.1': { hash[WORK] = 2; hash[CARRY] = 1; hash[MOVE] = 1; break; }
         case 'Fetcher.1': { hash[WORK] = 1; hash[CARRY] = 5; hash[MOVE] = 3; break; }
         case 'Fetcher.2': { hash[WORK] = 1; hash[CARRY] = 10; hash[MOVE] = 6; break; }
-        case 'Zealot': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
+        case 'Zealot.2': { hash[WORK] = 10; hash[CARRY] = 1; hash[MOVE] = 1; break; }
+        case 'Zealot.1': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 1; break; }
         case 'Reserver': { hash[CLAIM] = 2; hash[MOVE] = 1; break; }
         case 'Drone.1': { hash[WORK] = 1; hash[CARRY] = 1; hash[MOVE] = 1; break; }
         case 'Drone.2': { hash[WORK] = 2; hash[CARRY] = 2; hash[MOVE] = 2; break; }
