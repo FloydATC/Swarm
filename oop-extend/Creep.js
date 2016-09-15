@@ -200,7 +200,7 @@ Creep.prototype.get_energy = function() {
 
     // Consider fetching energy from a link
     if (debug) { console.log(this+' considers fetching energy from a link'); }
-    if (this.task == 'feed tower' || this.task == 'feed spawn' || this.task == 'feed extension') {
+    if (true || this.task == 'feed tower' || this.task == 'feed spawn' || this.task == 'feed extension') {
         var links = this.room.links.slice();
         while (links.length > 0) {
             var link = this.shift_nearest(links);
@@ -225,7 +225,7 @@ Creep.prototype.get_energy = function() {
 
     // Consider fetching energy from a container
     if (debug) { console.log(this+' considers fetching energy from a container to '+this.memory.task.type); }
-    if (this.task != 'stockpile') {
+    if (true || this.task != 'stockpile') {
         var containers = this.room.containers.slice();
         while (containers.length > 0) {
             var container = this.shift_nearest(containers);
@@ -250,7 +250,7 @@ Creep.prototype.get_energy = function() {
 
     // Consider fetching energy from storage
     if (debug) { console.log(this+' considers fetching energy from storage'); }
-    if (this.task != 'upgrade' && this.task != 'stockpile') {
+    if (this.task != 'XXXupgrade' && this.task != 'stockpile') {
         var storage = this.room.storage;
         if (storage instanceof StructureStorage) {
             var reserved = storage.reserved_amount || 0;
