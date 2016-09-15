@@ -858,7 +858,11 @@ Room.prototype.assign_task_build = function(drones, csites) {
 
 Room.prototype.assign_task_stockpile = function(drones, storage) {
     //console.log(this.link()+' container assignments:');
-    while (drones.length > 0 && storage) {
+    var need = 1;
+    if (storage && storage.energy_pct < 75) { need = 2; }
+    var count = 0;
+    while (drones.length > 0 && storage && count < need) {
+        count++;
         var drone = drones.shift();
         if (storage.free > 0) {
             drone.task = 'stockpile';
