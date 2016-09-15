@@ -198,31 +198,6 @@ Creep.prototype.get_energy = function() {
         }
     }
 
-    // Consider fetching energy from a link
-    if (debug) { console.log(this+' considers fetching energy from a link'); }
-    if (this.task != 'feed link') {
-        var links = this.room.links.slice();
-        while (links.length > 0) {
-            var link = this.shift_nearest(links);
-            if (link instanceof StructureLink) {
-                var reserved = link.reserved_amount || 0;
-                var wanted = this.carryCapacity - _.sum(this.carry);
-                var available = link.energy;
-                if (available < reserved + wanted) { continue; } // Not enough left for me
-                if (debug) { console.log(this+' decided to fetch from '+link+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')'); }
-                link.reserved_amount = reserved + this.carryCapacity - _.sum(this.carry);
-                if (this.pos.inRangeTo(link, 1)) {
-                    this.withdraw(link, RESOURCE_ENERGY);
-                    this.memory.tracking = true;
-                } else {
-                    this.move_to(link);
-                    this.memory.tracking = true;
-                }
-                return;
-            }
-        }
-    }
-
     // Consider fetching energy from a container
     if (debug) { console.log(this+' considers fetching energy from a container to '+this.memory.task.type); }
     if (true) {
@@ -241,6 +216,31 @@ Creep.prototype.get_energy = function() {
                     this.memory.tracking = true;
                 } else {
                     this.move_to(container);
+                    this.memory.tracking = true;
+                }
+                return;
+            }
+        }
+    }
+
+    // Consider fetching energy from a link
+    if (debug) { console.log(this+' considers fetching energy from a link'); }
+    if (this.task != 'feed link') {
+        var links = this.room.links.slice();
+        while (links.length > 0) {
+            var link = this.shift_nearest(links);
+            if (link instanceof StructureLink) {
+                var reserved = link.reserved_amount || 0;
+                var wanted = this.carryCapacity - _.sum(this.carry);
+                var available = link.energy;
+                if (available < reserved + wanted) { continue; } // Not enough left for me
+                if (debug) { console.log(this+' decided to fetch from '+link+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')'); }
+                link.reserved_amount = reserved + this.carryCapacity - _.sum(this.carry);
+                if (this.pos.inRangeTo(link, 1)) {
+                    this.withdraw(link, RESOURCE_ENERGY);
+                    this.memory.tracking = true;
+                } else {
+                    this.move_to(link);
                     this.memory.tracking = true;
                 }
                 return;
