@@ -339,22 +339,30 @@ Creep.prototype.task_hunt = function() {
     if (this.memory.destination && this.memory.destination == this.room.name) {
         //console.log(this.memory.class+' '+this+' hunting hostiles in '+this.room.name);
         // Attack!
-        var target = this.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+        var targets = this.room.hostile_creeps.slice();
+        var target = this.shift_nearest(targets);
+        while (Math.random() > 0.9) { target = this.shift_nearest(targets); } // Random chance to skip nearest
+        //var target = this.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
         if (target == null) {
-            delete this.memory.destination;
             this.say('Victory!');
+            this.memory.idle = (this.memory.idle || 0) + 1;
+            if (this.memory.idle == 50) { this.suicide(); }
         } else {
+            this.memory.idle = 0;
             if (this.room.rangeFromTo(this.pos, target.pos) > 3) {
                 if (this.hits < this.hitsMax) { this.heal(this); }// Attempt to heal self
                 this.move_to(target); // Close on target
                 return;
             }
-            if (this.at_exit() && this.room.controller) {
-                this.move_to(this.room.controller);
+            if (this.at_exit() && target != null) {
+                //this.move_to(this.room.controller);
+                this.move_to(target);
             } else {
                 this.stop();
             }
 
+
+            if (this.hits < this.hitsMax) { this.heal(this); }// Attempt to heal self
             this.rangedAttack(target);
             return;
         }
@@ -675,6 +683,7 @@ Creep.prototype.task_remote_fetch = function() {
                 var cs = csites[i];
                 if (cs.structureType == STRUCTURE_ROAD) {
                     this.build(cs);
+                    this.cancel_timer(); // If we run out of energy it must not count as a completed roundtrip
                     break;
                 }
             }
