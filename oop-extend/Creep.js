@@ -106,7 +106,8 @@ Creep.prototype.execute = function() {
 
     // Carrying something else than energy? Ignore task and store it somewhere!
     if (_.sum(this.carry) > this.carry.energy) {
-        var target = this.shift_nearest(this.room.containers.splice());
+        var target = this.room.terminal; //this.shift_nearest(this.room.containers.splice());
+        if (target == null) { target = this.rom.storage; }
         if (target != null) {
             if (this.pos.inRangeTo(target, 1)) {
                 for (var cargo in this.carry) { this.transfer(target, cargo); break; }
@@ -572,7 +573,7 @@ Creep.prototype.task_extract = function() {
             //this.drop(Object.keys(this.carry)[0])
             var creep = this;
             //console.log('  Carrying '+JSON.stringify(this.carry));
-            _.each(this.carry, (amt,type) => this.drop(type)); // Thanks warinternal
+            for (var cargo in this.carry) { this.drop(cargo); break; }
         }
         return;
     } else {

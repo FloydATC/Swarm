@@ -68,7 +68,7 @@ Room.prototype.initialize = function() {
             }
         }
         // There should also be a flag on each Extractor to coordinate mining efforts
-        if (false && this.extractor) {
+        if (this.extractor) {
             if (this.extractor.flag == null) {
                 var flagname = 'extract '+this.name;
                 this.createFlag(this.extractor.pos, flagname);
