@@ -110,7 +110,14 @@ Creep.prototype.execute = function() {
         if (target == null) { target = this.rom.storage; }
         if (target != null) {
             if (this.pos.inRangeTo(target, 1)) {
-                for (var cargo in this.carry) { console.log(this+' xfer '+cargo+' to '+target); this.transfer(target, cargo); break; }
+                for (var cargo in this.carry) {
+                    var amount = this.carry[cargo];
+                    if (amount > 0) {
+                        console.log(this+' xfer '+cargo+' to '+target);
+                        this.transfer(target, cargo);
+                        break; 
+                    }
+                }
                 this.memory.tracking = true;
 
             } else {
