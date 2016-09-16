@@ -38,6 +38,7 @@ Room.prototype.initialize = function() {
     // Sum of dropped energy on the floor
     this.total_dropped_energy = 0;
     _.forEach(this.dropped_energy, function(nrg) { console.log(nrg+' = '+nrg.amount); this.total_dropped_energy = this.total_dropped_energy + nrg.amount } );
+    console.log('  total: '+this.total_dropped_energy);
 
     // Neighbor room route cache
     if (typeof this.memory.to == 'undefined') { this.memory.to = {}; }
