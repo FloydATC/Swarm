@@ -18,6 +18,11 @@ Room.prototype.initialize = function() {
     //this.extensions = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTENSION; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
     this.extensions = this.find_extensions();
     this.containers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_STORAGE; } });
+
+    this.extractor = null;
+    this.extractors = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTRACTOR; } });
+    if (this.extractors.length > 0) { this.extractor = this.extractors[0]; }
+
     //this.storage = this.find(FIND_STRUCTURES, { filter: function(s) { s.structureType == STRUCTURE_STORAGE; } });
     this.construction_sites = this.find(FIND_CONSTRUCTION_SITES).sort( function(a,b) { return b.progress - a.progress; } ); // Nearest completion first
     var ambition = this.hp_ambition();
@@ -60,6 +65,15 @@ Room.prototype.initialize = function() {
                 this.createFlag(source.pos, flagname);
                 if (typeof Memory.flags[flagname] == 'undefined') { Memory.flags[flagname] = {}; }
                 Memory.flags[flagname].source = source.id;
+            }
+        }
+        // There should also be a flag on each Extractor to coordinate mining efforts
+        if (this.extractor) {
+            if (this.extractor.flag == null) {
+                var flagname = 'extract '+this.name;
+                this.createFlag(this.extractor.pos, flagname);
+                if (typeof Memory.flags[flagname] == 'undefined') { Memory.flags[flagname] = {}; }
+                Memory.flags[flagname].extractor = this.extractor.id;
             }
         }
     }
