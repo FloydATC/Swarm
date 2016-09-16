@@ -572,10 +572,11 @@ Creep.prototype.task_extract = function() {
             //this.drop(Object.keys(this.carry)[0])
             var creep = this;
             console.log('  Carrying '+JSON.stringify(this.carry));
-            _.forEach(creep.carry, function(resource) {
-                console.log('  Come on '+creep+'! Drop '+JSON.stringify(resource));
-                creep.drop(resource.resourceType, resource.amount); }
-            );
+            _.each(this.carry, (amt,type) => this.drop(type))
+            //_.forEach(creep.carry, function(resource) {
+            //    console.log('  Come on '+creep+'! Drop '+JSON.stringify(resource));
+            //    creep.drop(resource.resourceType, resource.amount); }
+            //);
         }
         return;
     } else {
