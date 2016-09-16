@@ -566,17 +566,13 @@ Creep.prototype.task_extract = function() {
             // Get resources
             this.stop();
             this.harvest(mineral);
-            console.log('Extractor '+this+' harvesting from ('+mineral+' in '+this.memory.mineral+')');
+            //console.log('Extractor '+this+' harvesting from ('+mineral+' in '+this.memory.mineral+')');
 
             // Just drop the resources on the ground
             //this.drop(Object.keys(this.carry)[0])
             var creep = this;
-            console.log('  Carrying '+JSON.stringify(this.carry));
-            _.each(this.carry, (amt,type) => this.drop(type))
-            //_.forEach(creep.carry, function(resource) {
-            //    console.log('  Come on '+creep+'! Drop '+JSON.stringify(resource));
-            //    creep.drop(resource.resourceType, resource.amount); }
-            //);
+            //console.log('  Carrying '+JSON.stringify(this.carry));
+            _.each(this.carry, (amt,type) => this.drop(type)); // Thanks warinternal
         }
         return;
     } else {
