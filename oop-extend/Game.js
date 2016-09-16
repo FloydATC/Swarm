@@ -45,6 +45,10 @@ module.exports = {
                 //rtt = 200;
                 var capacity = 500; // Assumes 10 carry parts
                 var fetchers = Math.floor((CREEP_LIFE_TIME * SOURCE_ENERGY_CAPACITY / ENERGY_REGEN_TIME) / ((capacity * CREEP_LIFE_TIME) / rtt));
+                if (flag.room && flag.room.total_dropped_energy) {
+                    // React to excess energy on the floor -- indicates temporary fetcher shortage
+                    fetchers += Math.floor(flag.room.total_dropped_energy / 2000);
+                }
 
                 flag.memory.cooldown = Math.floor(CREEP_LIFE_TIME / (fetchers+1)); // How many ticks minimum between spawns? FIXME!!!
                 flag.memory.workforce = { 'Miner': 1, 'Fetcher': fetchers };
