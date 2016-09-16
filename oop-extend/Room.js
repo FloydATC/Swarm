@@ -37,8 +37,7 @@ Room.prototype.initialize = function() {
 
     // Sum of dropped energy on the floor
     var total = 0;
-    _.forEach(this.dropped_energy, function(nrg) { console.log(nrg+' = '+nrg.amount); total += nrg.amount } );
-    console.log('  total: '+total);
+    _.forEach(this.dropped_energy, function(nrg) { total += nrg.amount } );
     this.total_dropped_energy = total;
 
     // Neighbor room route cache
@@ -525,8 +524,8 @@ Room.prototype.want_drones = function() {
     //return (this.sources.length * 2) + 4; // Naive calculation
     var num = 2 + this.sources.length;
     if (this.construction_sites.length > 0) { num++; } // One extra for construction
-    console.log(this.link()+' dropped energy total = '+this.total_dropped_energy);
-    //if (_.sum(this.dropped_energy)) { num++; } // One extra for construction
+    num += Math.floor(this.total_dropped_energy / 2000); // Energy on the floor means too few drones
+
     return num;
 }
 
