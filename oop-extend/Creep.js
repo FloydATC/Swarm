@@ -542,31 +542,31 @@ Creep.prototype.task_extract = function() {
     this.memory.tracking = true;
     // In the right room yet?
     if (this.room.name == this.memory.extract) {
-        var extractor = Game.getObjectById(flag.memory.extractor);
-        if (extractor == null) {
+        var mineral = Game.getObjectById(flag.memory.mineral);
+        if (mineral == null) {
             // Locate extractor at flag
-            var found = this.room.lookForAt(LOOK_STRUCTURE, flag);
-            extractor = found[0];
-            if (extractor == null) { flag.remove(); return; } // User error
-            flag.memory.extractor = extractor.id;
+            var found = this.room.lookForAt(LOOK_MINERALS, flag);
+            mineral = found[0];
+            if (mineral == null) { flag.remove(); return; } // User error
+            flag.memory.mineral = mineral.id;
         }
 
         // Register as arrived if we are within 3 tiles. Old creep may be in the way.
         var arrived = this.memory.arrived || 0;
-        var range = this.room.rangeFromTo(this.pos, extractor.pos);
+        var range = this.room.rangeFromTo(this.pos, mineral.pos);
         if (arrived == 0 && range <= 3) {
             this.memory.arrived = Game.time;
         }
 
         if (range > 1) {
             // Move closer
-            this.move_to(extractor);
+            this.move_to(mineral);
             //console.log('Miner '+this+' approaching source ('+source+' in '+this.memory.mine+')');
         } else {
             // Get resources
             this.stop();
-            this.harvest(extractor);
-            console.log('Extractor '+this+' harvesting resources from ('+extractor+' in '+this.memory.extract+')');
+            this.harvest(mineral);
+            console.log('Extractor '+this+' harvesting from ('+mineral+' in '+this.memory.mineral+')');
 
             // Just drop the resources on the ground
             //this.drop(Object.keys(this.carry)[0])
