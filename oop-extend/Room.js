@@ -519,8 +519,8 @@ Room.prototype.want_drones = function() {
     //return (this.sources.length * 2) + 4; // Naive calculation
     var num = 2 + this.sources.length;
     if (this.construction_sites.length > 0) { num++; } // One extra for construction
-    var dropped = _.sumBy(this.dropped_energy, 'amount');
-    console.log(this.link()+' dropped energy total = '+dropped);
+    //var dropped = _.sumBy(this.dropped_energy, 'amount');
+    //console.log(this.link()+' dropped energy total = '+dropped);
     //if (_.sum(this.dropped_energy)) { num++; } // One extra for construction
     return num;
 }
