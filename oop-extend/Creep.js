@@ -571,8 +571,9 @@ Creep.prototype.task_extract = function() {
             // Just drop the resources on the ground
             //this.drop(Object.keys(this.carry)[0])
             var creep = this;
+            console.log('  Carrying '+JSON.stringify(this.carry));
             _.forEach(creep.carry, function(resource) {
-                console.log('Come on '+creep+'! Drop '+JSON.stringify(resource));
+                console.log('  Come on '+creep+'! Drop '+JSON.stringify(resource));
                 creep.drop(resource.resourceType, resource.amount); }
             );
         }
