@@ -35,6 +35,10 @@ Room.prototype.initialize = function() {
     this.memory.hostiles = this.hostile_creeps.length;
     this.memory.scanned = Game.time;
 
+    // Sum of dropped energy on the floor
+    this.total_dropped_energy = 0;
+    _.forEach(this.dropped_energy, function(nrg) { this.total_dropped_energy += nrg.amount } );
+
     // Neighbor room route cache
     if (typeof this.memory.to == 'undefined') { this.memory.to = {}; }
 
@@ -519,8 +523,7 @@ Room.prototype.want_drones = function() {
     //return (this.sources.length * 2) + 4; // Naive calculation
     var num = 2 + this.sources.length;
     if (this.construction_sites.length > 0) { num++; } // One extra for construction
-    //var dropped = _.sumBy(this.dropped_energy, 'amount');
-    //console.log(this.link()+' dropped energy total = '+dropped);
+    console.log(this.link()+' dropped energy total = '+this.total_dropped_energy);
     //if (_.sum(this.dropped_energy)) { num++; } // One extra for construction
     return num;
 }
