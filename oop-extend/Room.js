@@ -164,6 +164,7 @@ Room.prototype.plan = function() {
     var need_repairs = this.need_repairs.slice(0,2); // Max 3 at a time
 
     var miners = [];        // Mine energy (local or remote)
+    var extractors = [];    // Mine resources
     var reservers = [];     // Reserve room controller
     var fetchers = [];      // Fetch energy from remote mines
     var zealots = [];       // Camp next to controller and upgrade it
@@ -180,6 +181,7 @@ Room.prototype.plan = function() {
         if (typeof creep == 'object') {
             if (!creep.memory.class) { creep.memory.class = 'Drone'; console.log(this.link()+' AMNESIAC '+creep+' assigned to Drone class'); }
             if (creep.memory.class == 'Miner')      { miners.push(creep);       continue; }
+            if (creep.memory.class == 'Extractor')  { extractors.push(creep);   continue; }
             if (creep.memory.class == 'Reserver')   { reservers.push(creep);    continue; }
             if (creep.memory.class == 'Fetcher')    { fetchers.push(creep);     continue; }
             if (creep.memory.class == 'Zealot')     { zealots.push(creep);      continue; }
@@ -246,6 +248,9 @@ Room.prototype.plan = function() {
     // Miners mine
     this.assign_task_mine(miners);
 
+    // Extractors extract
+    this.assign_task_extract(extractors);
+
     // Reservers reserve
     this.assign_task_reserve(reservers);
 
@@ -297,6 +302,22 @@ Room.prototype.plan = function() {
                 if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Miner.1'), undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } ); }
                 if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Miner', home: this.name, mine: this.name, flag: flag.name } ); }
                 if (result == OK) { flag.spawned('Miner'); }
+                return;
+            }
+        }
+    }
+    if (this.extractor_flags) {
+        //console.log(this.link()+' has source flags to consider: '+this.source_flags);
+        for (var i in this.extractor_flags) {
+            var flag = this.extractor_flags[i];
+            var needs = flag.needs();
+            if (needs == 'Extractor') {
+                //console.log(this.link()+' spawning a local Extractor for '+flag.pos.roomName);
+                var result = this.createCreep(this.schematic('Extractor.3'), undefined, { class: 'Extractor', home: this.name, extract: this.name, flag: flag.name } );
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Extractor.2'), undefined, { class: 'Extractor', home: this.name, extract: this.name, flag: flag.name } ); }
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Extractor.1'), undefined, { class: 'Extractor', home: this.name, extract: this.name, flag: flag.name } ); }
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Extractor', home: this.name, extract: this.name, flag: flag.name } ); }
+                if (result == OK) { flag.spawned('Extractor'); }
                 return;
             }
         }
@@ -485,6 +506,9 @@ Room.prototype.schematic = function(c) {
         case 'Miner.3': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
         case 'Miner.2': { hash[WORK] = 3; hash[CARRY] = 1; hash[MOVE] = 2; break; }
         case 'Miner.1': { hash[WORK] = 2; hash[CARRY] = 1; hash[MOVE] = 1; break; }
+        case 'Extractor.3': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
+        case 'Extractor.2': { hash[WORK] = 3; hash[CARRY] = 1; hash[MOVE] = 2; break; }
+        case 'Extractor.1': { hash[WORK] = 2; hash[CARRY] = 1; hash[MOVE] = 1; break; }
         case 'Fetcher.1': { hash[WORK] = 1; hash[CARRY] = 5; hash[MOVE] = 3; break; }
         case 'Fetcher.2': { hash[WORK] = 1; hash[CARRY] = 10; hash[MOVE] = 6; break; }
         case 'Zealot.2': { hash[WORK] = 10; hash[CARRY] = 1; hash[MOVE] = 1; break; }
@@ -719,6 +743,15 @@ Room.prototype.assign_task_mine = function(miners) {
         miner.task = 'mine';
         miner.target = miner.id; // Dummy because flag doesn't have an id. Duh.
         //console.log(miner.name+' assigned to '+miner.task+' '+miner.target);
+    }
+}
+
+Room.prototype.assign_task_extract = function(extractors) {
+    while (extractors.length > 0) {
+        var extractor = extractors.shift();
+        extractor.task = 'extract';
+        extractor.target = extractor.id; // Dummy because flag doesn't have an id. Duh.
+        //console.log(extractor.name+' assigned to '+extractor.task+' '+extractor.target);
     }
 }
 

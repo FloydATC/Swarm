@@ -97,6 +97,7 @@ Creep.prototype.execute = function() {
     if (this.task == 'recycle') { this.task_recycle(); return; }
     if (this.task == 'pick up') { this.task_pick_up(); return; }
     if (this.task == 'mine') { this.task_mine(); return; }
+    if (this.task == 'extract') { this.task_extract(); return; }
     if (this.task == 'reserve') { this.task_reserve(); return; }
     if (this.task == 'remote fetch') { this.task_remote_fetch(); return; }
     if (this.task == 'claim') { this.task_claim(); return; }
@@ -524,6 +525,51 @@ Creep.prototype.task_mine = function() {
             // Nope. Just drop the energy on the ground then
             this.drop(RESOURCE_ENERGY);
 
+        }
+        return;
+    } else {
+        // No. Try to reach the room marked with a flag.
+        this.move_to(flag);
+        //console.log('Miner '+this+' moving to flag ('+flag+' in '+this.memory.mine+')');
+        return;
+    }
+}
+
+Creep.prototype.task_extract = function() {
+    var flag = Game.flags[this.memory.flag];
+    if (flag == null) { this.memory.class = 'Drone'; return; }
+    flag.assign_worker(this); // Check in with flag
+    this.memory.tracking = true;
+    // In the right room yet?
+    if (this.room.name == this.memory.extract) {
+        var extractor = Game.getObjectById(flag.memory.extractor);
+        if (extractor == null) {
+            // Locate extractor at flag
+            var found = this.room.lookForAt(LOOK_STRUCTURE, flag);
+            extractor = found[0];
+            if (extractor == null) { flag.remove(); return; } // User error
+            flag.memory.extractor = extractor.id;
+        }
+
+        // Register as arrived if we are within 3 tiles. Old creep may be in the way.
+        var arrived = this.memory.arrived || 0;
+        var range = this.room.rangeFromTo(this.pos, extractor.pos);
+        if (arrived == 0 && range <= 3) {
+            this.memory.arrived = Game.time;
+        }
+
+        if (range > 1) {
+            // Move closer
+            this.move_to(extractor);
+            //console.log('Miner '+this+' approaching source ('+source+' in '+this.memory.mine+')');
+        } else {
+            // Get resources
+            this.stop();
+            this.harvest(extractor);
+            //console.log('Miner '+this+' harvesting source ('+source+' in '+this.memory.mine+')');
+
+            // Just drop the resources on the ground
+            _.forEach(this.carry, function(resource) { this.drop(resource); } )
         }
         return;
     } else {

@@ -127,6 +127,25 @@ module.exports = {
                 }
             }
 
+            // All extractors in owned rooms should have a flag. Non-owned should not.
+            if (flag.type() == 'extract') {
+                if (flag.memory.extractor) {
+                    var extractor = Game.getObjectById(flag.memory.extractor);
+                    if (extractor == null || extractor.room == null || extractor.room.controller == null || extractor.room.controller.my == false) {
+                        flag.remove();
+                        continue;
+                    }
+                    extractor.flag = flag;
+                    if (typeof extractor.room.extractor_flags == 'undefined') { extractor.room.extractor_flags = []; }
+                    extractor.room.extractor_flags.push(flag);
+
+                    // Calculate and set spawn parameters
+                    //flag.memory.lead_time = 20; // How many ticks from spawn to arrival? FIXME!!!
+                    flag.memory.cooldown = 200; // How many ticks minimum between spawns? FIXME!!!
+                    flag.memory.workforce = { 'Extractor': 1 };
+                }
+            }
+
             // Colonize rooms with "spawn" flag
             if (flag.type() == 'spawn') {
                 var room_name = flag.pos.roomName;
