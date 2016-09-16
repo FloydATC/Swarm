@@ -569,7 +569,8 @@ Creep.prototype.task_extract = function() {
             //console.log('Miner '+this+' harvesting source ('+source+' in '+this.memory.mine+')');
 
             // Just drop the resources on the ground
-            _.forEach(this.carry, function(resource) { this.drop(resource); } )
+            var creep = this;
+            _.forEach(creep.carry, function(resource) { creep.drop(resource); } )
         }
         return;
     } else {
