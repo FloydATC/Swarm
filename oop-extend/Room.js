@@ -1162,12 +1162,13 @@ Room.prototype.trade = function() {
                 console.log(this.link()+' consider selling '+offer.resourceType+' to meet order '+offer.id);
                 let amount = (offer.remainingAmount < sell_amount ? offer.remainingAmount : sell_amount);
                 let energy = Game.market.calcTransactionCost(amount, this.name, offer.roomName);
-                console.log('  transferring '+amount+' units to '+offer.roomName+' will cost '+energy+' energy');
+                console.log('  transferring '+amount+' units to '+offer.roomName+' costs '+energy+' energy');
                 let margin = offer.price - (Game.market_price[offer.resourceType] || 1);
                 let profit = (margin * amount) - (energy * (Game.market_price[RESOURCE_ENERGY] || 1));
                 if (profit >= 0) {
                     console.log('  margin: '+margin+' estimated PROFIT: '+profit+' Cr');
-                    deal(offer.id, amount, this.name);
+                    let result = deal(offer.id, amount, this.name);
+                    console.log('  deal result='+result);
                 } else {
                     console.log('  margin: '+margin+' estimated LOSS: '+profit+' Cr');
                 }
@@ -1181,12 +1182,13 @@ Room.prototype.trade = function() {
                 console.log(this.link()+' consider buying '+offer.resourceType+' to meet order '+offer.id);
                 let amount = (offer.remainingAmount < buy_amount ? offer.remainingAmount : buy_amount);
                 let energy = Game.market.calcTransactionCost(amount, offer.roomName, this.name);
-                console.log('  transferring '+amount+' units from '+offer.roomName+' will cost '+energy+' energy');
+                console.log('  transferring '+amount+' units from '+offer.roomName+' costs '+energy+' energy');
                 let margin = (Game.market_price[offer.resourceType] || 1) - offer.price;
                 let profit = (margin * amount) - (energy * (Game.market_price[RESOURCE_ENERGY] || 1));
                 if (profit >= 0) {
                     console.log('  margin: '+margin+' estimated PROFIT: '+profit+' Cr');
-                    deal(offer.id, amount, this.name);
+                    let result = deal(offer.id, amount, this.name);
+                    console.log('  deal result='+result);
                 } else {
                     console.log('  margin: '+margin+' estimated LOSS: '+profit+' Cr');
                 }
