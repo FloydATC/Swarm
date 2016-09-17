@@ -1,7 +1,6 @@
 
 require('Creep');               // Extends prototype
 require('Flag');                // Extends prototype
-require('Market');                // Extends prototype
 require('Room');                // Extends prototype
 require('Source');              // Extends prototype
 require('StructureContainer');  // Extends prototype
