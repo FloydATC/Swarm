@@ -3,6 +3,10 @@
 module.exports = {
 
     initialize: function() {
+
+        // Initialize market object
+        Game.market.initialize();
+        
         //console.log(this+' initializing');
         for (var name in this.rooms) {
             var room = this.rooms[name];

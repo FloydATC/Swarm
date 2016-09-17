@@ -1,6 +1,7 @@
 
 require('Creep');               // Extends prototype
 require('Flag');                // Extends prototype
+require('Market');                // Extends prototype
 require('Room');                // Extends prototype
 require('Source');              // Extends prototype
 require('StructureContainer');  // Extends prototype
@@ -52,6 +53,8 @@ module.exports.loop = function() {
         if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' optimized '+room); }
         room.execute();
         if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' executed '+room); }
+        room.trade();
+        if (show_perf) { console.log(Game.cpu.getUsed().toFixed(3)+' traded '+room); }
 
         //room.show_totals();
 

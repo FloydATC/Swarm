@@ -1108,3 +1108,55 @@ Room.prototype.recall = function(label) {
     //console.log(this.link()+' recalled '+label+':'+objects.length);
     return objects;
 }
+
+Room.prototype.trade = function() {
+    if (this.terminal == null) { return; }
+
+    // Consider selling to meet target
+    for (var resource in this.terminal.store) {
+        let sell_amount = this.terminal.store[resource] - Game.market.targets[resource];
+        if (sell_amount > 100) {
+            // Try to sell
+            console.log(this.link()+' wants to sell '+sell_amount+' '+resource+' to meet target');
+            let orders = this.my_orders( { type: ORDER_SELL, resourceType: resource } );
+            if (orders.length == 0) {
+                console.log('type='+ORDER_SELL+' resourceType='+resource+' price='+1+' totalAmount='+sell_amount+' roomName='+this.name);
+                let result = Game.market.createOrder(ORDER_SELL, resource, 1, buy_amount, this.name);
+                console.log('create order result='+result);
+            }
+        }
+    }
+
+    // Consider buying to meet target
+    for (var resource in Game.market.targets) {
+        let buy_amount = Game.market.targets[resource] - this.terminal.store[resource];
+        if (buy_amount > 100) {
+            // Try to buy
+            console.log(this.link()+' wants to buy '+buy_amount+' '+resource+' to meet target');
+            let orders = this.my_orders( { type: ORDER_BUY, resourceType: resource } );
+            if (orders.length == 0) {
+                console.log('create order type='+ORDER_BUY+' resourceType='+resource+' price='+1+' totalAmount='+buy_amount+' roomName='+this.name);
+                let result = Game.market.createOrder(ORDER_BUY, resource, 1, buy_amount, this.name);
+                console.log('create order result='+result);
+            }
+        }
+    }
+
+    // Active speculation
+    // For this to work, we need to consider the following for each resource:
+    // - credit balance
+    // - available storage space vs. current inventory
+    // - time since last movement (liquidate and accept loss?)
+    // - purchase price vs. historic market price vs. current market price (buy/hold/sell?)
+    let offers = Game.market.getAllOrders();
+    for (var offer in offers) {
+        console.log(this.link()+' market order: '+offer);
+    }
+
+}
+
+Room.prototype.my_orders = function(filter) {
+    // Filter my market orders for this room
+    filter[roomName] = this.name;
+    return _.filter(Game.market.orders, filter );
+}
