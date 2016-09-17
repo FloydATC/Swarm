@@ -7,6 +7,7 @@ require('StructureContainer');  // Extends prototype
 require('StructureLink');       // Extends prototype
 require('StructureSpawn');      // Extends prototype
 require('StructureStorage');    // Extends prototype
+require('StructureTerminal');   // Extends prototype
 require('StructureTower');      // Extends prototype
 
 var extend_game = require('Game');

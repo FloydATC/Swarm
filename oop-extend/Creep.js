@@ -107,7 +107,7 @@ Creep.prototype.execute = function() {
     // Carrying something else than energy? Ignore task and store it somewhere!
     if (_.sum(this.carry) > this.carry.energy) {
         var target = this.room.terminal; //this.shift_nearest(this.room.containers.splice());
-        if (target == null) { target = this.rom.storage; }
+        if (target == null) { target = this.room.storage; }
         if (target != null) {
             if (this.pos.inRangeTo(target, 1)) {
                 for (var cargo in this.carry) {
@@ -115,7 +115,7 @@ Creep.prototype.execute = function() {
                     if (amount > 0) {
                         console.log(this+' xfer '+cargo+' to '+target);
                         this.transfer(target, cargo);
-                        break; 
+                        break;
                     }
                 }
                 this.memory.tracking = true;

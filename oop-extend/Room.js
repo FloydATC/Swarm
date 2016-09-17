@@ -309,7 +309,7 @@ Room.prototype.plan = function() {
             }
         }
     }
-    if (this.extractor_flags && this.storage.energy_pct > 75) {
+    if (this.extractor_flags && this.storage.energy_pct > 75 && this.terminal.free_pct > 25) {
         //console.log(this.link()+' has source flags to consider: '+this.source_flags);
         for (var i in this.extractor_flags) {
             var flag = this.extractor_flags[i];
@@ -1009,6 +1009,8 @@ Room.prototype.hp_ambition = function() {
     if (this.controller && this.controller.my) {
         var level = this.controller.level + (this.controller.progress / this.controller.progressTotal).toFixed(1) * 1;
         var hp = 25000 * level;
+        //var hp = Math.floor(2000 * Math.exp(level+1));
+        if (level == 8) { hp = WALL_HITS_MAX; }
         return hp;
     } else {
         return 0;
