@@ -1,5 +1,5 @@
 
-Market.prototype.initialize = function() {
+Game.market.prototype.initialize = function() {
     console.log(this+' initializing');
     if (typeof Memory.m == 'undefined') { Memory.m = {}; }
     this.memory = Memory.m;
