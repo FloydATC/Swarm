@@ -8,6 +8,7 @@ module.exports = {
         if (typeof Memory.m == 'undefined') { Memory.m = {}; }
         this.memory = Memory.m;
         this.market_targets = {
+            RESOURCE_ENERGY: 10000,
             RESOURCE_HYDROGEN: 1000,
             RESOURCE_KEANIUM: 1000,
             RESOURCE_OXYGEN: 1000,
@@ -15,6 +16,21 @@ module.exports = {
             RESOURCE_KEANIUM_ACID: 1000,
         };
         this.all_orders = Game.market.getAllOrders();
+        let last_tick = Game.time-1;
+        this.new_orders = _.filter(this.all_orders, { created: last_tick });
+        // Keep weighted average buy/sell prices as new orders appear
+        for (let i in this.new_orders) {
+            let offer = this.new_orders[i];
+            let history = Memory.m[offer.resourceType];
+            if (typeof history == 'undefined') { history = [ null, null ]; }
+            //console.log(offer.type+' '+offer.resourceType+' history='+JSON.stringify(history));
+            let offset = (offer.type == ORDER_BUY ? 0 : 1);
+            let average = ((9 * (history[offset] || offer.price)) + offer.price) / 10; // Weighted average
+            history[offset] = average;
+            //console.log('  updated to '+JSON.stringify(history));
+            Memory.m[offer.resourceType] = history;
+        }
+
 
         //console.log(this+' initializing');
         for (var name in this.rooms) {

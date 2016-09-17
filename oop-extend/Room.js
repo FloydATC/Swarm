@@ -40,6 +40,7 @@ Room.prototype.initialize = function() {
     this.memory.hostiles = this.hostile_creeps.length;
     this.memory.scanned = Game.time;
 
+
     // Sum of dropped energy on the floor
     var total = 0;
     _.forEach(this.dropped_energy, function(nrg) { total += nrg.amount } );
@@ -1112,6 +1113,7 @@ Room.prototype.recall = function(label) {
 Room.prototype.trade = function() {
     if (this.terminal == null) { return; }
 
+    // Passive market orders
     // Consider selling to meet target
     for (var resource in this.terminal.store) {
         let sell_amount = this.terminal.store[resource] - Game.market_targets[resource];
@@ -1120,13 +1122,16 @@ Room.prototype.trade = function() {
             console.log(this.link()+' wants to sell '+sell_amount+' '+resource+' to meet target');
             let orders = this.my_orders( { type: ORDER_SELL, resourceType: resource } );
             if (orders.length == 0) {
-                console.log('type='+ORDER_SELL+' resourceType='+resource+' price='+1+' totalAmount='+sell_amount+' roomName='+this.name);
-                let result = Game.market.createOrder(ORDER_SELL, resource, 1, buy_amount, this.name);
+                let history = Memory.m[resource];
+                let price = ((history[0]*1 + history[1]*4)/5) || 1; // Set price slightly better than weighted average
+                console.log('type='+ORDER_SELL+' resourceType='+resource+' price='+price+' totalAmount='+sell_amount+' roomName='+this.name);
+                let result = Game.market.createOrder(ORDER_SELL, resource, price, buy_amount, this.name);
                 console.log('create order result='+result);
             }
         }
     }
 
+    // Passive market orders
     // Consider buying to meet target
     for (var resource in Game.market_targets) {
         let buy_amount = Game.market_targets[resource] - this.terminal.store[resource];
@@ -1135,8 +1140,9 @@ Room.prototype.trade = function() {
             console.log(this.link()+' wants to buy '+buy_amount+' '+resource+' to meet target');
             let orders = this.my_orders( { type: ORDER_BUY, resourceType: resource } );
             if (orders.length == 0) {
-                console.log('create order type='+ORDER_BUY+' resourceType='+resource+' price='+1+' totalAmount='+buy_amount+' roomName='+this.name);
-                let result = Game.market.createOrder(ORDER_BUY, resource, 1, buy_amount, this.name);
+                let price = ((history[0]*4 + history[1]*1)/5) || 1; // Set price slightly better than weighted average
+                console.log('create order type='+ORDER_BUY+' resourceType='+resource+' price='+price+' totalAmount='+buy_amount+' roomName='+this.name);
+                let result = Game.market.createOrder(ORDER_BUY, resource, price, buy_amount, this.name);
                 console.log('create order result='+result);
             }
         }
@@ -1147,13 +1153,11 @@ Room.prototype.trade = function() {
     // - credit balance
     // - available storage space vs. current inventory
     // - time since last movement (liquidate and accept loss?)
-    // - purchase price vs. historic market price vs. current market price (buy/hold/sell?)
-    let offers = Game.market.getAllOrders();
-    for (var i in offers) {
-        let offer = offers[i];
-        console.log(this.link()+' market order: '+JSON.stringify(offer));
-
-        if (i == 5) { return; } // Limit for now
+    // - purchase price vs. historic market price vs. current offers (buy/hold/sell?)
+    for (var i in Game.new_orders) {
+        let offer = Game.new_orders[i];
+        //console.log(this.link()+' NEW: '+JSON.stringify(offer));
+        // Sample: {"created":13735039,"type":"sell","amount":50000,"remainingAmount":50000,"resourceType":"L","price":5,"roomName":"E0N30","id":"57dd0f73ed387dbb429df4d9"}
     }
 
 }
