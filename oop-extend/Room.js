@@ -1149,8 +1149,11 @@ Room.prototype.trade = function() {
     // - time since last movement (liquidate and accept loss?)
     // - purchase price vs. historic market price vs. current market price (buy/hold/sell?)
     let offers = Game.market.getAllOrders();
-    for (var offer in offers) {
-        console.log(this.link()+' market order: '+offer);
+    for (var i in offers) {
+        let offer = offers[i];
+        console.log(this.link()+' market order: '+JSON.stringify(offer));
+
+        if (i == 5) { return; } // Limit for now
     }
 
 }
