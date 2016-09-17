@@ -7,30 +7,43 @@ module.exports = {
         // Initialize market code
         if (typeof Memory.m == 'undefined') { Memory.m = {}; }
         this.memory = Memory.m;
-        this.market_targets = {
-            RESOURCE_ENERGY: 10000,
-            RESOURCE_HYDROGEN: 1000,
-            RESOURCE_KEANIUM: 1000,
-            RESOURCE_OXYGEN: 1000,
-            RESOURCE_HYDROXIDE: 1000,
-            RESOURCE_KEANIUM_ACID: 1000,
-        };
+        this.market_targets = {};
+        this.market_targets[RESOURCE_ENERGY]        = 10000;
+        this.market_targets[RESOURCE_HYDROGEN]      = 1000;
+        this.market_targets[RESOURCE_KEANIUM]       = 1000;
+        this.market_targets[RESOURCE_OXYGEN]        = 1000;
+        this.market_targets[RESOURCE_HYDROXIDE]     = 1000;
+        this.market_targets[RESOURCE_KEANIUM_ACID]  = 1000;
+        this.market_price = Memory.m;
+        if (typeof this.market_price == 'undefined') { this.market_price = {}; }
         this.all_orders = Game.market.getAllOrders();
         let last_tick = Game.time-1;
         this.new_orders = _.filter(this.all_orders, { created: last_tick });
-        // Keep weighted average buy/sell prices as new orders appear
-        for (let i in this.new_orders) {
-            let offer = this.new_orders[i];
-            let history = Memory.m[offer.resourceType];
-            if (typeof history == 'undefined') { history = [ null, null ]; }
-            //console.log(offer.type+' '+offer.resourceType+' history='+JSON.stringify(history));
-            let offset = (offer.type == ORDER_BUY ? 0 : 1);
-            let average = ((9 * (history[offset] || offer.price)) + offer.price) / 10; // Weighted average
-            history[offset] = average;
-            //console.log('  updated to '+JSON.stringify(history));
-            Memory.m[offer.resourceType] = history;
+        this.partial_orders = _.filter(this.all_orders, function(order) { return order.amount > order.remainingAmount } );
+        // Calculate weighted average buy/sell prices based on volume
+        if (this.partial_orders.length > 0) {
+            let transactions = {};
+            console.log('Processing '+this.partial_orders.length+' partially filled market orders');
+            for (let i in this.partial_orders) {
+                let order = this.partial_orders[i];
+                //console.log(JSON.stringify(order));
+                let sold = order.amount - order.remainingAmount;
+                if (sold > 0) {
+                    let total = transactions[order.resourceType];
+                    if (typeof total == 'undefined') { total = { units: 0, price: 0 }; }
+                    total[price] = ((total[price] * total[units]) + (order.price * sold)) / (total[units] + sold);
+                    total[units] += sold;
+                    console.log('Market activity: '+sold+' '+order.resourceType+' sold for '+order.price+', trend='+total[price]);
+                    transactions[order.resourceType] = total;
+                }
+            }
+            for (let resource in transactions) {
+                let total = transactions[resource];
+                this.market_price[resource] = (((this.market_price[resource] || total[price]) * 99) + (total[price])) / 100;
+                console.log('updated moving average for '+resource+' to '+this.market_price[resource]);
+            }
+            Memory.m = this.market_price;
         }
-
 
         //console.log(this+' initializing');
         for (var name in this.rooms) {
