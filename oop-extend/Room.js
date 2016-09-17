@@ -1114,7 +1114,7 @@ Room.prototype.trade = function() {
 
     // Consider selling to meet target
     for (var resource in this.terminal.store) {
-        let sell_amount = this.terminal.store[resource] - Game.market.targets[resource];
+        let sell_amount = this.terminal.store[resource] - Game.market_targets[resource];
         if (sell_amount > 100) {
             // Try to sell
             console.log(this.link()+' wants to sell '+sell_amount+' '+resource+' to meet target');
@@ -1128,8 +1128,8 @@ Room.prototype.trade = function() {
     }
 
     // Consider buying to meet target
-    for (var resource in Game.market.targets) {
-        let buy_amount = Game.market.targets[resource] - this.terminal.store[resource];
+    for (var resource in Game.market_targets) {
+        let buy_amount = Game.market_targets[resource] - this.terminal.store[resource];
         if (buy_amount > 100) {
             // Try to buy
             console.log(this.link()+' wants to buy '+buy_amount+' '+resource+' to meet target');
