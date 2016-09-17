@@ -273,6 +273,8 @@ Room.prototype.plan = function() {
         // If we are NOT under attack, check for other rooms that may require assistance
         for (var name in Memory.rooms) {
             if (name == this.name) { continue; } // Assist self? Duh.
+            if (this.energyAvailable < 500) { continue; } // Low on energy
+            if (this.storage == null || this.storage.energy_pct < 50) { continue; } // Not in a good position to help
             if (Game.manhattanDistance(this.name, name) <= 2) {
                 if (Memory.rooms[name].hostiles > 0 && Memory.rooms[name].scanned > Game.time - 1000) {
                     //console.log('  '+name+' is under attack, '+this.link()+' checking energy reserves ('+this.calc_spawn_reserves()+')');
@@ -306,7 +308,7 @@ Room.prototype.plan = function() {
             }
         }
     }
-    if (this.extractor_flags) {
+    if (this.extractor_flags && this.energy_pct > 75) {
         //console.log(this.link()+' has source flags to consider: '+this.source_flags);
         for (var i in this.extractor_flags) {
             var flag = this.extractor_flags[i];
