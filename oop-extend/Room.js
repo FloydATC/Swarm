@@ -1042,7 +1042,7 @@ Room.prototype.hp_ambition = function() {
         var level = this.controller.level + (this.controller.progress / this.controller.progressTotal).toFixed(1) * 1;
         var hp = 25000 * level;
         //var hp = Math.floor(2000 * Math.exp(level+1));
-        if (level == 8) { hp = WALL_HITS_MAX; }
+        if (level == 8 && this.storage && this.storage.energy_pct >= 50) { hp = WALL_HITS_MAX; }
         return hp;
     } else {
         return 0;
