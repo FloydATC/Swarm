@@ -17,7 +17,12 @@ Room.prototype.initialize = function() {
     this.links = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_LINK; } });
     //this.extensions = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTENSION; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
     this.extensions = this.find_extensions();
-    this.containers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_CONTAINER || s.structureType == STRUCTURE_STORAGE; } });
+    this.containers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_CONTAINER; } });
+
+    this.storage_energy_pct = 0;
+    if (this.storage) {
+        this.storage_energy_pct = this.storage.energy * 100 / this.storage.storeCapacity;
+    }
 
     this.extractor = null;
     this.extractors = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTRACTOR; } });
@@ -124,7 +129,8 @@ Room.prototype.initialize = function() {
     for (var i=0; i<this.towers.length; i++) { this.towers[i].initialize(); }
     for (var i=0; i<this.sources.length; i++) { this.sources[i].initialize(); }
     for (var i=0; i<this.spawns.length; i++) { this.spawns[i].initialize(); }
-    for (var i=0; i<this.containers.length; i++) { this.containers[i].initialize(); } // Note: Includes storage
+    for (var i=0; i<this.containers.length; i++) { this.containers[i].initialize(); }
+    if (this.storage != null) { this.storage.initialize(); }
 
     //console.log(this.link()+' containers: '+this.containers);
     this.containers = this.containers.sort( function(a,b) { return a.free - b.free; } ); // Note: Must initialize before sorting
@@ -275,7 +281,7 @@ Room.prototype.plan = function() {
         for (var name in Memory.rooms) {
             if (name == this.name) { continue; } // Assist self? Duh.
             if (this.energyAvailable < 500) { continue; } // Low on energy
-            if (this.storage == null || this.storage.energy_pct < 50) { continue; } // Not in a good position to help
+            if (this.storage == null || this.storage_energy_pct < 50) { continue; } // Not in a good position to help
             if (Game.manhattanDistance(this.name, name) <= 2) {
                 if (Memory.rooms[name].hostiles > 0 && Memory.rooms[name].scanned > Game.time - 1000) {
                     //console.log('  '+name+' is under attack, '+this.link()+' checking energy reserves ('+this.calc_spawn_reserves()+')');
@@ -309,7 +315,9 @@ Room.prototype.plan = function() {
             }
         }
     }
-    if (this.extractor_flags && this.storage && this.storage.energy_pct > 75 && this.terminal && this.terminal.free_pct > 25) {
+    console.log(this.link()+' storage='+this.storage_energy_pct);
+    //console.log('storage.energy_pct='+this.storage.energy_pct);
+    if (this.extractor_flags && this.storage_energy_pct > 75 && this.terminal && this.terminal.free_pct > 25) {
         console.log(this.link()+' has extractor flags to consider: '+this.extractor_flags);
         for (var i in this.extractor_flags) {
             var flag = this.extractor_flags[i];
@@ -382,7 +390,7 @@ Room.prototype.plan = function() {
         if (needs == 'Zealot') {
             //console.log(this.link()+' spawning a zealot for '+flag.pos.roomName);
             var result = ERR_NOT_ENOUGH_ENERGY;
-            if (this.storage && this.storage.energy_pct >= 75) {
+            if (this.storage_energy_pct >= 75) {
                 // Boost upgrading if the room is doing well
                 result = this.createCreep(this.schematic('Zealot.2'), undefined, { class: 'Zealot', home: this.name, flag: flag.name } );
             }
@@ -916,7 +924,7 @@ Room.prototype.assign_task_build = function(drones, csites) {
 Room.prototype.assign_task_stockpile = function(drones, storage) {
     //console.log(this.link()+' stockpile assignments: ('+drones.length+' drones available)');
     var need = 1;
-    if (storage && storage.energy_pct < 75) { need = 2; }
+    if (this.storage_energy_pct < 75) { need = 2; }
     var count = 0;
     while (drones.length > 0 && storage && count < need) {
         count++;
