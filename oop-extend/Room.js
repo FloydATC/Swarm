@@ -309,7 +309,7 @@ Room.prototype.plan = function() {
             }
         }
     }
-    if (this.extractor_flags && this.storage.energy_pct > 75 && this.terminal.free_pct > 25) {
+    if (this.extractor_flags && this.storage && this.storage.energy_pct > 75 && this.terminal && this.terminal.free_pct > 25) {
         //console.log(this.link()+' has source flags to consider: '+this.source_flags);
         for (var i in this.extractor_flags) {
             var flag = this.extractor_flags[i];
@@ -491,8 +491,9 @@ Room.prototype.optimize = function() {
 }
 
 
-Room.prototype.link = function() {
-    return '<A href="https://screeps.com/a/#!/room/'+this.name+'">'+this.name+'</A>';
+Room.prototype.link = function(name) {
+    let roomname = name || this.name;
+    return '<A href="https://screeps.com/a/#!/room/'+roomname+'">'+roomname+'</A>';
 }
 
 
@@ -1161,19 +1162,22 @@ Room.prototype.trade = function() {
         if (offer.type == ORDER_BUY) {
             let sell_amount = this.terminal.store[offer.resourceType] - Game.market_targets[offer.resourceType];
             if (sell_amount > 0) {
-                console.log(this.link()+' consider selling '+offer.resourceType+' to meet order '+offer.id);
+                console.log(this.link()+' consider selling '+offer.resourceType+' at '+offer.price+' Cr/unit to meet order '+offer.id);
                 let amount = (offer.remainingAmount < sell_amount ? offer.remainingAmount : sell_amount);
                 let energy = Game.market.calcTransactionCost(amount, this.name, offer.roomName);
                 console.log('  transferring '+amount+' units to '+offer.roomName+' costs '+energy+' energy');
                 let margin = offer.price - (Game.market_price[offer.resourceType] || 1);
+                let total = offer.price * amount;
+                console.log('  total: '+total+' Cr');
                 let profit = (margin * amount) - (energy * (Game.market_price[RESOURCE_ENERGY] || 1));
-                if (profit >= 0) {
+                console.log('  '+this.link()+' has '+Game.market.credits+' Cr and '+this.terminal.store.energy+' units of energy');
+//                if (profit >= 0) {
                     console.log('  margin: '+margin+' estimated PROFIT: '+profit+' Cr');
-                    let result = deal(offer.id, amount, this.name);
+                    let result = Game.market.deal(offer.id, amount, this.name);
                     console.log('  deal result='+result);
-                } else {
-                    console.log('  margin: '+margin+' estimated LOSS: '+profit+' Cr');
-                }
+//                } else {
+//                    console.log('  margin: '+margin+' estimated LOSS: '+profit+' Cr');
+//                }
             }
         }
 
@@ -1181,15 +1185,18 @@ Room.prototype.trade = function() {
         if (offer.type == ORDER_SELL) {
             let buy_amount = Game.market_targets[offer.resourceType] - this.terminal.store[offer.resourceType];
             if (buy_amount > 0) {
-                console.log(this.link()+' consider buying '+offer.resourceType+' to meet order '+offer.id);
+                console.log(this.link()+' consider buying '+offer.resourceType+' at '+offer.price+' Cr/unit to meet order '+offer.id);
                 let amount = (offer.remainingAmount < buy_amount ? offer.remainingAmount : buy_amount);
                 let energy = Game.market.calcTransactionCost(amount, offer.roomName, this.name);
                 console.log('  transferring '+amount+' units from '+offer.roomName+' costs '+energy+' energy');
                 let margin = (Game.market_price[offer.resourceType] || 1) - offer.price;
+                let total = offer.price * amount;
+                console.log('  total: '+total+' Cr');
                 let profit = (margin * amount) - (energy * (Game.market_price[RESOURCE_ENERGY] || 1));
+                console.log('  '+this.link()+' has '+Game.market.credits+' Cr and '+this.terminal.store.energy+' units of energy');
                 if (profit >= 0) {
                     console.log('  margin: '+margin+' estimated PROFIT: '+profit+' Cr');
-                    let result = deal(offer.id, amount, this.name);
+                    let result = Game.market.deal(offer.id, amount, this.name);
                     console.log('  deal result='+result);
                 } else {
                     console.log('  margin: '+margin+' estimated LOSS: '+profit+' Cr');
@@ -1202,6 +1209,7 @@ Room.prototype.trade = function() {
     // For this to work, we need to consider the following for each resource:
     // - credit balance
     // - available storage space vs. current inventory
+    // - available energy to move commodities
     // - time since last movement (liquidate and accept loss?)
     // - purchase price vs. historic market price vs. current offers (buy/hold/sell?)
     // TBD

@@ -19,6 +19,7 @@ module.exports = {
         this.all_orders = Game.market.getAllOrders();
         let last_tick = Game.time-1;
         this.new_orders = _.filter(this.all_orders, { created: last_tick });
+
         this.partial_orders = _.filter(this.all_orders, function(order) { return order.amount > order.remainingAmount } );
         // Calculate weighted average buy/sell prices based on volume
         if (this.partial_orders.length > 0) {

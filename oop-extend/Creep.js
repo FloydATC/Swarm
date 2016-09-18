@@ -232,8 +232,8 @@ Creep.prototype.get_energy = function() {
         }
     }
 
-    // Consider fetching energy from a link
-    if (debug) { console.log(this+' considers fetching energy from a link'); }
+    // Consider fetching energy from the nearest link
+    if (debug) { console.log(this+' considers fetching energy from nearest link'); }
     if (this.task != 'feed link') {
         var links = this.room.links.slice();
         while (links.length > 0) {
@@ -242,7 +242,7 @@ Creep.prototype.get_energy = function() {
                 var reserved = link.reserved_amount || 0;
                 var wanted = this.carryCapacity - _.sum(this.carry);
                 var available = link.energy;
-                if (available < reserved + wanted) { continue; } // Not enough left for me
+                if (available < reserved + wanted) { break; } // Nearest has not enough left for me
                 if (debug) { console.log(this+' decided to fetch from '+link+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')'); }
                 link.reserved_amount = reserved + this.carryCapacity - _.sum(this.carry);
                 if (this.pos.inRangeTo(link, 1)) {
@@ -254,12 +254,13 @@ Creep.prototype.get_energy = function() {
                 }
                 return;
             }
+            break; // Only consider the nearest link!
         }
     }
 
     // Consider fetching energy from storage
     if (debug) { console.log(this+' considers fetching energy from storage'); }
-    if (this.task != 'stockpile') {
+    if (this.task != 'stockpile' && this.task != 'upgrade') {
         var storage = this.room.storage;
         if (storage instanceof StructureStorage) {
             var reserved = storage.reserved_amount || 0;
@@ -377,7 +378,7 @@ Creep.prototype.task_hunt = function() {
         }
     }
     if (this.memory.destination && this.memory.destination != this.room.name) {
-        console.log(this.memory.class+' '+this+' heading for '+this.memory.destination+' to assist');
+        console.log(this.room.link()+' '+this.memory.class+' '+this+' heading for '+this.room.link(this.memory.destination)+' to assist');
         this.move_to({ pos: new RoomPosition(25, 25, this.memory.destination) });
         return;
     }
