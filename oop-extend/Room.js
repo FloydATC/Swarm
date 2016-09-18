@@ -250,6 +250,9 @@ Room.prototype.plan = function() {
     // Zealots always upgrade
     this.assign_task_upgrade(zealots);
 
+    // Terminal needs energy?
+    this.assign_task_feed_terminal(drones, this.terminal);
+
     // FINALLY: Any leftover drones? Upgrade
     this.assign_task_upgrade(drones);
 
@@ -938,6 +941,28 @@ Room.prototype.assign_task_stockpile = function(drones, storage) {
             // No containers need energy
             drones.push(drone);
             break;
+        }
+    }
+}
+
+Room.prototype.assign_task_feed_terminal = function(drones, terminal) {
+    //console.log(this.link()+' stockpile assignments: ('+drones.length+' drones available)');
+    if (this.terminal == null) { return; }
+    if (this.terminal.energy >= 10000) { return; }
+    if (this.terminal.free < 10000) { return; }
+    if (drones.length > 0) {
+        count++;
+        var drone = drones.shift();
+        if (terminal.free > 0) {
+            drone.task = 'feed terminal';
+            drone.target = terminal.id;
+            //console.log(drone.room+' '+drone.name+' assigned to '+drone.task+' '+storage+' ('+storage.energy+' energy, '+storage.energy_pct+'%)');
+            return;
+        }
+        if (typeof drone.task == 'undefined') {
+            // No containers need energy
+            drones.push(drone);
+            return;
         }
     }
 }

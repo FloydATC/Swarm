@@ -153,6 +153,7 @@ Creep.prototype.execute = function() {
     if (this.task == 'feed link') { this.task_feed_link(); return; }
     if (this.task == 'feed tower') { this.task_feed(); return; }
     if (this.task == 'feed extension') { this.task_feed(); return; }
+    if (this.task == 'feed terminal') { this.task_feed(); return; }
     if (this.task == 'stockpile') { this.task_feed(); return; }
     if (this.task == 'build') { this.task_build(); return; }
     if (this.task == 'repair') { this.task_repair(); return; }
