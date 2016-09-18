@@ -951,7 +951,6 @@ Room.prototype.assign_task_feed_terminal = function(drones, terminal) {
     if (this.terminal.energy >= 10000) { return; }
     if (this.terminal.free < 10000) { return; }
     if (drones.length > 0) {
-        count++;
         var drone = drones.shift();
         if (terminal.free > 0) {
             drone.task = 'feed terminal';
