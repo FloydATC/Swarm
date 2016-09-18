@@ -914,7 +914,7 @@ Room.prototype.assign_task_build = function(drones, csites) {
 }
 
 Room.prototype.assign_task_stockpile = function(drones, storage) {
-    //console.log(this.link()+' container assignments:');
+    //console.log(this.link()+' stockpile assignments: ('+drones.length+' drones available)');
     var need = 1;
     if (storage && storage.energy_pct < 75) { need = 2; }
     var count = 0;
@@ -924,8 +924,8 @@ Room.prototype.assign_task_stockpile = function(drones, storage) {
         if (storage.free > 0) {
             drone.task = 'stockpile';
             drone.target = storage.id;
-            //console.log(drone.room+' '+drone.name+' assigned to '+drone.task+' '+container+' ('+container.energy+' energy)');
-            break;
+            //console.log(drone.room+' '+drone.name+' assigned to '+drone.task+' '+storage+' ('+storage.energy+' energy, '+storage.energy_pct+'%)');
+            continue;
         }
         if (typeof drone.task == 'undefined') {
             // No containers need energy
