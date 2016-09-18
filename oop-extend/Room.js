@@ -1163,7 +1163,7 @@ Room.prototype.trade = function() {
             let sell_amount = this.terminal.store[offer.resourceType] - Game.market_targets[offer.resourceType];
             if (sell_amount > 0) {
                 console.log(this.link()+' consider selling '+offer.resourceType+' at '+offer.price+' Cr/unit to meet order '+offer.id);
-                let amount = (offer.remainingAmount < sell_amount ? offer.remainingAmount : sell_amount);
+                let amount = Math.min(offer.remainingAmount, sell_amount, 1000);
                 let energy = Game.market.calcTransactionCost(amount, this.name, offer.roomName);
                 console.log('  transferring '+amount+' units to '+offer.roomName+' costs '+energy+' energy');
                 let margin = offer.price - (Game.market_price[offer.resourceType] || 1);
@@ -1186,7 +1186,7 @@ Room.prototype.trade = function() {
             let buy_amount = Game.market_targets[offer.resourceType] - this.terminal.store[offer.resourceType];
             if (buy_amount > 0) {
                 console.log(this.link()+' consider buying '+offer.resourceType+' at '+offer.price+' Cr/unit to meet order '+offer.id);
-                let amount = (offer.remainingAmount < buy_amount ? offer.remainingAmount : buy_amount);
+                let amount = Math.min(offer.remainingAmount, buy_amount, 1000);
                 let energy = Game.market.calcTransactionCost(amount, offer.roomName, this.name);
                 console.log('  transferring '+amount+' units from '+offer.roomName+' costs '+energy+' energy');
                 let margin = (Game.market_price[offer.resourceType] || 1) - offer.price;
