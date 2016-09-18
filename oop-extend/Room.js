@@ -317,7 +317,7 @@ Room.prototype.plan = function() {
         }
     }
     if (this.extractor_flags && this.storage && this.storage.energy_pct > 75 && this.terminal && this.terminal.free_pct > 25) {
-        console.log(this.link()+' has extractor flags to consider: '+this.extractor_flags);
+        //console.log(this.link()+' has extractor flags to consider: '+this.extractor_flags);
         for (var i in this.extractor_flags) {
             var flag = this.extractor_flags[i];
             var needs = flag.needs();
