@@ -1202,13 +1202,13 @@ Room.prototype.trade = function() {
                 console.log('  total: '+total+' Cr');
                 let profit = (margin * amount) - (energy * (Game.market_price[RESOURCE_ENERGY] || 1));
                 console.log('  '+this.link()+' has '+Game.market.credits+' Cr and '+this.terminal.store.energy+' units of energy');
-//                if (profit >= 0) {
+                if (profit >= 0) {
                     console.log('  margin: '+margin+' estimated PROFIT: '+profit+' Cr');
                     let result = Game.market.deal(offer.id, amount, this.name);
                     console.log('  deal result='+result);
-//                } else {
-//                    console.log('  margin: '+margin+' estimated LOSS: '+profit+' Cr');
-//                }
+                } else {
+                    console.log('  margin: '+margin+' estimated LOSS: '+profit+' Cr');
+                }
             }
         }
 
