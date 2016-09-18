@@ -396,7 +396,10 @@ Room.prototype.plan = function() {
                 // Boost upgrading if the room is doing well
                 result = this.createCreep(this.schematic('Zealot.2'), undefined, { class: 'Zealot', home: this.name, flag: flag.name } );
             }
-            if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Zealot.1'), undefined, { class: 'Zealot', home: this.name, flag: flag.name } ); }
+            if (this.storage_energy_pct >= 25) {
+                // Regular upgrading unless we are critical
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Zealot.1'), undefined, { class: 'Zealot', home: this.name, flag: flag.name } ); }
+            }
             if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Zealot', home: this.name, flag: flag.name } ); }
             if (result == OK) { flag.spawned('Zealot'); }
             //console.log('spawn zealot: '+result);
