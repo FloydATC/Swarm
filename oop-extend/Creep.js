@@ -245,7 +245,7 @@ Creep.prototype.get_energy = function() {
                 var wanted = this.carryCapacity - _.sum(this.carry);
                 var available = link.energy;
                 //if (available < reserved + wanted) { break; } // Nearest has not enough left for me
-                if (available - reserved < 0) { break; } // Nearest has not enough left for me
+                if (available - reserved < 0) { break; } // Nearest has nothing left for me
                 if (debug) { console.log(this+' decided to fetch from '+link+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')'); }
                 link.reserved_amount = reserved + this.carryCapacity - _.sum(this.carry);
                 if (this.pos.inRangeTo(link, 1)) {
