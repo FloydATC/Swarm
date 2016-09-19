@@ -114,7 +114,7 @@ Creep.prototype.execute = function() {
                 for (var cargo in this.carry) {
                     var amount = this.carry[cargo];
                     if (amount > 0) {
-                        console.log(this+' xfer '+cargo+' to '+target);
+                        //console.log(this+' xfer '+cargo+' to '+target);
                         this.transfer(target, cargo);
                         break;
                     }
