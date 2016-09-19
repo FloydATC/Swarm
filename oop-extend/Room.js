@@ -415,7 +415,7 @@ Room.prototype.plan = function() {
             }
         }
     }
-    if (this.extractor_flags && this.storage && this.storage.energy_pct > 75 && this.terminal && this.terminal.free_pct > 25) {
+    if (this.extractor_flags && this.storage && this.storage.energy_pct > 75 && this.terminal && this.terminal.free_pct > 25 &&  this.under_attack() == false) {
         //console.log(this.link()+' has extractor flags to consider: '+this.extractor_flags);
         for (var i in this.extractor_flags) {
             var flag = this.extractor_flags[i];
