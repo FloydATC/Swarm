@@ -8,7 +8,6 @@ module.exports = {
         if (typeof Memory.m == 'undefined') { Memory.m = {}; }
         this.memory = Memory.m;
         this.market_targets = {};
-        this.market_targets[RESOURCE_ENERGY]        = 10000;
         this.market_targets[RESOURCE_HYDROGEN]      = 1000;
         this.market_targets[RESOURCE_KEANIUM]       = 1000;
         this.market_targets[RESOURCE_OXYGEN]        = 1000;
