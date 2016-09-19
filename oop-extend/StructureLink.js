@@ -11,6 +11,8 @@ StructureLink.prototype.initialize = function() {
     this.energy_pct = this.energy * 100 / this.energyCapacity;
 
     if (typeof this.room.memory.links == 'undefined') { this.room.memory.links = {}; }
+    this.loc = this.pos.x+','+this.pos.y;
+    this.room.memory.links[this.loc] = ((this.room.memory.links[this.loc] || 0) * 0.99);
 }
 
 StructureLink.prototype.execute = function() {
