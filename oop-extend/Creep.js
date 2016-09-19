@@ -154,7 +154,7 @@ Creep.prototype.execute = function() {
     if (this.task == 'feed tower') { this.task_feed(); return; }
     if (this.task == 'feed extension') { this.task_feed(); return; }
     if (this.task == 'feed terminal') { this.task_feed(); return; }
-    if (this.task == 'stockpile') { this.task_feed(); return; }
+    if (this.task == 'stockpile') { this.say('POST'); this.task_feed(); return; }
     if (this.task == 'build') { this.task_build(); return; }
     if (this.task == 'repair') { this.task_repair(); return; }
     if (this.task == 'upgrade') { this.task_upgrade(); return; } // Note: Zealots are caught earlier!
@@ -269,6 +269,7 @@ Creep.prototype.get_energy = function() {
             var available = storage.store.energy;
             if (available >= reserved + wanted) {
                 if (debug) { console.log(this+' decided to fetch from '+storage+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')'); }
+                this.say('GET');
                 storage.reserved_amount = reserved + this.carryCapacity - _.sum(this.carry);
                 if (this.pos.inRangeTo(storage, 1)) {
                     this.withdraw(storage, RESOURCE_ENERGY);
