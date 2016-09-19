@@ -866,7 +866,11 @@ Creep.prototype.task_upgrade = function() {
             var treasures = this.energy_within_reach();
             if (treasures.length > 0) { this.pickup(treasures[0]); return; }
             var links = this.links_within_reach();
-            if (links.length > 0) { this.withdraw(links[0], RESOURCE_ENERGY, this.free); return; }
+            if (links.length > 0) {
+                this.withdraw(links[0], RESOURCE_ENERGY, this.free);
+                links[0].count_withdraw();
+                return;
+            }
         }
         return;
     }
