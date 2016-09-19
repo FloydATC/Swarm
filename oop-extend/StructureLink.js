@@ -42,7 +42,7 @@ StructureLink.prototype.execute = function() {
         }
         if (lo_index != null) {
             let peer = this.room.links[lo_index];
-            console.log(this.room.link()+' '+this+' transferring energy to '+peer);
+            //console.log(this.room.link()+' '+this+' transferring energy to '+peer);
             this.transferEnergy(peer, Math.min(this.energy-1, peer.free-1));
         }
     }
@@ -58,13 +58,13 @@ StructureLink.prototype.shift_least_energy = function(objects) {
 StructureLink.prototype.count_transfer = function() {
     let loc = this.pos.x+','+this.pos.y;
     this.room.memory.links[loc] = ((this.room.memory.links[loc] || 0) * 0.9) + 1;
-    console.log(this.room.link()+' '+this+' at '+this.pos+' transfer => direction='+this.room.memory.links[loc]);
+    //console.log(this.room.link()+' '+this+' at '+this.pos+' transfer => direction='+this.room.memory.links[loc]);
 }
 
 StructureLink.prototype.count_withdraw = function() {
     let loc = this.pos.x+','+this.pos.y;
     this.room.memory.links[loc] = ((this.room.memory.links[loc] || 0) * 0.9) - 1;
-    console.log(this.room.link()+' '+this+' at '+this.pos+' withdraw => direction='+this.room.memory.links[loc]);
+    //console.log(this.room.link()+' '+this+' at '+this.pos+' withdraw => direction='+this.room.memory.links[loc]);
 }
 
 StructureLink.prototype.direction = function() {

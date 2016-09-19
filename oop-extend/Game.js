@@ -19,9 +19,9 @@ module.exports = {
         this.all_orders = [];
         this.new_orders = [];
         this.partial_orders = [];
-        if (Game.time % 50 == 0) {
+        if (Game.time % 20 == 0) {
             this.all_orders = Game.market.getAllOrders();
-            let last_tick = Game.time-50;
+            let last_tick = Game.time-20;
             this.new_orders = _.filter(this.all_orders, { created: last_tick });
             this.partial_orders = _.filter(this.all_orders, function(order) { return order.amount > order.remainingAmount } );
         }
