@@ -937,7 +937,7 @@ Room.prototype.assign_task_stockpile = function(drones, storage) {
         if (storage.free > 0) {
             drone.task = 'stockpile';
             drone.target = storage.id;
-            //console.log(drone.room+' '+drone.name+' assigned to '+drone.task+' '+storage+' ('+storage.energy+' energy, '+storage.energy_pct+'%)');
+            console.log(drone.room+' '+drone.name+' assigned to '+drone.task+' '+storage+' ('+storage.energy+' energy, '+storage.energy_pct+'%)');
             continue;
         }
         if (typeof drone.task == 'undefined') {
