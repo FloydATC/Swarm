@@ -928,7 +928,7 @@ Room.prototype.assign_task_build = function(drones, csites) {
 
 Room.prototype.assign_task_stockpile = function(drones, storage) {
     console.log(this.link()+' stockpile assignments: ('+drones.length+' drones available)');
-    if (storage == null) { console.log(this.room.link()+' has no storage'); return; }
+    if (storage == null) { console.log(this.link()+' has no storage'); return; }
     var need = 1;
     if (storage.energy_pct < 75) { need = 2; }
     if (storage.energy_pct < 50) { need = 3; }
