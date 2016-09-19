@@ -24,7 +24,7 @@ StructureLink.prototype.execute = function() {
 //        //console.log(this.room+' '+this+' transferring '+amount+' to '+peer);
 //        this.transferEnergy(peer, amount);
 //    }
-    if (this.direction() < 0) { return; }  // This is a receiver
+    if (this.direction() > 0) { return; }  // This is a receiver
     if (this.energy_pct >= 25) {
         // More than 25% full, transfer to the receiver with least energy
         let lo_index = null;
@@ -32,7 +32,7 @@ StructureLink.prototype.execute = function() {
         for (let i in this.room.links) {
             let peer = this.room.links[i];
             if (peer.id == this.id) { continue; } // Self
-            if (peer.direction() < 0) { continue; } // Another receiver
+            if (peer.direction() > 0) { continue; } // Another receiver
             if (peer.free > 0) {
                 if (lo_energy == null || peer.energy < lo_energy) {
                     lo_energy = peer.energy;
