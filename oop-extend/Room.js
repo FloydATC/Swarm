@@ -932,7 +932,7 @@ Room.prototype.assign_task_stockpile = function(drones, storage) {
     var need = 1;
     if (storage.energy_pct < 75) { need = 2; }
     if (storage.energy_pct < 50) { need = 3; }
-    if (storage.energy_pct < 25) { console.log('--- ENERGY CRITICAL ---'); need = 4; }
+    if (storage.energy_pct < 25) { console.log(this.link()+' ENERGY CRITICAL: '+storage.energy_pct); need = 4; }
     var count = 0;
     while (drones.length > 0 && storage && count < need) {
         count++;
