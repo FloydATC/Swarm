@@ -250,7 +250,7 @@ Creep.prototype.get_energy = function() {
                 link.reserved_amount = reserved + this.carryCapacity - _.sum(this.carry);
                 if (this.pos.inRangeTo(link, 1)) {
                     this.withdraw(link, RESOURCE_ENERGY);
-                    this.count_withdraw();
+                    link.count_withdraw();
                     this.memory.tracking = true;
                 } else {
                     this.move_to(link);
@@ -517,7 +517,11 @@ Creep.prototype.task_mine = function() {
                 if (links[i].free == 0) { continue; }
                 link = links[i]
             }
-            if (link != null) { this.transfer(link, RESOURCE_ENERGY); return; }
+            if (link != null) {
+                this.transfer(link, RESOURCE_ENERGY);
+                link.count_transfer();
+                return;
+            }
 
             // Container with free space within reach?
             var containers = this.containers_within_reach();
@@ -794,7 +798,7 @@ Creep.prototype.task_feed_link = function() {
     if (this.pos.inRangeTo(target, 1)) {
         this.stop();
         this.transfer(target, RESOURCE_ENERGY);
-        this.count_transfer();
+        target.count_transfer();
     } else {
         this.move_to(target);
     }
