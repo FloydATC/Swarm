@@ -8,6 +8,7 @@ StructureLink.prototype.initialize = function() {
     this.room.link_total += this.energy;
     this.room.link_average = Math.floor(this.room.link_total / this.room.link_count);
     this.reserved_amount = 0;
+    this.energy_pct = this.energy * 100 / this.energyCapacity;
 
     if (typeof this.room.memory.links == 'undefined') { this.room.memory.links = {}; }
 }
@@ -24,7 +25,7 @@ StructureLink.prototype.execute = function() {
 //        this.transferEnergy(peer, amount);
 //    }
     if (this.direction() < 0) { return; }  // This is a receiver
-    if (this.energy > this.free / 4) {
+    if (this.energy_pct >= 25) {
         // More than 25% full, transfer to the receiver with least energy
         let lo_index = null;
         let lo_energy = null;
@@ -64,6 +65,6 @@ StructureLink.prototype.count_withdraw = function() {
 
 StructureLink.prototype.direction = function() {
     let direction = this.room.memory.links[this.id] || 0;
-    console.log(this.room.link()+' '+this+' at '+this.pos+' direction='+direction);
+    //console.log(this.room.link()+' '+this+' at '+this.pos+' direction='+direction);
     return direction;
 }
