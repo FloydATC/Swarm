@@ -359,11 +359,11 @@ Room.prototype.plan = function() {
         if (needs == 'Zealot') {
             //console.log(this.link()+' spawning a zealot for '+flag.pos.roomName);
             var result = ERR_NOT_ENOUGH_ENERGY;
-            if (this.storage_energy_pct >= 75) {
+            if (this.storage && this.storage.energy_pct >= 75) {
                 // Boost upgrading if the room is doing well
                 result = this.createCreep(this.schematic('Zealot.2'), undefined, { class: 'Zealot', home: this.name, flag: flag.name } );
             }
-            if (this.storage_energy_pct >= 25) {
+            if (this.storage && this.storage.energy_pct >= 25) {
                 // Regular upgrading unless we are critical
                 if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Zealot.1'), undefined, { class: 'Zealot', home: this.name, flag: flag.name } ); }
             }

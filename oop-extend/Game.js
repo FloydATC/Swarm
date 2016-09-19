@@ -15,11 +15,17 @@ module.exports = {
         this.market_targets[RESOURCE_KEANIUM_ACID]  = 1000;
         this.market_price = Memory.m;
         if (typeof this.market_price == 'undefined') { this.market_price = {}; }
-        this.all_orders = Game.market.getAllOrders();
-        let last_tick = Game.time-1;
-        this.new_orders = _.filter(this.all_orders, { created: last_tick });
 
-        this.partial_orders = _.filter(this.all_orders, function(order) { return order.amount > order.remainingAmount } );
+        this.all_orders = [];
+        this.new_orders = [];
+        this.partial_orders = [];
+        if (Game.time % 50 == 0) {
+            this.all_orders = Game.market.getAllOrders();
+            let last_tick = Game.time-50;
+            this.new_orders = _.filter(this.all_orders, { created: last_tick });
+            this.partial_orders = _.filter(this.all_orders, function(order) { return order.amount > order.remainingAmount } );
+        }
+
         // Calculate weighted average buy/sell prices based on volume
         if (this.partial_orders.length > 0) {
             let transactions = {};
@@ -107,7 +113,7 @@ module.exports = {
                 var lo_room = null;
                 for (var name in this.rooms) {
                     var room = this.rooms[name];
-                    if (room.controller && room.controller.my == true && room.controller.level > 6) {
+                    if (room.controller && room.controller.my == true && room.controller.level >= 6) {
                         var range = this.manhattanDistance(flag.pos.roomName, room.name);
                         //console.log('  candidate room '+room+' range is '+range);
                         if (lo_range == null || range < lo_range) {
