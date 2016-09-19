@@ -250,6 +250,7 @@ Creep.prototype.get_energy = function() {
                 link.reserved_amount = reserved + this.carryCapacity - _.sum(this.carry);
                 if (this.pos.inRangeTo(link, 1)) {
                     this.withdraw(link, RESOURCE_ENERGY);
+                    this.count_withdraw();
                     this.memory.tracking = true;
                 } else {
                     this.move_to(link);
@@ -793,6 +794,7 @@ Creep.prototype.task_feed_link = function() {
     if (this.pos.inRangeTo(target, 1)) {
         this.stop();
         this.transfer(target, RESOURCE_ENERGY);
+        this.count_transfer();
     } else {
         this.move_to(target);
     }
