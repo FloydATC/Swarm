@@ -302,22 +302,6 @@ Room.prototype.plan = function() {
             }
         }
     }
-    if (this.extractor_flags && this.storage && this.storage.energy_pct > 75 && this.terminal && this.terminal.free_pct > 25) {
-        //console.log(this.link()+' has extractor flags to consider: '+this.extractor_flags);
-        for (var i in this.extractor_flags) {
-            var flag = this.extractor_flags[i];
-            var needs = flag.needs();
-            if (needs == 'Extractor') {
-                //console.log(this.link()+' spawning a local Extractor for '+flag.pos.roomName);
-                var result = this.createCreep(this.schematic('Extractor.3'), undefined, { class: 'Extractor', home: this.name, extract: this.name, flag: flag.name } );
-                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Extractor.2'), undefined, { class: 'Extractor', home: this.name, extract: this.name, flag: flag.name } ); }
-                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Extractor.1'), undefined, { class: 'Extractor', home: this.name, extract: this.name, flag: flag.name } ); }
-                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Extractor', home: this.name, extract: this.name, flag: flag.name } ); }
-                if (result == OK) { flag.spawned('Extractor'); }
-                return;
-            }
-        }
-    }
     if (this.spawns.length > 0) {
         var drone_spawn_interval = CREEP_LIFE_TIME / this.want_drones();
         var drone_spawn_timer = Game.time - (this.memory.last_drone_spawned || 0);
@@ -427,6 +411,22 @@ Room.prototype.plan = function() {
                 //console.log(this.link()+' spawning a remote miner for '+flag.pos.roomName);
                 var result = this.createCreep(this.schematic('Reserver'), undefined, { class: 'Reserver', home: this.name, reserve: flag.pos.roomName, flag: flag.name } );
                 if (result == OK) { flag.spawned('Reserver'); }
+                return;
+            }
+        }
+    }
+    if (this.extractor_flags && this.storage && this.storage.energy_pct > 75 && this.terminal && this.terminal.free_pct > 25) {
+        //console.log(this.link()+' has extractor flags to consider: '+this.extractor_flags);
+        for (var i in this.extractor_flags) {
+            var flag = this.extractor_flags[i];
+            var needs = flag.needs();
+            if (needs == 'Extractor') {
+                //console.log(this.link()+' spawning a local Extractor for '+flag.pos.roomName);
+                var result = this.createCreep(this.schematic('Extractor.3'), undefined, { class: 'Extractor', home: this.name, extract: this.name, flag: flag.name } );
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Extractor.2'), undefined, { class: 'Extractor', home: this.name, extract: this.name, flag: flag.name } ); }
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Extractor.1'), undefined, { class: 'Extractor', home: this.name, extract: this.name, flag: flag.name } ); }
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Extractor', home: this.name, extract: this.name, flag: flag.name } ); }
+                if (result == OK) { flag.spawned('Extractor'); }
                 return;
             }
         }
