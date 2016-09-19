@@ -244,10 +244,10 @@ Room.prototype.plan = function() {
     // Build stuff?
     this.assign_task_build(drones, csites);
 
-    // Storage needs energy?
+    // Storage needs energy? (scale aggressively)
     this.assign_task_stockpile(drones, this.storage);
 
-    // Terminal needs energy?
+    // Terminal needs energy? (low priority)
     this.assign_task_feed_terminal(drones, this.terminal);
 
     // FINALLY: Any leftover drones? Upgrade
@@ -927,11 +927,12 @@ Room.prototype.assign_task_build = function(drones, csites) {
 }
 
 Room.prototype.assign_task_stockpile = function(drones, storage) {
-    //console.log(this.link()+' stockpile assignments: ('+drones.length+' drones available)');
+    console.log(this.link()+' stockpile assignments: ('+drones.length+' drones available)');
+    if (storage == null) { console.log(this.room.link()+' has no storage'); return; }
     var need = 1;
-    if (this.storage_energy_pct < 75) { need = 2; }
-    if (this.storage_energy_pct < 50) { need = 3; }
-    if (this.storage_energy_pct < 25) { need = 4; }
+    if (storage.energy_pct < 75) { need = 2; }
+    if (storage.energy_pct < 50) { need = 3; }
+    if (storage.energy_pct < 25) { need = 4; }
     var count = 0;
     while (drones.length > 0 && storage && count < need) {
         count++;
