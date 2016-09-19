@@ -247,9 +247,6 @@ Room.prototype.plan = function() {
     // Storage needs energy?
     this.assign_task_stockpile(drones, this.storage);
 
-    // Zealots always upgrade
-    this.assign_task_upgrade(zealots);
-
     // Terminal needs energy?
     this.assign_task_feed_terminal(drones, this.terminal);
 
@@ -267,6 +264,9 @@ Room.prototype.plan = function() {
 
     // Remote fetchers
     this.assign_task_remote_fetch(fetchers);
+
+    // Zealots always upgrade
+    this.assign_task_upgrade(zealots);
 
 
     // Under attack? Plan A: Rlease a hunter. Plan B: Spam tiny fighters and hope for the best
@@ -986,7 +986,7 @@ Room.prototype.assign_task_upgrade = function(drones) {
         var drone = drones.shift();
         drone.task = 'upgrade';
         drone.target = this.controller.id;
-        //console.log(drone.memory.class+' '+drone.name+' assigned to '+drone.task+' '+drone.target);
+        console.log(drone.memory.class+' '+drone.name+' assigned to '+drone.task+' '+drone.target);
     }
 
 }
