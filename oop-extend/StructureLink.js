@@ -63,5 +63,7 @@ StructureLink.prototype.count_withdraw = function() {
 }
 
 StructureLink.prototype.direction = function() {
-    return this.room.memory.links[this.id] || 0;
+    let direction = this.room.memory.links[this.id] || 0;
+    console.log(this.room.link()+' '+this+' at '+this.pos+' direction='+direction);
+    return direction;
 }
