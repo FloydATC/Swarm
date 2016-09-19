@@ -971,7 +971,7 @@ Room.prototype.assign_task_upgrade = function(drones) {
         var drone = drones.shift();
         drone.task = 'upgrade';
         drone.target = this.controller.id;
-        console.log(drone.memory.class+' '+drone.name+' assigned to '+drone.task+' '+drone.target);
+        //console.log(drone.room.link()+' '+drone.memory.class+' '+drone.name+' assigned to '+drone.task+' '+drone.target);
     }
 }
 
