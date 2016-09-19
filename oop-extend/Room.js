@@ -205,20 +205,18 @@ Room.prototype.plan = function() {
         }
     }
 
-    // Hunters hunters
+    // Role based tasks
     this.assign_task_hunt(hunters);
-
-    // Biters swarm and attack threats. Recycle when no longer needed.
     this.assign_task_attack(biters);
-
-    // Spitters swarm and attack threats. Recycle when no longer needed.
     this.assign_task_ranged_attack(spitters);
-
-    // Swarmers? Send them in the right direction or morph into Infector
     this.assign_task_travel(swarmers);
-
-    // Infectors? Use them to capture control point, then morph into Drone
     this.assign_task_claim(infectors);
+    this.assign_task_mine(miners);
+    this.assign_task_extract(extractors);
+    this.assign_task_reserve(reservers);
+    this.assign_task_remote_fetch(fetchers);
+    this.assign_task_upgrade(zealots);
+
 
     // Controller critical?
     this.assign_task_controller(drones);
@@ -252,21 +250,6 @@ Room.prototype.plan = function() {
 
     // FINALLY: Any leftover drones? Upgrade
     this.assign_task_upgrade(drones);
-
-    // Miners mine
-    this.assign_task_mine(miners);
-
-    // Extractors extract
-    this.assign_task_extract(extractors);
-
-    // Reservers reserve
-    this.assign_task_reserve(reservers);
-
-    // Remote fetchers
-    this.assign_task_remote_fetch(fetchers);
-
-    // Zealots always upgrade
-    this.assign_task_upgrade(zealots);
 
 
     // Under attack? Plan A: Rlease a hunter. Plan B: Spam tiny fighters and hope for the best
@@ -927,12 +910,11 @@ Room.prototype.assign_task_build = function(drones, csites) {
 }
 
 Room.prototype.assign_task_stockpile = function(drones, storage) {
-    console.log(this.link()+' stockpile assignments: ('+drones.length+' drones available)');
-    if (storage == null) { console.log(this.link()+' has no storage'); return; }
+    //console.log(this.link()+' stockpile assignments: ('+drones.length+' drones available)');
+    if (storage == null) { return; }
     var need = 1;
-    if (storage.energy_pct < 75) { need = 2; }
-    if (storage.energy_pct < 50) { need = 3; }
-    if (storage.energy_pct < 25) { console.log(this.link()+' ENERGY CRITICAL: '+storage.energy_pct); need = 4; }
+    if (storage.energy_pct < 50) { need = 2; }
+    if (storage.energy_pct < 20) { need = 3; }
     var count = 0;
     while (drones.length > 0 && storage && count < need) {
         count++;
@@ -940,7 +922,7 @@ Room.prototype.assign_task_stockpile = function(drones, storage) {
         if (storage.free > 0) {
             drone.task = 'stockpile';
             drone.target = storage.id;
-            console.log(drone.room+' '+drone.name+' assigned to '+drone.task+' '+storage+' ('+storage.energy+' energy, '+storage.energy_pct+'%)');
+            //console.log(drone.room+' '+drone.name+' assigned to '+drone.task+' '+storage+' ('+storage.energy+' energy, '+storage.energy_pct+'%)');
             continue;
         }
         if (typeof drone.task == 'undefined') {
