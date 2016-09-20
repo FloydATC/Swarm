@@ -257,8 +257,11 @@ Room.prototype.plan = function() {
     this.assign_task_upgrade(drones);
 
 
-    // Under attack? Plan A: Rlease a hunter. Plan B: Spam tiny fighters and hope for the best
+    // Under attack? Plan A: Spawn berserker. Plan B: Release a hunter. Plan C: Spam tiny fighters and hope for the best
     if (this.hostile_creeps.length > 0) {
+        if (this.controller && this.controller.my && this.controller.level >= 7) {
+            if (this.createCreep(this.schematic('Berserker'), undefined, { class: 'Berserker', destination: this.name })) { return; }
+        }
         // Try to spawn a hunter
         if (hunters.length == 0) {
             if (this.createCreep(this.schematic('Hunter'), undefined, { class: 'Hunter', destination: this.name }) == OK) { return; }
@@ -507,6 +510,7 @@ Room.prototype.schematic = function(c) {
     switch (c) {
         case 'Spitter': { hash[RANGED_ATTACK] = 1; hash[MOVE] = 1; break; }
         case 'Biter': { hash[ATTACK] = 1; hash[MOVE] = 1; break; }
+        case 'Berserker': { hash[TOUGH] = 6; hash[MOVE] = 16; hash[ATTACK] = 28; break; }
         case 'Hunter': { hash[TOUGH] = 2; hash[MOVE] = 5; hash[RANGED_ATTACK] = 4; hash[HEAL] = 4; break; }
         case 'Miner.3': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
         case 'Miner.2': { hash[WORK] = 3; hash[CARRY] = 1; hash[MOVE] = 2; break; }

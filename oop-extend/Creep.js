@@ -20,6 +20,20 @@ Creep.prototype.initialize = function() {
     //if (this.memory.debug) { console.log(this.adjacent); }
 }
 
+Creep.prototype.on_rampart = function() {
+    let objects = creep.room.lookForAt(LOOK_MY_STRUCTURES, this);
+    let rampart = _.filter(objects, { structureType: STRUCTURE_RAMPART } );
+    return (rampart != null); // True if Creep is standing on a rampart
+}
+
+Creep.prototype.is_melee = function() {
+    return (this.getActiveBodyParts(ATTACK) > 0); // True if Creep has atleast one usable ATTACK part
+}
+
+Creep.prototype.is_ranged = function() {
+    return (this.getActiveBodyParts(RANGED_ATTACK) > 0); // True if Creep has atleast one usable ATTACK part
+}
+
 Creep.prototype.containers_within_reach = function() {
     var found = [];
     for (var i=0; i<this.adjacent.length; i++) {
@@ -364,9 +378,12 @@ Creep.prototype.task_hunt = function() {
             if (this.memory.idle == 50) { this.suicide(); }
         } else {
             this.memory.idle = 0;
-            if (this.room.rangeFromTo(this.pos, target.pos) > 3) {
+            let range = this.room.rangeFromTo(this.pos, target.pos);
+            if (range > 3) {
                 if (this.hits < this.hitsMax) { this.heal(this); }// Attempt to heal self
-                this.move_to(target); // Close on target
+                if (this.on_rampart() == false) {
+                    this.move_to(target); // Close on target
+                }
                 return;
             }
             if (this.at_exit() && target != null) {
@@ -378,6 +395,7 @@ Creep.prototype.task_hunt = function() {
 
 
             if (this.hits < this.hitsMax) { this.heal(this); }// Attempt to heal self
+            if (this.is_melee() && range <= 1) { this.attack(target); return }
             this.rangedAttack(target);
             return;
         }
@@ -408,7 +426,9 @@ Creep.prototype.task_attack = function() {
         this.attack(target);
         this.add_stats('attack')
     } else {
-        this.move_to(target);
+        if (this.on_rampart() == false) {
+            this.move_to(target);
+        }
     }
     return;
 }
@@ -421,7 +441,9 @@ Creep.prototype.task_ranged_attack = function() {
         this.rangedAttack(target);
         this.add_stats('ranged attack')
     } else {
-        this.move_to(target);
+        if (this.on_rampart() == false) {
+            this.move_to(target);
+        }
     }
     return;
 }
