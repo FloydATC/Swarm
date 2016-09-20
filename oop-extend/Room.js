@@ -138,7 +138,12 @@ Room.prototype.initialize = function() {
 }
 
 Room.prototype.under_attack = function() {
-    return (this.hostile_creeps.length > 0); // true if hostiles spotted
+    let hostiles = this.hostile_creeps.length;
+    let mem = this.memory.hostiles;
+    if (mem == null) { mem = 0; }
+    if (mem == 0 && hostiles > 0) { console.log(this.link()+' IS UNDER ATTACK'); }
+    if (mem > 0 && hostiles == 0) { console.log(this.link()+' no longer under attack'); }
+    return (hostiles > 0); // true if hostiles spotted
 }
 
 /*Room.prototype.get_exits = function(direction) {

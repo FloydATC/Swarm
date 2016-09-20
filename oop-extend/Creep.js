@@ -1005,7 +1005,7 @@ Creep.prototype.move_to = function(target) {
                 //console.log('  roomCallback('+roomName+')');
 
                 let room = Game.rooms[roomName];
-                if (!room) { console.log('  no vision in '+roomName); return; } // No vision so pathfinding will be inaccurate
+                if (!room) { return; } // No vision so pathfinding will be inaccurate
                 if (room.costmatrix) {
                     //console.log('  reusing costmatrix for '+roomName);
                     return room.costmatrix;
