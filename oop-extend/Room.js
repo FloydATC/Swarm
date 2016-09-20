@@ -187,6 +187,7 @@ Room.prototype.plan = function() {
     var biters = [];        // Basic attack unit
     var spitters = [];      // Basic ranged attack unit
     var hunters = [];       // Medium ranged attack unit
+    var berserkers = [];    // Heavy attack unit
 
     // Sort creeps into classes
     for (var i in my_creeps) {
@@ -204,6 +205,7 @@ Room.prototype.plan = function() {
             if (creep.memory.class == 'Biter')      { biters.push(creep);       continue; }
             if (creep.memory.class == 'Spitter')    { spitters.push(creep);     continue; }
             if (creep.memory.class == 'Hunter')     { hunters.push(creep);      continue; }
+            if (creep.memory.class == 'Berserker')  { berserkers.push(creep);   continue; }
             console.log(this.link()+' unhandled creep class '+creep.memory.class);
         } else {
             console.log(this.link()+' POSSIBLE SERVER ERROR: INVALID CREEP type='+(typeof creep)+' creep='+creep);
@@ -211,6 +213,7 @@ Room.prototype.plan = function() {
     }
 
     // Role based tasks
+    this.assign_task_hunt(berserkers);
     this.assign_task_hunt(hunters);
     this.assign_task_attack(biters);
     this.assign_task_ranged_attack(spitters);
