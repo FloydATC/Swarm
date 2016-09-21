@@ -31,7 +31,7 @@ Creep.prototype.is_melee = function() {
 }
 
 Creep.prototype.is_ranged = function() {
-    return (this.getActiveBodyParts(RANGED_ATTACK) > 0); // True if Creep has atleast one usable ATTACK part
+    return (this.getActiveBodyparts(RANGED_ATTACK) > 0); // True if Creep has atleast one usable ATTACK part
 }
 
 Creep.prototype.containers_within_reach = function() {
