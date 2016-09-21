@@ -289,7 +289,7 @@ Room.prototype.plan = function() {
             if (name == this.name) { continue; } // Assist self? Duh.
             if (this.energyAvailable < 500) { continue; } // Low on energy
             if (this.storage == null || this.storage_energy_pct < 50) { continue; } // Not in a good position to help
-            if (Game.manhattanDistance(this.name, name) <= 2) {
+            if (Game.manhattanDistance(this.name, name) <= 3) {
                 if (Memory.rooms[name].hostiles > 0 && Memory.rooms[name].scanned > Game.time - 1000) {
                     //console.log('  '+name+' is under attack, '+this.link()+' checking energy reserves ('+this.calc_spawn_reserves()+')');
                     if (this.calc_spawn_reserves() > 75) {
