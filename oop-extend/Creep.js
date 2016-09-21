@@ -21,7 +21,7 @@ Creep.prototype.initialize = function() {
 }
 
 Creep.prototype.on_rampart = function() {
-    let objects = creep.room.lookForAt(LOOK_MY_STRUCTURES, this);
+    let objects = this.room.lookForAt(LOOK_MY_STRUCTURES, this);
     let rampart = _.filter(objects, { structureType: STRUCTURE_RAMPART } );
     return (rampart != null); // True if Creep is standing on a rampart
 }
