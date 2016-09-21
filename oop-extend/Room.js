@@ -6,7 +6,6 @@ Room.prototype.initialize = function() {
     //console.log(this.link()+' initializing');
     this.my_creeps = this.find(FIND_MY_CREEPS);
     this.my_creeps = this.my_creeps.sort( function(a,b) { return a.ticksToLive - b.ticksToLive; } );
-    this.hostile_creeps = this.find(FIND_HOSTILE_CREEPS);
     this.dropped_energy = this.find(FIND_DROPPED_ENERGY);
     this.dropped_other = this.find(FIND_DROPPED_RESOURCES, { filter: function(r) { return r.resourceType != RESOURCE_ENERGY; } });
     this.sources = this.find(FIND_SOURCES);
@@ -40,6 +39,16 @@ Room.prototype.initialize = function() {
     this.link_count = 0;
     this.link_total = 0;
     this.link_average = 0;
+
+    // Scan for hostiles
+    // Filter against those who have permission to enter
+    this.hostile_creeps = this.find(FIND_HOSTILE_CREEPS);
+    if (typeof this.memory.allow == 'undefined') { this.memory.allow = []; }
+    for (let i in this.memory.allow) {
+        let player = this.memory.allow[i];
+        if (player == '*') { this.hostile_creeps = []; } // Free for all
+        this.hostile_creeps = _.filter(this.hostile_creeps, function(creep) { creep.owner.username != player } );
+    }
 
     // Record presence of hostiles in case we lose visual - used by other rooms to assist
     this.memory.hostiles = this.hostile_creeps.length;

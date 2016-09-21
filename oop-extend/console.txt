@@ -26,3 +26,12 @@ Memory.creeps['James'].debug = true;
 // Profiling
 Game.profiler.profile(1000)
 Game.profiler.email(1000)
+
+// Permit access to shared room for specific player
+Memory.room['E28N41'].allow.push('Kotarou');
+
+// Revoke access to shared room for specific player
+Memory.room['E28N41'].allow.filter( function(p) { p != 'Kotarou' } );
+
+// Permit access to shared room for any player
+Memory.room['E28N41'].allow.push('*');
