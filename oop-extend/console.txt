@@ -34,4 +34,4 @@ Memory.rooms['E28N41'].allow.push('Kotarou');
 Memory.rooms['E28N41'].allow.filter( function(p) { p != 'Kotarou' } );
 
 // Permit access to shared room for any player
-Memory.rooms['E28N41'].allow.push('*');
+Memory.rooms['E27N40'].allow.push('*');

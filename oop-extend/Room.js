@@ -41,13 +41,24 @@ Room.prototype.initialize = function() {
     this.link_average = 0;
 
     // Scan for hostiles
-    // Filter against those who have permission to enter
+    // Filter against those who have permission to enter ("whitelist")
     this.hostile_creeps = this.find(FIND_HOSTILE_CREEPS);
     if (typeof this.memory.allow == 'undefined') { this.memory.allow = []; }
-    for (let i in this.memory.allow) {
-        let player = this.memory.allow[i];
-        if (player == '*') { this.hostile_creeps = []; } // Free for all
-        this.hostile_creeps = _.filter(this.hostile_creeps, function(creep) { creep.owner.username != player } );
+    if (this.memory.allow.length > 0 && this.hostile_creeps.length > 0) {
+        console.log(this.link()+' hostiles before filter: '+this.hostile_creeps.length);
+        for (let i in this.memory.allow) {
+            let player = this.memory.allow[i];
+            if (player == '*') { this.hostile_creeps = []; } // Free for all
+            if (this.hostile_creeps.length == 0) { console.log('  list is now empty'); break; }
+            console.log(this.link()+' allow player '+player);
+            console.log('  pre='+this.hostile_creeps);
+            this.hostile_creeps = _.filter(this.hostile_creeps, function(creep) {
+                console.log('    creep='+creep+' owner='+creep.owner+' username="'+creep.owner.username+'" player="'+player+'"');
+                return (creep.owner.username != player);
+            } );
+            console.log('  post='+this.hostile_creeps);
+        }
+        console.log(this.link()+' hostiles after filter: '+this.hostile_creeps.length);
     }
 
     // Record presence of hostiles in case we lose visual - used by other rooms to assist
@@ -289,9 +300,13 @@ Room.prototype.plan = function() {
             if (name == this.name) { continue; } // Assist self? Duh.
             if (this.energyAvailable < 500) { continue; } // Low on energy
             if (this.storage == null || this.storage_energy_pct < 50) { continue; } // Not in a good position to help
-            if (Game.manhattanDistance(this.name, name) <= 3) {
+            //console.log(name+' hostiles='+Memory.rooms[name].hostiles);
+            //console.log(name+' scanned='+Memory.rooms[name].scanned);
+            let range = Game.manhattanDistance(this.name, name);
+            //console.log(name+' distance to '+this.name+' is '+range);
+            if (range <= 3) {
                 if (Memory.rooms[name].hostiles > 0 && Memory.rooms[name].scanned > Game.time - 1000) {
-                    //console.log('  '+name+' is under attack, '+this.link()+' checking energy reserves ('+this.calc_spawn_reserves()+')');
+                    console.log('  '+name+' is under attack, '+this.link()+' checking energy reserves ('+this.calc_spawn_reserves()+')');
                     if (this.calc_spawn_reserves() > 75) {
                         //console.log('  '+this.link()+' spawning assistance!');
                         // Spawn a hunter to assist!
@@ -566,7 +581,7 @@ Room.prototype.createCreep = function(body, name, memory) {
             memory['spawned'] = Game.time;
             memory['spawn'] = spawn.id;
             result = spawn.createCreep(body, name, memory);
-            console.log(this.link()+' '+spawn+' spawn '+body+' result='+result);
+            console.log(this.link()+' '+spawn+' spawning '+memory.class+' '+result);
             if (_.isString(result)) { result = OK; }
             if (result == OK) { spawn.busy = true; }
             return result;
@@ -650,7 +665,7 @@ Room.prototype.consider_road = function(creep) {
     //console.log(this.link()+' vote sheet after: '+JSON.stringify(votes));
     if (votes[coord] > this.roads.length) {
         votes = {}; // Reset vote sheet
-        console.log(this.link()+' build road at '+coord+' (have '+this.roads.length+')');
+        //console.log(this.link()+' build road at '+coord+' (have '+this.roads.length+')');
         this.createConstructionSite(creep.pos.x, creep.pos.y, STRUCTURE_ROAD);
     } else {
         //console.log(this.link()+' received '+votes[coord]+' votes for a road at '+coord+' (need '+this.roads.length+')');

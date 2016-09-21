@@ -29,7 +29,7 @@ module.exports.loop = function() {
             var name = memory_names[i];
             var tombstone = Memory.creeps[name];
             if (Game.creeps[name] == null) {
-                console.log(tombstone.class+' '+name+' has died in '+tombstone.where+' at age '+tombstone.age);
+                console.log(Room.prototype.link(tombstone.where)+' '+tombstone.class+' '+name+' died at age '+tombstone.age);
                 delete Memory.creeps[name];
             }
         }
