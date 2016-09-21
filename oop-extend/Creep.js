@@ -401,7 +401,7 @@ Creep.prototype.task_hunt = function() {
         }
     }
     if (this.memory.destination && this.memory.destination != this.room.name) {
-        console.log(this.room.link()+' '+this.memory.class+' '+this+' heading for '+this.room.link(this.memory.destination)+' to assist');
+        console.log(this.room.link()+' '+this.memory.class+' '+this.name+' heading for '+this.room.link(this.memory.destination)+' to assist');
         this.move_to({ pos: new RoomPosition(25, 25, this.memory.destination) });
         return;
     }
