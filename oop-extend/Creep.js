@@ -27,7 +27,7 @@ Creep.prototype.on_rampart = function() {
 }
 
 Creep.prototype.is_melee = function() {
-    return (this.getActiveBodyParts(ATTACK) > 0); // True if Creep has atleast one usable ATTACK part
+    return (this.getActiveBodyparts(ATTACK) > 0); // True if Creep has atleast one usable ATTACK part
 }
 
 Creep.prototype.is_ranged = function() {
