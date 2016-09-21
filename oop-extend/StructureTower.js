@@ -17,7 +17,7 @@ StructureTower.prototype.execute = function() {
             var hostile = this.shift_nearest(redfor);
             if (hostile.is_harmless()) { continue; }
             if (Math.random() > 0.75) { continue; }
-            console.log(this+' attacking threat '+hostile);
+            console.log(this.room.link()+' '+this+' attacking '+hostile+' ('+hostile.owner.username+')');
             this.attack(hostile);
             return;
         }
