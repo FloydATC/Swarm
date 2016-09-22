@@ -23,7 +23,8 @@ Creep.prototype.initialize = function() {
 Creep.prototype.on_rampart = function() {
     let objects = this.room.lookForAt(LOOK_STRUCTURES, this);
     let rampart = _.filter(objects, { structureType: STRUCTURE_RAMPART, my: true } );
-    return (rampart != null); // True if Creep is standing on a rampart
+//    return false;
+    return (rampart.length > 0); // True if Creep is standing on a rampart
 }
 
 Creep.prototype.is_melee = function() {
@@ -365,8 +366,9 @@ Creep.prototype.is_harmless = function() {
 
 Creep.prototype.task_hunt = function() {
     this.memory.tracking = false;
+    if (this.room.name == 'E26N36' || this.memory.destination == 'E26N36') { this.suicide(); }
     if (this.memory.destination && this.memory.destination == this.room.name) {
-        //console.log(this.memory.class+' '+this+' hunting hostiles in '+this.room.name);
+        console.log(this.room.link()+' '+this.memory.class+' '+this.name+' hunting hostiles');
         // Attack!
         var targets = this.room.hostile_creeps.slice();
         var target = this.shift_nearest(targets);
@@ -380,14 +382,19 @@ Creep.prototype.task_hunt = function() {
             this.memory.idle = 0;
             let range = this.room.rangeFromTo(this.pos, target.pos);
             if (range > 3) {
+                //console.log('  out of range');
                 if (this.hits < this.hitsMax) { this.heal(this); }// Attempt to heal self
                 if (this.on_rampart() == false) {
+                    //console.log('  advancing on target');
                     this.move_to(target); // Close on target
+                } else {
+                    //console.log('  standing my ground');
                 }
                 return;
             }
             if (this.at_exit() && target != null) {
                 //this.move_to(this.room.controller);
+                //console.log('  on border, moving');
                 this.move_to(target);
             } else {
                 this.stop();
@@ -1024,7 +1031,11 @@ Creep.prototype.move_to = function(target) {
 
             roomCallback: function(roomName) {
 
-                //console.log('  roomCallback('+roomName+')');
+                // Is this room on the 'avoid' list?
+                if (Memory.avoid && _.filter(Memory.avoid, function(name) { return name == roomName; } ).length > 0) {
+                    console.log('Room '+roomName+' is on the avoid list');
+                    return false;
+                }
 
                 let room = Game.rooms[roomName];
                 if (!room) { return; } // No vision so pathfinding will be inaccurate
@@ -1059,6 +1070,7 @@ Creep.prototype.move_to = function(target) {
             },
         }
     );
+    if (ret.incomplete == true) { console.log(this.room.link()+' '+this+' got an incomplete path for '+target.pos); }
     //console.log(this+' PathFinder returned '+ret.path);
     Nav.learn_path(this.pos, target.pos, ret.path);
     this.moveTo(ret.path[0]);

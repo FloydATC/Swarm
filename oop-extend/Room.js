@@ -45,20 +45,20 @@ Room.prototype.initialize = function() {
     this.hostile_creeps = this.find(FIND_HOSTILE_CREEPS);
     if (typeof this.memory.allow == 'undefined') { this.memory.allow = []; }
     if (this.memory.allow.length > 0 && this.hostile_creeps.length > 0) {
-        console.log(this.link()+' hostiles before filter: '+this.hostile_creeps.length);
+        //console.log(this.link()+' hostiles before filter: '+this.hostile_creeps.length);
         for (let i in this.memory.allow) {
             let player = this.memory.allow[i];
             if (player == '*') { this.hostile_creeps = []; } // Free for all
-            if (this.hostile_creeps.length == 0) { console.log('  list is now empty'); break; }
-            console.log(this.link()+' allow player '+player);
-            console.log('  pre='+this.hostile_creeps);
+            if (this.hostile_creeps.length == 0) { break; }
+            //console.log(this.link()+' allow player '+player);
+            //console.log('  pre='+this.hostile_creeps);
             this.hostile_creeps = _.filter(this.hostile_creeps, function(creep) {
-                console.log('    creep='+creep+' owner='+creep.owner+' username="'+creep.owner.username+'" player="'+player+'"');
+                //console.log('    creep='+creep+' owner='+creep.owner+' username="'+creep.owner.username+'" player="'+player+'"');
                 return (creep.owner.username != player);
             } );
-            console.log('  post='+this.hostile_creeps);
+            //console.log('  post='+this.hostile_creeps);
         }
-        console.log(this.link()+' hostiles after filter: '+this.hostile_creeps.length);
+        //console.log(this.link()+' hostiles after filter: '+this.hostile_creeps.length);
     }
 
     // Record presence of hostiles in case we lose visual - used by other rooms to assist
@@ -298,6 +298,7 @@ Room.prototype.plan = function() {
         // If we are NOT under attack, check for other rooms that may require assistance
         for (var name in Memory.rooms) {
             if (name == this.name) { continue; } // Assist self? Duh.
+            if (name == 'E26N36') { console.log('IGNORE E26N36 FOR NOW'); continue; }
             if (this.energyAvailable < 500) { continue; } // Low on energy
             if (this.storage == null || this.storage_energy_pct < 50) { continue; } // Not in a good position to help
             //console.log(name+' hostiles='+Memory.rooms[name].hostiles);

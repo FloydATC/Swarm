@@ -29,9 +29,13 @@ Game.profiler.email(1000)
 
 // Permit access to shared room for specific player
 Memory.rooms['E28N41'].allow.push('Kotarou');
+Memory.rooms['E27N36'].allow.push('tedivm');
 
 // Revoke access to shared room for specific player
 Memory.rooms['E28N41'].allow.filter( function(p) { p != 'Kotarou' } );
 
 // Permit access to shared room for any player
 Memory.rooms['E27N40'].allow.push('*');
+
+// Loop through all currently visible rooms
+_.forEach(_.keys(Game.rooms), function(name) { delete Memory.rooms[name].exits } );
