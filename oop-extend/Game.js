@@ -67,25 +67,38 @@ module.exports = {
             if (flag.type() == 'harvest') {
                 // Find nearest room with an owned controller
                 //console.log('Assigning owner room to flag '+flag);
-                var lo_range = null;
-                var lo_room = null;
-                for (var name in this.rooms) {
-                    var room = this.rooms[name];
-                    if (room.controller && room.controller.my == true && room.controller.level > 2) {
-                        var range = this.manhattanDistance(flag.pos.roomName, room.name);
-                        //console.log('  candidate room '+room+' range is '+range);
-                        if (lo_range == null || range < lo_range) {
-                            lo_range = range;
-                            lo_room = room;
-                        }
+
+                let owner_room = null;
+                if (flag.memory.owner) {
+                    owner_room = Game.rooms[flag.memory.owner];
+                    if (owner_room == null) {
+                        delete flag.memory.owner; // No longer valid!
                     }
                 }
-                //console.log('  assigned to room '+room);
-                if (typeof flag.memory == 'undefined') { flag.memory = {}; }
-                flag.memory.owner = lo_room.name;
+                if (flag.memory.owner == null) {
+                    var lo_range = null;
+                    var lo_room = null;
+                    for (var name in this.rooms) {
+                        var room = this.rooms[name];
+                        if (room.controller && room.controller.my == true && room.controller.level > 2) {
+                            //var range = this.manhattanDistance(flag.pos.roomName, room.name);
+                            var range = Game.map.findRoute(flag.pos.roomName, room.name).length;
+                            //console.log('  candidate room '+room+' range is '+range);
+                            if (lo_range == null || range < lo_range) {
+                                lo_range = range;
+                                lo_room = room;
+                            }
+                        }
+                    }
+                    console.log('Flag '+flag+' assigned to room '+room);
+                    if (typeof flag.memory == 'undefined') { flag.memory = {}; }
+                    flag.memory.owner = lo_room.name;
+                    owner_room = Game.rooms[flag.memory.owner];
+                }
                 // Add this flag to that room
-                if (!lo_room.harvest_flags) { lo_room.harvest_flags = []; }
-                lo_room.harvest_flags.push(flag);
+                if (!owner_room.harvest_flags) { owner_room.harvest_flags = []; }
+                owner_room.harvest_flags.push(flag);
+
 
                 // Calculate and set spawn parameters
                 var lead = flag.memory.lead_time || 250; // Est.time from spawn command to flag reached
@@ -105,7 +118,55 @@ module.exports = {
                 //flag.memory.ticks = (flag.memory.ticks + 1) || 0;
             }
 
-            // Remote mine sources tagged with a "harvest" flag
+            // Dismantling works pretty much like remote mining
+            if (flag.type() == 'dismantle') {
+                // Find nearest room with an owned controller
+                //console.log('Assigning owner room to flag '+flag);
+
+                let owner_room = null;
+                if (flag.memory.owner) {
+                    owner_room = Game.rooms[flag.memory.owner];
+                    if (owner_room == null) {
+                        delete flag.memory.owner; // No longer valid!
+                    }
+                }
+                if (flag.memory.owner == null) {
+                    var lo_range = null;
+                    var lo_room = null;
+                    for (var name in this.rooms) {
+                        var room = this.rooms[name];
+                        if (room.controller && room.controller.my == true && room.controller.level > 2) {
+                            //var range = this.manhattanDistance(flag.pos.roomName, room.name);
+                            var range = Game.map.findRoute(flag.pos.roomName, room.name).length;
+                            console.log('  candidate room '+room+' range is '+range+' (level='+room.controller.level+')');
+                            if (lo_range == null || range < lo_range) {
+                                lo_range = range;
+                                lo_room = room;
+                            }
+                        }
+                    }
+                    console.log('Flag '+flag+' assigned to room '+lo_room);
+                    if (typeof flag.memory == 'undefined') { flag.memory = {}; }
+                    flag.memory.owner = lo_room.name;
+                    owner_room = Game.rooms[flag.memory.owner];
+                }
+                // Add this flag to that room
+                if (!owner_room.dismantle_flags) { owner_room.dismantle_flags = []; }
+                owner_room.dismantle_flags.push(flag);
+
+
+                // Calculate and set spawn parameters
+                var lead = flag.memory.lead_time || 250; // Est.time from spawn command to flag reached
+                let fetchers = 1;
+
+                flag.memory.cooldown = Math.floor(CREEP_LIFE_TIME / (fetchers+1)); // How many ticks minimum between spawns? FIXME!!!
+                flag.memory.workforce = { 'Dismantler': 1, 'Fetcher': fetchers };
+
+                //flag.memory.frequency = 250; // TTL / 6
+                //flag.memory.ticks = (flag.memory.ticks + 1) || 0;
+            }
+
+            // Reserve controllers marked with a "reserve" flag
             if (flag.type() == 'reserve') {
                 // Find nearest room with an owned controller
                 //console.log('Assigning owner room to flag '+flag);

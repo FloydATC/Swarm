@@ -113,6 +113,7 @@ Creep.prototype.execute = function() {
     if (this.task == 'recycle') { this.task_recycle(); return; }
     if (this.task == 'pick up') { this.task_pick_up(); return; }
     if (this.task == 'mine') { this.task_mine(); return; }
+    if (this.task == 'dismantle') { this.task_dismantle(); return; }
     if (this.task == 'extract') { this.task_extract(); return; }
     if (this.task == 'reserve') { this.task_reserve(); return; }
     if (this.task == 'remote fetch') { this.task_remote_fetch(); return; }
@@ -380,13 +381,13 @@ Creep.prototype.task_hunt = function() {
                 console.log(this.room.link()+' '+this.name+' looking for nearby rooms under attack');
                 let roomnames = _.filter(_.keys(Memory.rooms), function(roomname) { return Memory.rooms[roomname].hostiles > 0; } );
                 if (roomnames.length > 0) {
-                    // Pick the closest one with manhattanDistance <= 2
-                    // TODO
-
-                    // For now, just pick the first
-                    console.log('  redirecting to room '+roomnames[0]);
-                    this.memory.destination == roomnames[0];
-                    return;
+                    // Pick the closest one with range <= 2
+                    let nearest = _.min(roomnames, function(roomname) { let range = Game.map.getRoomLinearDistance(creep.room.name, roomname); return (range <= 2 ? range : Infinity ); } );
+                    if (nearest != null) {
+                        this.memory.destination == nearest;
+                        console.log(this.room.link()+' '+this.name+' will assist '+this.room.link(nearest));
+                        return;
+                    }
                 }
 
                 // None? We are victorious!
@@ -599,6 +600,55 @@ Creep.prototype.task_mine = function() {
     }
 }
 
+Creep.prototype.task_dismantle = function() {
+    var flag = Game.flags[this.memory.flag];
+    //console.log(this.room.link()+' '+this+' executing task: dismantle');
+    if (flag == null) { this.memory.class = 'Drone'; return; }
+    flag.assign_worker(this); // Check in with flag
+    this.memory.tracking = true;
+    // In the right room yet?
+    if (this.room.name == this.memory.dismantle) {
+        //console.log(this.room.link()+' '+this+' has arrived in target room');
+        var structure = Game.getObjectById(flag.memory.structure);
+        if (structure == null) {
+            // Locate structure at flag
+            var found = this.room.lookForAt(LOOK_STRUCTURES, flag);
+            structure = found[0];
+            if (structure == null) { flag.remove(); return; } // User error
+            flag.memory.structure = structure.id;
+            //console.log(this.room.link()+' '+this+' identified structure to dismantle: '+structure);
+        }
+
+        // Register as arrived if we are within 3 tiles. Old creep may be in the way.
+        var arrived = this.memory.arrived || 0;
+        var range = this.room.rangeFromTo(this.pos, structure.pos);
+        if (arrived == 0 && range <= 3) {
+            this.memory.arrived = Game.time;
+        }
+
+        if (range > 1) {
+            // Move closer
+            this.move_to(structure);
+            //console.log('Dismantler '+this+' approaching structure ('+structure+' in '+this.memory.dismantle+')');
+        } else {
+            // Get energy
+            this.stop();
+            this.dismantle(structure);
+            //console.log(this.room.link()+' Dismantler '+this+' dismantling structure ('+structure+' in '+this.memory.dismantle+')');
+
+            // Nope. Just drop the energy on the ground then
+            this.drop(RESOURCE_ENERGY);
+
+        }
+        return;
+    } else {
+        // No. Try to reach the room marked with a flag.
+        this.move_to(flag);
+        //console.log('Dismantler '+this+' moving to flag ('+flag+' in '+this.memory.dismantle+')');
+        return;
+    }
+}
+
 Creep.prototype.task_extract = function() {
     var flag = Game.flags[this.memory.flag];
     if (flag == null) { this.memory.class = 'Drone'; return; }
@@ -720,18 +770,36 @@ Creep.prototype.task_remote_fetch = function() {
             // Locate source at flag
             var found = this.room.lookForAt(LOOK_SOURCES, flag);
             var source = found[0];
-            if (source == null) { flag.remove(); return; } // User error
-            if (this.room.rangeFromTo(this.pos, source.pos) > 1) {
-                // Move closer
-                this.move_to(source);
-                //console.log('Fetcher '+this+' approaching source ('+source+' in '+this.memory.mine+')');
+            if (source != null) {
+                if (this.room.rangeFromTo(this.pos, source.pos) > 1) {
+                    // Move closer
+                    this.move_to(source);
+                    //console.log('Fetcher '+this+' approaching source ('+source+' in '+this.memory.mine+')');
+                } else {
+                    // Get energy -- dedicated miner missing or behind schedule?
+                    this.stop();
+                    this.harvest(source);
+                    this.stop_timer();
+                    //console.log('Fetcher '+this+' harvesting source ('+source+' in '+this.memory.mine+')');
+                }
             } else {
-                // Get energy -- dedicated miner missing or behind schedule?
-                this.stop();
-                this.harvest(source);
-                this.stop_timer();
-                //console.log('Fetcher '+this+' harvesting source ('+source+' in '+this.memory.mine+')');
+                found = this.room.lookForAt(LOOK_STRUCTURES, flag);
+                var structure = found[0];
+                if (structure != null) {
+                    if (this.room.rangeFromTo(this.pos, structure.pos) > 1) {
+                        // Move closer
+                        this.move_to(structure);
+                        //console.log('Fetcher '+this+' approaching source ('+source+' in '+this.memory.mine+')');
+                    } else {
+                        // Get energy -- dedicated miner missing or behind schedule?
+                        this.stop();
+                        this.dismantle(structure);
+                        this.stop_timer();
+                        //console.log('Fetcher '+this+' dismantling structure ('+structure+' in '+this.memory.dismantle+')');
+                    }
+                }
             }
+
             // Dropped energy within reach? Grab it.
             //var treasures = this.pos.findInRange(FIND_DROPPED_ENERGY, 1);
             var treasures = this.energy_within_reach();
@@ -1087,7 +1155,7 @@ Creep.prototype.move_to = function(target) {
             },
         }
     );
-    if (ret.incomplete == true) { console.log(this.room.link()+' '+this+' got an incomplete path for '+target.pos); }
+    //if (ret.incomplete == true) { console.log(this.room.link()+' '+this+' got an incomplete path for '+target.pos); }
     //console.log(this+' PathFinder returned '+ret.path);
     Nav.learn_path(this.pos, target.pos, ret.path);
     this.moveTo(ret.path[0]);

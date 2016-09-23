@@ -7,7 +7,7 @@ Room.prototype.initialize = function() {
     this.my_creeps = this.find(FIND_MY_CREEPS);
     this.my_creeps = this.my_creeps.sort( function(a,b) { return a.ticksToLive - b.ticksToLive; } );
     this.dropped_energy = this.find(FIND_DROPPED_ENERGY);
-    this.dropped_other = this.find(FIND_DROPPED_RESOURCES, { filter: function(r) { return r.resourceType != RESOURCE_ENERGY; } });
+    this.dropped_other = this.find(FIND_DROPPED_RESOURCES);
     this.sources = this.find(FIND_SOURCES);
     this.spawns = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_SPAWN; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
     this.towers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_TOWER; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
@@ -196,6 +196,7 @@ Room.prototype.plan = function() {
     var csites = this.construction_sites.slice(0,2); // Max 3 at a time
     var need_repairs = this.need_repairs.slice(0,2); // Max 3 at a time
 
+    var dismantlers = [];   // Dismantle structures (local or remote)
     var miners = [];        // Mine energy (local or remote)
     var extractors = [];    // Mine resources
     var reservers = [];     // Reserve room controller
@@ -214,6 +215,7 @@ Room.prototype.plan = function() {
         var creep = my_creeps[i];
         if (typeof creep == 'object') {
             if (!creep.memory.class) { creep.memory.class = 'Drone'; console.log(this.link()+' AMNESIAC '+creep+' assigned to Drone class'); }
+            if (creep.memory.class == 'Dismantler') { dismantlers.push(creep);  continue; }
             if (creep.memory.class == 'Miner')      { miners.push(creep);       continue; }
             if (creep.memory.class == 'Extractor')  { extractors.push(creep);   continue; }
             if (creep.memory.class == 'Reserver')   { reservers.push(creep);    continue; }
@@ -240,6 +242,7 @@ Room.prototype.plan = function() {
     this.assign_task_travel(swarmers);
     this.assign_task_claim(infectors);
     this.assign_task_mine(miners);
+    this.assign_task_dismantle(dismantlers);
     this.assign_task_extract(extractors);
     this.assign_task_reserve(reservers);
     this.assign_task_remote_fetch(fetchers);
@@ -307,7 +310,7 @@ Room.prototype.plan = function() {
             //console.log(name+' distance to '+this.name+' is '+range);
             if (range <= 3) {
                 if (Memory.rooms[name].hostiles > 0 && Memory.rooms[name].scanned > Game.time - 1000) {
-                    console.log('  '+name+' is under attack, '+this.link()+' checking energy reserves ('+this.calc_spawn_reserves()+')');
+                    console.log(this.link(name)+' is under attack, '+this.link()+' checking energy reserves ('+this.calc_spawn_reserves().toFixed(1)+'%)');
                     if (this.calc_spawn_reserves() > 75) {
                         //console.log('  '+this.link()+' spawning assistance!');
                         // Spawn a hunter to assist!
@@ -433,6 +436,31 @@ Room.prototype.plan = function() {
             }
         }
     }
+    if (this.dismantle_flags && this.under_attack() == false) {
+        //console.log(this.link()+' has dismantle flags to consider: '+this.dismantle_flags);
+        for (var i in this.dismantle_flags) {
+            var flag = this.dismantle_flags[i];
+            var needs = flag.needs();
+            //console.log(this.link()+' owned flag '+flag+' needs '+needs);
+            if (needs == 'Dismantler') {
+                //console.log(this.link()+' spawning a dismantler for '+flag.pos.roomName);
+                var result = this.createCreep(this.schematic('Dismantler.3'), undefined, { class: 'Dismantler', home: this.name, dismantle: flag.pos.roomName, flag: flag.name } );
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Dismantler.2'), undefined, { class: 'Dismantler', home: this.name, dismantle: flag.pos.roomName, flag: flag.name } ); }
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Dismantler.1'), undefined, { class: 'Dismantler', home: this.name, dismantle: flag.pos.roomName, flag: flag.name } ); }
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Dismantler', home: this.name, dismantle: flag.pos.roomName, flag: flag.name } ); }
+                if (result == OK) { flag.spawned('Dismantler'); }
+                return;
+            }
+            if (needs == 'Fetcher') {
+                //console.log(this.link()+' spawning a remote fetcher for '+flag.pos.roomName);
+                var result = this.createCreep(this.schematic('Fetcher.2'), undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } );
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep(this.schematic('Fetcher.1'), undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } ); }
+                if (result == ERR_NOT_ENOUGH_ENERGY) { result = this.createCreep([WORK,CARRY,MOVE], undefined, { class: 'Fetcher', home: this.name, mine: flag.pos.roomName, flag: flag.name } ); }
+                if (result == OK) { flag.spawned('Fetcher'); }
+                return;
+            }
+        }
+    }
     if (this.reserve_flags && this.under_attack() == false) {
         //console.log(this.link()+' has harvest flags to consider: '+this.harvest_flags);
         for (var i in this.reserve_flags) {
@@ -543,6 +571,9 @@ Room.prototype.schematic = function(c) {
         case 'Miner.3': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
         case 'Miner.2': { hash[WORK] = 3; hash[CARRY] = 1; hash[MOVE] = 2; break; }
         case 'Miner.1': { hash[WORK] = 2; hash[CARRY] = 1; hash[MOVE] = 1; break; }
+        case 'Dismantler.3': { hash[WORK] = 20; hash[CARRY] = 1; hash[MOVE] = 12; break; }
+        case 'Dismantler.2': { hash[WORK] = 10; hash[CARRY] = 1; hash[MOVE] = 6; break; }
+        case 'Dismantler.1': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
         case 'Extractor.3': { hash[WORK] = 5; hash[CARRY] = 1; hash[MOVE] = 3; break; }
         case 'Extractor.2': { hash[WORK] = 3; hash[CARRY] = 1; hash[MOVE] = 2; break; }
         case 'Extractor.1': { hash[WORK] = 2; hash[CARRY] = 1; hash[MOVE] = 1; break; }
@@ -780,6 +811,15 @@ Room.prototype.assign_task_mine = function(miners) {
         miner.task = 'mine';
         miner.target = miner.id; // Dummy because flag doesn't have an id. Duh.
         //console.log(miner.name+' assigned to '+miner.task+' '+miner.target);
+    }
+}
+
+Room.prototype.assign_task_dismantle = function(dismantlers) {
+    while (dismantlers.length > 0) {
+        var dismantler = dismantlers.shift();
+        dismantler.task = 'dismantle';
+        dismantler.target = dismantler.id; // Dummy because flag doesn't have an id. Duh.
+        //console.log(dismantler.name+' assigned to '+dismantler.task+' '+dismantler.target);
     }
 }
 
