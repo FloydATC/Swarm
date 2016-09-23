@@ -367,7 +367,7 @@ Creep.prototype.is_harmless = function() {
 Creep.prototype.task_hunt = function() {
     this.memory.tracking = false;
     if (this.room.name == 'E26N36' || this.memory.destination == 'E26N36') { this.suicide(); }
-    if (this.memory.destination && this.memory.destination == this.room.name) {
+    if (this.room.hostile_creeps.length > 0 || (this.memory.destination && this.memory.destination == this.room.name)) {
         console.log(this.room.link()+' '+this.memory.class+' '+this.name+' hunting hostiles');
         // Attack!
         var targets = this.room.hostile_creeps.slice();
@@ -375,9 +375,26 @@ Creep.prototype.task_hunt = function() {
         while (Math.random() > 0.9) { target = this.shift_nearest(targets); } // Random chance to skip nearest
         //var target = this.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
         if (target == null) {
-            this.say('Victory!');
-            this.memory.idle = (this.memory.idle || 0) + 1;
-            if (this.memory.idle == 50) { this.suicide(); }
+            if (this.room.hostile_creeps.length == 0) {
+                // Look for other rooms nearby that require assistance
+                console.log(this.room.link()+' '+this.name+' looking for nearby rooms under attack');
+                let roomnames = _.filter(_.keys(Memory.rooms), function(roomname) { return Memory.rooms[roomname].hostiles > 0; } );
+                if (roomnames.length > 0) {
+                    // Pick the closest one with manhattanDistance <= 2
+                    // TODO
+
+                    // For now, just pick the first
+                    console.log('  redirecting to room '+roomnames[0]);
+                    this.memory.destination == roomnames[0];
+                    return;
+                }
+
+                // None? We are victorious!
+                this.say('Victory!');
+                this.memory.idle = (this.memory.idle || 0) + 1;
+                if (this.memory.idle == 50) { this.suicide(); }
+
+            }
         } else {
             this.memory.idle = 0;
             let range = this.room.rangeFromTo(this.pos, target.pos);
