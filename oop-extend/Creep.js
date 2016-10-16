@@ -931,6 +931,7 @@ Creep.prototype.task_feed_link = function() {
 Creep.prototype.task_build = function() {
     var target = Game.getObjectById(this.target); // Room has already assigned nearest?
     if (target == null) { target = this.shift_nearest(this.room.csites.slice()); }
+    console.log(this+' build target='+target);
     this.memory.tracking = true;
     if (this.pos.inRangeTo(target, 3)) {
         this.stop();
