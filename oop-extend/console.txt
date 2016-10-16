@@ -38,4 +38,6 @@ Memory.rooms['E28N41'].allow.filter( function(p) { p != 'Kotarou' } );
 Memory.rooms['E27N40'].allow.push('*');
 
 // Loop through all currently visible rooms
-_.forEach(_.keys(Game.rooms), function(name) { delete Memory.rooms[name].exits } );
+_.forEach(_.keys(Game.rooms), function(name) { delete Memory.rooms[name].roads } );
+
+// Loop through all rooms in memory

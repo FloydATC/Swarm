@@ -55,7 +55,7 @@ StructureTower.prototype.execute = function() {
         // Repair nearest damaged structure
         var damaged = this.room.need_repairs.slice();
         while (damaged.length > 0) {
-            var structure = damaged.shift();
+            var structure = this.shift_nearest(damaged);
             var range = this.pos.getRangeTo(structure);
             if (structure.repairing && structure.repairing + structure.hits > structure.hitsMax) { continue; } // Someone else already repairing
             if (structure.structureType == STRUCTURE_WALL && structure.hits > 10000 && range >= TOWER_FALLOFF_RANGE) { continue; }

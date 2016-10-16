@@ -7,30 +7,59 @@ Room.prototype.initialize = function() {
     this.my_creeps = this.find(FIND_MY_CREEPS);
     this.my_creeps = this.my_creeps.sort( function(a,b) { return a.ticksToLive - b.ticksToLive; } );
     this.dropped_energy = this.find(FIND_DROPPED_ENERGY);
-    this.dropped_other = this.find(FIND_DROPPED_RESOURCES);
-    this.sources = this.find(FIND_SOURCES);
-    this.spawns = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_SPAWN; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
-    this.towers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_TOWER; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
+    this.dropped_other = this.find(FIND_DROPPED_RESOURCES, { filter: function(r) { return r.resourceType != RESOURCE_ENERGY; } });
+
+    if (typeof this.sources == 'undefined') { this.sources = this.find(FIND_SOURCES); } // Re-use if possible
+    //this.spawns = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_SPAWN; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
+    //this.towers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_TOWER; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
     //this.roads = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_ROAD; } });
-    this.roads = this.find_roads();
-    this.links = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_LINK; } });
+    //this.roads = this.find_roads();
+    //this.links = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_LINK; } });
     //this.extensions = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTENSION; } }).sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
-    this.extensions = this.find_extensions();
-    this.containers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_CONTAINER; } });
+    //this.extensions = this.find_extensions();
+    //this.containers = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_CONTAINER; } });
 
     this.storage_energy_pct = 0;
     if (this.storage) {
         this.storage_energy_pct = this.storage.energy * 100 / this.storage.storeCapacity;
     }
 
-    this.extractor = null;
-    this.extractors = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTRACTOR; } });
-    if (this.extractors.length > 0) { this.extractor = this.extractors[0]; }
+    //this.extractor = null;
+    //this.extractors = this.find(FIND_STRUCTURES, { filter: function(s) { return s.structureType == STRUCTURE_EXTRACTOR; } });
+    //if (this.extractors.length > 0) { this.extractor = this.extractors[0]; }
 
     //this.storage = this.find(FIND_STRUCTURES, { filter: function(s) { s.structureType == STRUCTURE_STORAGE; } });
-    this.construction_sites = this.find(FIND_CONSTRUCTION_SITES).sort( function(a,b) { return b.progress - a.progress; } ); // Nearest completion first
+    this.construction_sites = this.find(FIND_CONSTRUCTION_SITES); //.sort( function(a,b) { return b.progress - a.progress; } ); // Nearest completion first
     var ambition = this.hp_ambition();
-    this.need_repairs = this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits && s.hits < ambition && s.hits < s.hitsMax; } }).sort( function(a,b) { return (a.hits - b.hits) || (a.ticksToDecay - b.ticksToDecay); } ); // Most urgent first
+    //this.need_repairs = this.find(FIND_STRUCTURES, { filter: function(s) { return s.hits && s.hits < ambition && s.hits < s.hitsMax; } }).sort( function(a,b) { return (a.hits - b.hits) || (a.ticksToDecay - b.ticksToDecay); } ); // Most urgent first
+
+    // Scan structures
+    this.extractor = null;
+    this.containers = [];
+    this.links = [];
+    this.roads = [];
+    this.spawns = [];
+    this.towers = [];
+    this.extensions = [];
+    this.need_repairs = [];
+    this.structures = this.find(FIND_STRUCTURES);
+    for (let i in this.structures) {
+        let s = this.structures[i];
+        if (s.hits && s.hits < ambition && s.hits < s.hitsMax) { this.need_repairs.push(s); }
+        switch (s.structureType) {
+            case STRUCTURE_EXTRACTOR:   this.extractor = s;         break;
+            case STRUCTURE_CONTAINER:   this.containers.push(s);    break;
+            case STRUCTURE_LINK:        this.links.push(s);         break;
+            case STRUCTURE_ROAD:        this.roads.push(s);         break;
+            case STRUCTURE_SPAWN:       this.spawns.push(s);        break;
+            case STRUCTURE_TOWER:       this.towers.push(s);        break;
+            case STRUCTURE_EXTENSION:   this.extensions.push(s);    break;
+        }
+    }
+    this.spawns.sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
+    this.towers.sort( function(a,b) { return a.energy - b.energy; } ); // Least energy first
+    //this.extensions.sort( function(a,b) { return a.energy - b.energy; } ); // NO POINT, we always consider nearest first
+    //this.need_repairs.sort( function(a,b) { return (a.hits - b.hits) || (a.ticksToDecay - b.ticksToDecay); } ); // NO POINT, we always consider nearest first
 
     this.timer = {}; // Used by .start_timer() and .stop_timer()
     this.total = {}; // Accumulated timers, used by .show_totals()
@@ -70,9 +99,6 @@ Room.prototype.initialize = function() {
     var total = 0;
     _.forEach(this.dropped_energy, function(nrg) { total += nrg.amount } );
     this.total_dropped_energy = total;
-
-    // Neighbor room route cache
-    if (typeof this.memory.to == 'undefined') { this.memory.to = {}; }
 
     // Owned room?
     if (this.controller && this.controller.my) {
@@ -123,25 +149,6 @@ Room.prototype.initialize = function() {
     }
 
 
-    delete this.memory.exits;
-/*
-    // Record exits if not already done (Store in encoded format)
-    if (typeof this.memory.exits == 'undefined') {
-        this.memory.exits = {};
-        var directions = [ FIND_EXIT_TOP, FIND_EXIT_LEFT, FIND_EXIT_BOTTOM, FIND_EXIT_RIGHT ];
-        for (var i in directions) {
-            var direction = directions[i];
-            var exits = this.find(direction);
-            var encoded = '';
-            for (var j in exits) {
-                var exit = exits[j];
-                //console.log(this.link()+' exit dir '+direction+' no '+j+' = '+JSON.stringify(exit));
-                encoded = encoded + String.fromCharCode(exit.x + (50 * exit.y));
-            }
-            this.memory.exits[direction] = encoded;
-        }
-    }
-*/
 
 
     for (var i=0; i<this.links.length; i++) { this.links[i].initialize(); }
@@ -154,7 +161,7 @@ Room.prototype.initialize = function() {
     if (this.terminal != null) { this.terminal.initialize(); }
 
     //console.log(this.link()+' containers: '+this.containers);
-    this.containers = this.containers.sort( function(a,b) { return a.free - b.free; } ); // Note: Must initialize before sorting
+    //this.containers = this.containers.sort( function(a,b) { return a.free - b.free; } ); // Note: Must initialize before sorting
 }
 
 Room.prototype.under_attack = function() {
@@ -163,6 +170,7 @@ Room.prototype.under_attack = function() {
     if (mem == null) { mem = 0; }
     if (mem == 0 && hostiles > 0) { console.log(this.link()+' IS UNDER ATTACK'); }
     if (mem > 0 && hostiles == 0) { console.log(this.link()+' no longer under attack'); }
+    this.memory.hostiles = hostiles;
     return (hostiles > 0); // true if hostiles spotted
 }
 
@@ -293,9 +301,11 @@ Room.prototype.plan = function() {
             if (this.createCreep(this.schematic('Hunter'), undefined, { class: 'Hunter', destination: this.name }) == OK) { return; }
             // Emergency, spawn biters and spitters if possible
             //if (Math.random() > 0.80) { this.createCreep(this.schematic('Healer'), undefined, { class: 'Healer' }); return; }
-            if (Math.random() > 0.50) { this.createCreep(this.schematic('Spitter'), undefined, { class: 'Spitter' }); return; }
-            this.createCreep(this.schematic('Biter'), undefined, { class: 'Biter' });
-            return;
+            if (this.my_creeps.length < 16) {
+                if (Math.random() > 0.50) { this.createCreep(this.schematic('Spitter'), undefined, { class: 'Spitter' }); return; }
+                this.createCreep(this.schematic('Biter'), undefined, { class: 'Biter' });
+                return;
+            }
         }
     } else {
         // If we are NOT under attack, check for other rooms that may require assistance
@@ -310,7 +320,7 @@ Room.prototype.plan = function() {
             //console.log(name+' distance to '+this.name+' is '+range);
             if (range <= 3) {
                 if (Memory.rooms[name].hostiles > 0 && Memory.rooms[name].scanned > Game.time - 1000) {
-                    console.log(this.link(name)+' is under attack, '+this.link()+' checking energy reserves ('+this.calc_spawn_reserves().toFixed(1)+'%)');
+                    //console.log(this.link(name)+' is under attack, '+this.link()+' checking energy reserves ('+this.calc_spawn_reserves().toFixed(1)+'%)');
                     if (this.calc_spawn_reserves() > 75) {
                         //console.log('  '+this.link()+' spawning assistance!');
                         // Spawn a hunter to assist!
@@ -362,33 +372,45 @@ Room.prototype.plan = function() {
             if (result == OK) { this.memory.last_drone_spawned = Game.time; }
             return;
         }
-    }
-    //console.log(this.link()+' time='+Game.time+' colonize='+(Game.colonize ? 'yes' : 'no')+' request='+(Game.request_drones ? 'yes' : 'no'));
-    if (Game.colonize && Game.time % 300 == 0 && this.under_attack() == false) {
-        if (Game.manhattanDistance(this.name, Game.colonize) <= 2 && (!(Game.rooms[Game.colonize]) || Game.rooms[Game.colonize].controller && Game.rooms[Game.colonize].controller.my == false)) {
-            //console.log(this.link()+' spawning a creep to claim '+Game.colonize);
-            var result = this.createCreep([MOVE,CARRY,WORK,CLAIM], undefined, { class: 'Swarmer', destination: Game.colonize });
-            return;
-        } else {
-            //console.log(this.link()+' would like to help colonize but, gee, '+Game.colonize+' is awfully far away: '+Game.manhattanDistance(this.name, Game.colonize));
-        }
-    }
-    if (Game.request_drones && Game.time % 300 == 0 && this.under_attack() == false) {
-        if (Game.manhattanDistance(this.name, Game.request_drones) <= 2 && Game.rooms[Game.request_drones].controller && Game.rooms[Game.request_drones].controller.my == true) {
-            //console.log(this.link()+' spawning a creep to build spawn in '+Game.request_drones);
-            // Try to spawn a drone appropriate for this room controller level
-            var result = null;
-            for (var level=this.controller.level; level>0; level--) {
-                result = this.createCreep(this.schematic('Drone.'+level), undefined, { class: 'Swarmer', destination: Game.request_drones });
-                if (result == OK) { break; }
-                if (result == ERR_NOT_ENOUGH_ENERGY) { continue; }
-                //console.log(this.link()+' createCreep returned '+result);
-                break;
+
+        let colonize_interval = 100;
+        //console.log(this.link()+' time='+Game.time+' ('+(Game.time % colonize_interval)+'/'+colonize_interval+') colonize='+(Game.colonize ? 'yes' : 'no')+' request='+(Game.request_drones ? 'yes' : 'no'));
+        if (this.under_attack() == false && Game.time % colonize_interval == 0) {
+            if (Game.colonize) {
+                if (this.can_colonize(Game.colonize)) {
+                    if (Game.manhattanDistance(this.name, Game.colonize) <= 3) {
+                        console.log(this.link()+' spawning a creep to claim '+Game.colonize);
+                        var result = this.createCreep([MOVE,CARRY,WORK,CLAIM], undefined, { class: 'Swarmer', destination: Game.colonize });
+                        return;
+                    } else {
+                        console.log(this.link()+' would like to help colonize but, gee, '+Game.colonize+' is awfully far away: '+Game.manhattanDistance(this.name, Game.colonize));
+                    }
+                } else {
+                    console.log(Game.colonize+' can not be colonized at this time');
+                }
             }
-            //var result = this.createCreep(this.schematic('Drone'), undefined, { class: 'Swarmer', destination: Game.request_drones });
-            return;
-        } else {
-            //console.log(this.link()+' would like to help build but, gee, '+Game.request_drones+' is awfully far away: '+Game.manhattanDistance(this.name, Game.request_drones));
+            if (Game.request_drones) {
+                if (Game.rooms[Game.request_drones] && Game.rooms[Game.request_drones].controller && Game.rooms[Game.request_drones].controller.my == true) {
+                    if (Game.manhattanDistance(this.name, Game.request_drones) <= 3) {
+                        console.log(this.link()+' spawning a creep to build spawn in '+Game.request_drones);
+                        // Try to spawn a drone appropriate for this room controller level
+                        var result = null;
+                        for (var level=this.controller.level; level>0; level--) {
+                            result = this.createCreep(this.schematic('Drone.'+level), undefined, { class: 'Swarmer', destination: Game.request_drones });
+                            if (result == OK) { break; }
+                            if (result == ERR_NOT_ENOUGH_ENERGY) { continue; }
+                            //console.log(this.link()+' createCreep returned '+result);
+                            break;
+                        }
+                        //var result = this.createCreep(this.schematic('Drone'), undefined, { class: 'Swarmer', destination: Game.request_drones });
+                        return;
+                    } else {
+                        console.log(this.link()+' would like to help build but, gee, '+Game.request_drones+' is awfully far away: '+Game.manhattanDistance(this.name, Game.request_drones));
+                    }
+                } else {
+                    console.log(Game.request_drones+' cis currently unavailable for building');
+                }
+            }
         }
     }
     if (this.controller && this.controller.flag && this.under_attack() == false) {
@@ -479,7 +501,7 @@ Room.prototype.plan = function() {
             }
         }
     }
-    if (this.extractor_flags && this.storage && this.storage.energy_pct > 75 && this.terminal && this.terminal.free_pct > 25 &&  this.under_attack() == false) {
+    if (false && this.extractor_flags && this.storage && this.storage.energy_pct > 75 && this.terminal && this.terminal.free_pct > 25 &&  this.under_attack() == false) {
         //console.log(this.link()+' has extractor flags to consider: '+this.extractor_flags);
         for (var i in this.extractor_flags) {
             var flag = this.extractor_flags[i];
@@ -640,6 +662,16 @@ Room.prototype.execute = function() {
     for (var i=0; i<this.towers.length; i++) { this.towers[i].execute(); }
     for (var i=0; i<this.links.length; i++) { this.links[i].execute(); }
     for (var i=0; i<this.my_creeps.length; i++) { this.my_creeps[i].execute(); }
+}
+
+Room.prototype.can_colonize = function(roomname) {
+    if (! Game.rooms[roomname]) { return false; } // No vision
+    let room = Game.rooms[roomname];
+    if (! room.controller) { return false; } // Room has no controller
+    if (room.controller.my == true) { return false; }  // Room is already claimed by us
+    if (! room.controller.reservation) { return true; } // Unreserved
+    if (room.controller.reservation.username == this.controller.owner.username) { return true; } // Reserved by us
+    return false;
 }
 
 Room.prototype.calc_energy_reserves = function() {
@@ -930,23 +962,22 @@ Room.prototype.assign_task_pick_up = function(drones, drops) {
         var loot = drone.shift_nearest(drops);
         drone.task = 'pick up';
         drone.target = loot.id;
-        //console.log(drone.name+' assigned to '+drone.task+' '+loot);
+        if (drone.memory.debug) { console.log(this.link()+' '+drone.name+' assigned to '+drone.task+' '+loot); }
     }
 }
 
 Room.prototype.assign_task_feed_extension = function(drones, extensions) {
     var count = 0;
     extensions = _.filter(extensions, function(e) { return e.energy < e.energyCapacity; } );
+    //console.log(this.link()+' extensions that need energy: '+extensions.length);
     while (drones.length > 0 && extensions.length > 0 && count < 3) {
         var drone = drones.shift();
-        while (extensions.length > 0) {
-            var extension = drone.shift_nearest(extensions);
-            drone.task = 'feed extension';
-            drone.target = extension.id;
-            count++;
-            //console.log(drone.name+' assigned to '+drone.task+' '+extension);
-            break;
-        }
+        var extension = drone.shift_nearest(extensions);
+        drone.task = 'feed extension';
+        drone.target = extension.id;
+        count++;
+        //console.log(this.link()+' '+drone.name+' assigned to '+drone.task+' '+extension);
+        //drone.say('!!!');
     }
 }
 
@@ -1086,7 +1117,7 @@ Room.prototype.expire_routes = function() {
     delete this.memory.router;
     if (this.memory.r) {
       var count = 0;
-        var maxage = 1800; // Drop routing table for tiles not visited in 'maxage' ticks
+        var maxage = 1200; // Drop routing table for tiles not visited in 'maxage' ticks
         var tiles = Object.keys(this.memory.r);
         for (var i=0; i<tiles.length; i++) {
             var mru = this.memory.r[tiles[i]]['mru'];

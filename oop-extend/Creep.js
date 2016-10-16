@@ -75,25 +75,25 @@ Creep.prototype.speak = function() {
 
 Creep.prototype.execute = function() {
 
-    if (Math.random() > 0.9) { this.speak(); }
+    //if (Math.random() > 0.9) { this.speak(); }
     var debug = this.memory.debug || false;
-    if (debug) { console.log(this+' execute: task='+this.memory.task.type+' target='+this.memory.target+' is_full='+this.is_full()+' is_empty='+this.is_empty()+' ttl='+this.ticksToLive); }
+    if (debug) { console.log(this+' execute: task='+this.memory.task.type+' target='+this.target+' is_full='+this.is_full()+' is_empty='+this.is_empty()+' ttl='+this.ticksToLive); }
 
     // Consider new roads
     if (this.fatigue > 0 && this.memory.tracking == true) { this.room.consider_road(this); }
 
     var target = Game.getObjectById(this.target);
-    //console.log(this+' target '+target);
+    if (debug) { console.log(this+' target '+target); }
     if (this.memory.class == 'Drone' && target == null) {
-        console.log(this.room.link()+' '+this+' is confused: target='+target+' task='+this.memory.task.type);
-        if (this.room.controller && (this.room.controller.level < 3 || this.room.spawn_reserves() > 50)) {
-            target = this.room.controller;
-            this.task = 'upgrade';
-            this.target = this.room.controller.id;
-        } else {
-            this.task = 'none';
-            this.target = null;
-        }
+        console.log(this.room.link()+' '+this+' is confused? target='+target+' task='+this.memory.task.type);
+//        if (this.room.controller && (this.room.controller.level < 3 || this.room.spawn_reserves > 50)) {
+//            target = this.room.controller;
+//            this.task = 'upgrade';
+//            this.target = this.room.controller.id;
+//        } else {
+//            this.task = 'none';
+//            this.target = null;
+//        }
     }
     //console.log(this+' executing task: '+this.task+' '+(target || ''));
     //this.say(this.task);
@@ -225,31 +225,6 @@ Creep.prototype.get_energy = function() {
         }
     }
 
-    // Consider fetching energy from a container
-    if (debug) { console.log(this+' considers fetching energy from a container to '+this.memory.task.type); }
-    if (true) {
-        var containers = this.room.containers.slice();
-        while (containers.length > 0) {
-            var container = this.shift_nearest(containers);
-            if (container instanceof StructureContainer) {
-                var reserved = container.reserved_amount || 0;
-                var wanted = this.carryCapacity - _.sum(this.carry);
-                var available = container.store.energy;
-                if (available < reserved + wanted) { continue; } // Not enough left for me
-                if (debug) { console.log(this+' decided to fetch from '+container+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')'); }
-                container.reserved_amount = reserved + wanted;
-                if (this.pos.inRangeTo(container, 1)) {
-                    this.withdraw(container, RESOURCE_ENERGY);
-                    this.memory.tracking = true;
-                } else {
-                    this.move_to(container);
-                    this.memory.tracking = true;
-                }
-                return;
-            }
-        }
-    }
-
     // Consider fetching energy from the nearest link
     if (debug) { console.log(this+' considers fetching energy from nearest link'); }
     if (this.task != 'feed link') {
@@ -275,6 +250,31 @@ Creep.prototype.get_energy = function() {
                 return;
             }
             break; // Only consider the nearest link!
+        }
+    }
+
+    // Consider fetching energy from a container
+    if (debug) { console.log(this+' considers fetching energy from a container to '+this.memory.task.type); }
+    if (true) {
+        var containers = this.room.containers.slice();
+        while (containers.length > 0) {
+            var container = this.shift_nearest(containers);
+            if (container instanceof StructureContainer) {
+                var reserved = container.reserved_amount || 0;
+                var wanted = this.carryCapacity - _.sum(this.carry);
+                var available = container.store.energy;
+                if (available < reserved + wanted) { continue; } // Not enough left for me
+                if (debug) { console.log(this+' decided to fetch from '+container+' (available='+available+' , reserved='+reserved+', wanted='+wanted+')'); }
+                container.reserved_amount = reserved + wanted;
+                if (this.pos.inRangeTo(container, 1)) {
+                    this.withdraw(container, RESOURCE_ENERGY);
+                    this.memory.tracking = true;
+                } else {
+                    this.move_to(container);
+                    this.memory.tracking = true;
+                }
+                return;
+            }
         }
     }
 
@@ -382,6 +382,7 @@ Creep.prototype.task_hunt = function() {
                 let roomnames = _.filter(_.keys(Memory.rooms), function(roomname) { return Memory.rooms[roomname].hostiles > 0; } );
                 if (roomnames.length > 0) {
                     // Pick the closest one with range <= 2
+                    let creep = this;
                     let nearest = _.min(roomnames, function(roomname) { let range = Game.map.getRoomLinearDistance(creep.room.name, roomname); return (range <= 2 ? range : Infinity ); } );
                     if (nearest != null) {
                         this.memory.destination == nearest;
@@ -404,7 +405,7 @@ Creep.prototype.task_hunt = function() {
                 if (this.hits < this.hitsMax) { this.heal(this); }// Attempt to heal self
                 if (this.on_rampart() == false) {
                     //console.log('  advancing on target');
-                    this.move_to(target); // Close on target
+                    this.move_to(target, 3); // Close on target
                 } else {
                     //console.log('  standing my ground');
                 }
@@ -427,7 +428,7 @@ Creep.prototype.task_hunt = function() {
     }
     if (this.memory.destination && this.memory.destination != this.room.name) {
         console.log(this.room.link()+' '+this.memory.class+' '+this.name+' heading for '+this.room.link(this.memory.destination)+' to assist');
-        this.move_to({ pos: new RoomPosition(25, 25, this.memory.destination) });
+        this.move_to({ pos: new RoomPosition(25, 25, this.memory.destination) }, 20);
         return;
     }
     if (this.hits < this.hitsMax) { this.heal(this); }// Attempt to heal self
@@ -467,7 +468,7 @@ Creep.prototype.task_ranged_attack = function() {
         this.add_stats('ranged attack')
     } else {
         if (this.on_rampart() == false) {
-            this.move_to(target);
+            this.move_to(target, 3);
         }
     }
     return;
@@ -492,10 +493,14 @@ Creep.prototype.task_recycle = function() {
 Creep.prototype.task_pick_up = function() {
     var target = Game.getObjectById(this.target);
     this.memory.tracking = false;
+    // This task should NOT be used for picking up energy!
+    if (target.resourceType == RESOURCE_ENERGY) { console.log(this+' task=pick up type=RESOURCE_ENERGY is invalid'); }
     if (this.pos.inRangeTo(target, 1)) {
         this.stop();
         this.pickup(target);
+        if (this.memory.debug) { console.log(this+' picking up '+target); }
     } else {
+        if (this.memory.debug) { console.log(this+' moving to pick up '+target); }
         if (this.carry.energy) { this.drop(RESOURCE_ENERGY); } // Make room for valuables!
         this.move_to(target);
     }
@@ -890,7 +895,7 @@ Creep.prototype.task_claim = function() {
 }
 
 Creep.prototype.task_travel = function() {
-    var result = this.move_to({ pos: new RoomPosition(25, 25, this.memory.destination)});
+    var result = this.move_to({ pos: new RoomPosition(25, 25, this.memory.destination)}, 10);
     this.memory.tracking = true;
     //console.log(this+' moveTo '+this.memory.destination+' result='+result);
     return;
@@ -899,6 +904,7 @@ Creep.prototype.task_travel = function() {
 Creep.prototype.task_feed = function() {
     var target = Game.getObjectById(this.target);
     this.memory.tracking = true;
+    //this.say('f:'+target.pos.x+','+target.pos.y);
     if (this.pos.inRangeTo(target, 1)) {
         this.stop();
         this.transfer(target, RESOURCE_ENERGY);
@@ -923,20 +929,20 @@ Creep.prototype.task_feed_link = function() {
 }
 
 Creep.prototype.task_build = function() {
-    var target = Game.getObjectById(this.target);
+    var target = Game.getObjectById(this.target); // Room has already assigned nearest
     this.memory.tracking = true;
     if (this.pos.inRangeTo(target, 3)) {
         this.stop();
         this.build(target);
         this.add_stats('build')
     } else {
-        this.move_to(target);
+        this.move_to(target, 3);
     }
     return;
 }
 
 Creep.prototype.task_repair = function() {
-    var target = Game.getObjectById(this.target);
+    var target = Game.getObjectById(this.target); // Room has already assigned nearest
     this.memory.tracking = true;
     //this.say(target.pos.x+','+target.pos.y);
     if (this.pos.inRangeTo(target, 3)) {
@@ -944,7 +950,7 @@ Creep.prototype.task_repair = function() {
         this.repair(target)
         this.add_stats('repair')
     } else {
-        this.move_to(target); // Stay in this room!
+        this.move_to(target, 3); // Stay in this room!
     }
     return;
 }
@@ -997,7 +1003,7 @@ Creep.prototype.task_upgrade = function() {
             this.upgradeController(ctrl);
             this.add_stats('upgrade');
         } else {
-            this.move_to(ctrl);
+            this.move_to(ctrl, 3);
         }
         return;
     }
@@ -1076,9 +1082,11 @@ Creep.prototype.learn_serialized_path = function(to, p) {
     return OK;
 }
 
-Creep.prototype.move_to = function(target) {
+Creep.prototype.move_to = function(target, within) {
     if (this.fatigue > 0) { return; }
     this.add_stats('move');
+
+
 
     // Check for tile hint
     var direction = Nav.get_direction(this.pos, target.pos);
@@ -1105,7 +1113,7 @@ Creep.prototype.move_to = function(target) {
 
     // Use new pathfinder
     this.say('slow');
-    var goal = { pos: target.pos, range: 1 };
+    var goal = { pos: target.pos, range: (within || 1) };
     var ret = PathFinder.search(
         this.pos, goal,
         {
@@ -1113,6 +1121,7 @@ Creep.prototype.move_to = function(target) {
             // can set the road cost lower in `roomCallback`
             plainCost: 2,
             swampCost: 10,
+            maxOps: 3000,
 
             roomCallback: function(roomName) {
 
