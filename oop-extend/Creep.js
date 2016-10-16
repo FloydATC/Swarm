@@ -929,7 +929,8 @@ Creep.prototype.task_feed_link = function() {
 }
 
 Creep.prototype.task_build = function() {
-    var target = Game.getObjectById(this.target); // Room has already assigned nearest
+    var target = Game.getObjectById(this.target); // Room has already assigned nearest?
+    if (target == null) { this.shift_nearest(this.room.csites.slice()); }
     this.memory.tracking = true;
     if (this.pos.inRangeTo(target, 3)) {
         this.stop();
@@ -943,6 +944,7 @@ Creep.prototype.task_build = function() {
 
 Creep.prototype.task_repair = function() {
     var target = Game.getObjectById(this.target); // Room has already assigned nearest
+    if (target == null) { this.shift_nearest(this.room.need_repairs.slice()); }
     this.memory.tracking = true;
     //this.say(target.pos.x+','+target.pos.y);
     if (this.pos.inRangeTo(target, 3)) {
